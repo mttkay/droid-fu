@@ -17,7 +17,13 @@ import com.github.droidfu.DroidFu;
 import com.github.droidfu.imageloader.ImageLoader;
 import com.github.droidfu.imageloader.ImageLoaderHandler;
 
-public class GalleryItem extends ViewSwitcher {
+/**
+ * An image view that fetches its image off the web using the supplied URL.
+ * While the image is being downloaded, a progress indicator will be shown.
+ * 
+ * @author Matthias Kaeppler
+ */
+public class WebImageView extends ViewSwitcher {
 
     private String imageUrl;
 
@@ -27,26 +33,59 @@ public class GalleryItem extends ViewSwitcher {
 
     private ImageView imageView;
 
+    private ScaleType scaleType = ScaleType.CENTER_CROP;
+
     private Drawable progressDrawable;
 
-    public GalleryItem(Context context, String imageUrl,
-            Drawable progressDrawable) {
+    /**
+     * @param context
+     *        the view's current context
+     * @param imageUrl
+     *        the URL of the image to download and show
+     * @param autoLoad
+     *        Whether the download should start immediately after creating the
+     *        view. If set to false, use {@link WebImageView.loadImage()} to
+     *        manually trigger the image download.
+     */
+    public WebImageView(Context context, String imageUrl, boolean autoLoad) {
         super(context);
-        initialize(context, imageUrl, progressDrawable, false);
+        initialize(context, imageUrl, null, autoLoad);
     }
 
-    public GalleryItem(Context context, AttributeSet attributes) {
+    /**
+     * @param context
+     *        the view's current context
+     * @param imageUrl
+     *        the URL of the image to download and show
+     * @param progressDrawable
+     *        the drawable to be used for the {@link ProgressBar} which is
+     *        displayed while the image is loading
+     * @param autoLoad
+     *        Whether the download should start immediately after creating the
+     *        view. If set to false, use {@link WebImageView.loadImage()} to
+     *        manually trigger the image download.
+     */
+    public WebImageView(Context context, String imageUrl,
+            Drawable progressDrawable, boolean autoLoad) {
+        super(context);
+        initialize(context, imageUrl, progressDrawable, autoLoad);
+    }
+
+    public WebImageView(Context context, AttributeSet attributes) {
         super(context, attributes);
-        //TypedArray styles = context.obtainStyledAttributes(attributes,
-        //        R.styleable.GalleryItem);
+        // TypedArray styles = context.obtainStyledAttributes(attributes,
+        // R.styleable.GalleryItem);
         int progressDrawableId = attributes.getAttributeResourceValue(
-                DroidFu.XMLNS, "progressDrawable",
-                android.R.drawable.ic_popup_sync);
+            DroidFu.XMLNS, "progressDrawable", 0);
+        Drawable progressDrawable = null;
+        if (progressDrawableId > 0) {
+            progressDrawable = context.getResources().getDrawable(
+                progressDrawableId);
+        }
         initialize(context, attributes.getAttributeValue(DroidFu.XMLNS,
-                "imageUrl"), context.getResources().getDrawable(
-                progressDrawableId), attributes.getAttributeBooleanValue(
-                DroidFu.XMLNS, "autoLoad", true));
-        //styles.recycle();
+            "imageUrl"), progressDrawable, attributes.getAttributeBooleanValue(
+            DroidFu.XMLNS, "autoLoad", true));
+        // styles.recycle();
     }
 
     private void initialize(Context context, String imageUrl,
@@ -73,26 +112,35 @@ public class GalleryItem extends ViewSwitcher {
     private void addLoadingSpinnerView(Context context) {
         loadingSpinner = new ProgressBar(context);
         loadingSpinner.setIndeterminate(true);
-        loadingSpinner.setIndeterminateDrawable(progressDrawable);
-        if (progressDrawable instanceof AnimationDrawable) {
-            final AnimationDrawable d = (AnimationDrawable) progressDrawable;
-            d.start();
+        if (this.progressDrawable == null) {
+            this.progressDrawable = loadingSpinner.getIndeterminateDrawable();
+        } else {
+            loadingSpinner.setIndeterminateDrawable(progressDrawable);
+            if (progressDrawable instanceof AnimationDrawable) {
+                ((AnimationDrawable) progressDrawable).start();
+            }
         }
+
         LayoutParams lp = new LayoutParams(
-                progressDrawable.getIntrinsicWidth(),
-                progressDrawable.getIntrinsicHeight());
+            progressDrawable.getIntrinsicWidth(), progressDrawable
+                .getIntrinsicHeight());
         lp.gravity = Gravity.CENTER;
+
         addView(loadingSpinner, 0, lp);
     }
 
     private void addImageView(Context context) {
         imageView = new ImageView(context);
-        imageView.setScaleType(ScaleType.CENTER_CROP);
+        imageView.setScaleType(scaleType);
         ViewGroup.LayoutParams lp = new ViewGroup.LayoutParams(
-                LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+            LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
         addView(imageView, 1, lp);
     }
 
+    /**
+     * Use this method to trigger the image download if you had previously set
+     * autoLoad to false.
+     */
     public void loadImage() {
         ImageLoader.start(imageUrl, new GalleryImageLoaderHandler());
     }
