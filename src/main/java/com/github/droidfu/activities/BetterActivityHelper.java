@@ -1,6 +1,5 @@
 package com.github.droidfu.activities;
 
-import java.lang.reflect.Method;
 import java.util.List;
 
 import android.app.Activity;
@@ -29,6 +28,7 @@ class BetterActivityHelper {
 
     public static final String INFO_DIALOG_TITLE_RESOURCE = "droidfu_info_dialog_title";
 
+    // FIXME: this method currently doesn't work as advertised
     public static int getWindowFeatures(Activity activity) {
         Window window = activity.getWindow();
         if (window == null) {
@@ -37,7 +37,7 @@ class BetterActivityHelper {
         try {
             // Method m =
             // activity.getWindow().getClass().getMethod("getFeatures");
-            Method[] m = window.getClass().getMethods();
+            // Method[] m = window.getClass().getMethods();
             // m.setAccessible(true);
             // return (Integer) m.invoke(window);
             return 0;
@@ -46,22 +46,20 @@ class BetterActivityHelper {
         }
     }
 
-    public static ProgressDialog createProgressDialog(Activity activity,
-            int progressDialogTitleId, int progressDialogMsgId) {
+    public static ProgressDialog createProgressDialog(Activity activity, int progressDialogTitleId,
+            int progressDialogMsgId) {
         ProgressDialog progressDialog = new ProgressDialog(activity);
         if (progressDialogTitleId > 0) {
             progressDialog.setTitle(progressDialogTitleId);
         } else {
             progressDialog.setTitle(activity.getResources().getIdentifier(
-                    PROGRESS_DIALOG_TITLE_RESOURCE, "string",
-                    activity.getPackageName()));
+                PROGRESS_DIALOG_TITLE_RESOURCE, "string", activity.getPackageName()));
         }
         if (progressDialogMsgId > 0) {
             progressDialog.setMessage(activity.getString(progressDialogMsgId));
         } else {
             progressDialogMsgId = activity.getResources().getIdentifier(
-                    PROGRESS_DIALOG_MESSAGE_RESOURCE, "string",
-                    activity.getPackageName());
+                PROGRESS_DIALOG_MESSAGE_RESOURCE, "string", activity.getPackageName());
             progressDialog.setMessage(activity.getString(progressDialogMsgId));
         }
         progressDialog.setIndeterminate(true);
@@ -69,8 +67,8 @@ class BetterActivityHelper {
         return progressDialog;
     }
 
-    public static void showMessageDialog(final Activity activity,
-            String dialogTitle, String screenMessage, int iconResourceId) {
+    public static void showMessageDialog(final Activity activity, String dialogTitle,
+            String screenMessage, int iconResourceId) {
         try {
             Log.e("ERROR", screenMessage);
 
@@ -102,22 +100,20 @@ class BetterActivityHelper {
         }
     }
 
-    public static void showMessageDialog(Activity activity, String dialogTitle,
-            Exception error) {
+    public static void showMessageDialog(Activity activity, String dialogTitle, Exception error) {
         error.printStackTrace();
         String screenMessage = "";
         if (error instanceof ResourceMessageException) {
-            screenMessage = activity.getString(((ResourceMessageException) error).getClientMessageResourceId());
+            screenMessage = activity.getString(((ResourceMessageException) error)
+                .getClientMessageResourceId());
         } else {
             screenMessage = error.getLocalizedMessage();
         }
-        showMessageDialog(activity, dialogTitle, screenMessage,
-                android.R.drawable.ic_dialog_alert);
+        showMessageDialog(activity, dialogTitle, screenMessage, android.R.drawable.ic_dialog_alert);
     }
 
-    public static <T> Dialog newListDialog(Context context,
-            final List<T> elements, final DialogClickListener<T> listener,
-            final boolean closeOnSelect) {
+    public static <T> Dialog newListDialog(Context context, final List<T> elements,
+            final DialogClickListener<T> listener, final boolean closeOnSelect) {
 
         String[] entries = new String[elements.size()];
         for (int i = 0; i < elements.size(); i++) {
@@ -125,15 +121,14 @@ class BetterActivityHelper {
         }
 
         Builder builder = new AlertDialog.Builder(context);
-        builder.setSingleChoiceItems(entries, 0,
-                new DialogInterface.OnClickListener() {
+        builder.setSingleChoiceItems(entries, 0, new DialogInterface.OnClickListener() {
 
-                    public void onClick(DialogInterface dialog, int which) {
-                        if (closeOnSelect)
-                            dialog.dismiss();
-                        listener.onClick(which, elements.get(which));
-                    }
-                });
+            public void onClick(DialogInterface dialog, int which) {
+                if (closeOnSelect)
+                    dialog.dismiss();
+                listener.onClick(which, elements.get(which));
+            }
+        });
 
         return builder.create();
     }
