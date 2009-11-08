@@ -65,8 +65,8 @@ public class WebImageView extends ViewSwitcher {
      *        view. If set to false, use {@link WebImageView.loadImage()} to
      *        manually trigger the image download.
      */
-    public WebImageView(Context context, String imageUrl,
-            Drawable progressDrawable, boolean autoLoad) {
+    public WebImageView(Context context, String imageUrl, Drawable progressDrawable,
+            boolean autoLoad) {
         super(context);
         initialize(context, imageUrl, progressDrawable, autoLoad);
     }
@@ -75,23 +75,23 @@ public class WebImageView extends ViewSwitcher {
         super(context, attributes);
         // TypedArray styles = context.obtainStyledAttributes(attributes,
         // R.styleable.GalleryItem);
-        int progressDrawableId = attributes.getAttributeResourceValue(
-            DroidFu.XMLNS, "progressDrawable", 0);
+        int progressDrawableId = attributes.getAttributeResourceValue(DroidFu.XMLNS,
+            "progressDrawable", 0);
         Drawable progressDrawable = null;
         if (progressDrawableId > 0) {
-            progressDrawable = context.getResources().getDrawable(
-                progressDrawableId);
+            progressDrawable = context.getResources().getDrawable(progressDrawableId);
         }
-        initialize(context, attributes.getAttributeValue(DroidFu.XMLNS,
-            "imageUrl"), progressDrawable, attributes.getAttributeBooleanValue(
-            DroidFu.XMLNS, "autoLoad", true));
+        initialize(context, attributes.getAttributeValue(DroidFu.XMLNS, "imageUrl"),
+            progressDrawable, attributes.getAttributeBooleanValue(DroidFu.XMLNS, "autoLoad", true));
         // styles.recycle();
     }
 
-    private void initialize(Context context, String imageUrl,
-            Drawable progressDrawable, boolean autoLoad) {
+    private void initialize(Context context, String imageUrl, Drawable progressDrawable,
+            boolean autoLoad) {
         this.imageUrl = imageUrl;
         this.progressDrawable = progressDrawable;
+
+        ImageLoader.initialize(context);
 
         // ScaleAnimation anim = new ScaleAnimation(0.0f, 1.0f, 0.0f, 1.0f,
         // 125.0f, preferredItemHeight / 2.0f);
@@ -121,9 +121,8 @@ public class WebImageView extends ViewSwitcher {
             }
         }
 
-        LayoutParams lp = new LayoutParams(
-            progressDrawable.getIntrinsicWidth(), progressDrawable
-                .getIntrinsicHeight());
+        LayoutParams lp = new LayoutParams(progressDrawable.getIntrinsicWidth(), progressDrawable
+            .getIntrinsicHeight());
         lp.gravity = Gravity.CENTER;
 
         addView(loadingSpinner, 0, lp);
@@ -132,8 +131,8 @@ public class WebImageView extends ViewSwitcher {
     private void addImageView(Context context) {
         imageView = new ImageView(context);
         imageView.setScaleType(scaleType);
-        ViewGroup.LayoutParams lp = new ViewGroup.LayoutParams(
-            LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+        ViewGroup.LayoutParams lp = new ViewGroup.LayoutParams(LayoutParams.WRAP_CONTENT,
+            LayoutParams.WRAP_CONTENT);
         addView(imageView, 1, lp);
     }
 
