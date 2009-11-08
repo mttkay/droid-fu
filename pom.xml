@@ -29,8 +29,8 @@
 
   <scm>
     <url>http://github.com/kaeppler/droid-fu</url>
-    <connection>git://github.com/kaeppler/droid-fu.git</connection>
-    <developerConnection>git@github.com:kaeppler/droid-fu.git</developerConnection>
+    <connection>scm:git:git://github.com/kaeppler/droid-fu.git</connection>
+    <developerConnection>scm:git:git@github.com:kaeppler/droid-fu.git</developerConnection>
   </scm>
 
   <issueManagement>
