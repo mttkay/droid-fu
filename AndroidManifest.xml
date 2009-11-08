@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-      package="com.github.droidfu"
-      android:versionCode="1"
-      android:versionName="1.0">
-      
+  package="com.github.droidfu">
+
+  <!--
+    DroidFu is never actually compiled to an APK, so this config is
+    meaningless, but it still serves documentary purposes (e.g. which
+    minimum version of Android DroidFu assumes.
+  -->
   <uses-sdk android:minSdkVersion="3" />
-     
-  
 
 </manifest> 
