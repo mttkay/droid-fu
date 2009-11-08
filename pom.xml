@@ -142,6 +142,10 @@
     </repository>    
   </repositories>
 
+  <distributionManagement>
+    <downloadUrl>http://github.com/kaeppler/droid-fu/downloads</downloadUrl>
+  </distributionManagement>
+
   <!-- 
   <distributionManagement>
     <repository>
