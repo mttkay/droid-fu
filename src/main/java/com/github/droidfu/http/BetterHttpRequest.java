@@ -47,8 +47,7 @@ import android.util.Log;
 
 public abstract class BetterHttpRequest {
 
-    private static final String LOG_TAG = BetterHttpRequest.class
-        .getSimpleName();
+    private static final String LOG_TAG = BetterHttpRequest.class.getSimpleName();
 
     private static final int MAX_CONNECTIONS = 6;
     private static final int MAX_RETRIES = 5;
@@ -83,10 +82,8 @@ public abstract class BetterHttpRequest {
                 throws ClientProtocolException, IOException {
 
             int status = response.getStatusLine().getStatusCode();
-            if (expectedStatusCodes != null
-                    && !expectedStatusCodes.contains(status)) {
-                throw new HttpResponseException(status,
-                    "Unexpected status code: " + status);
+            if (expectedStatusCodes != null && !expectedStatusCodes.contains(status)) {
+                throw new HttpResponseException(status, "Unexpected status code: " + status);
             }
 
             return new BetterHttpResponse(response);
@@ -99,8 +96,7 @@ public abstract class BetterHttpRequest {
      */
     private HttpRequestRetryHandler retryHandler = new HttpRequestRetryHandler() {
 
-        public boolean retryRequest(IOException exception, int executionCount,
-                HttpContext context) {
+        public boolean retryRequest(IOException exception, int executionCount, HttpContext context) {
 
             if (executionCount > MAX_RETRIES) {
                 return false;
@@ -108,14 +104,12 @@ public abstract class BetterHttpRequest {
 
             exception.printStackTrace();
             Log.d(BetterHttpRequest.class.getSimpleName(), "Retrying "
-                    + request.getRequestLine().getUri() + " (tried: "
-                    + executionCount + " times)");
+                    + request.getRequestLine().getUri() + " (tried: " + executionCount + " times)");
 
             // Apache HttpClient rewrites the request URI to be relative before
             // sending a request, but we need the full URI for OAuth signing,
             // so restore it before proceeding.
-            RequestWrapper request = (RequestWrapper) context
-                .getAttribute(ExecutionContext.HTTP_REQUEST);
+            RequestWrapper request = (RequestWrapper) context.getAttribute(ExecutionContext.HTTP_REQUEST);
             URI rewrittenUri = request.getURI();
             URI originalUri = (URI) context.getAttribute(REQUEST_URI_BACKUP);
             request.setURI(originalUri);
@@ -142,27 +136,23 @@ public abstract class BetterHttpRequest {
         BasicHttpParams httpParams = new BasicHttpParams();
 
         ConnManagerParams.setTimeout(httpParams, CONNECTION_TIMEOUT);
-        ConnManagerParams.setMaxConnectionsPerRoute(httpParams,
-            new ConnPerRouteBean(MAX_CONNECTIONS));
+        ConnManagerParams.setMaxConnectionsPerRoute(httpParams, new ConnPerRouteBean(
+                MAX_CONNECTIONS));
         ConnManagerParams.setMaxTotalConnections(httpParams, MAX_CONNECTIONS);
         HttpProtocolParams.setVersion(httpParams, HttpVersion.HTTP_1_1);
         HttpProtocolParams.setUserAgent(httpParams, HTTP_USER_AGENT);
 
         SchemeRegistry schemeRegistry = new SchemeRegistry();
-        schemeRegistry.register(new Scheme("http", PlainSocketFactory
-            .getSocketFactory(), 80));
-        schemeRegistry.register(new Scheme("https", PlainSocketFactory
-            .getSocketFactory(), 443));
+        schemeRegistry.register(new Scheme("http", PlainSocketFactory.getSocketFactory(), 80));
+        schemeRegistry.register(new Scheme("https", PlainSocketFactory.getSocketFactory(), 443));
 
-        ThreadSafeClientConnManager cm = new ThreadSafeClientConnManager(
-            httpParams, schemeRegistry);
+        ThreadSafeClientConnManager cm = new ThreadSafeClientConnManager(httpParams, schemeRegistry);
         httpClient = new DefaultHttpClient(cm, httpParams);
     }
 
     public static void updateProxySettings(Context context) {
         HttpParams httpParams = httpClient.getParams();
-        ConnectivityManager connectivity = (ConnectivityManager) context
-            .getSystemService(Context.CONNECTIVITY_SERVICE);
+        ConnectivityManager connectivity = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo nwInfo = connectivity.getActiveNetworkInfo();
         if (nwInfo == null) {
             return;
@@ -171,8 +161,7 @@ public abstract class BetterHttpRequest {
             String proxyHost = Proxy.getDefaultHost();
             int proxyPort = Proxy.getDefaultPort();
             if (proxyHost != null && proxyPort > -1) {
-                Log.d(LOG_TAG, "Detected carrier proxy " + proxyHost + ":"
-                        + proxyPort);
+                Log.d(LOG_TAG, "Detected carrier proxy " + proxyHost + ":" + proxyPort);
                 HttpHost proxy = new HttpHost(proxyHost, proxyPort);
                 httpParams.setParameter(ConnRoutePNames.DEFAULT_PROXY, proxy);
             }
@@ -186,13 +175,12 @@ public abstract class BetterHttpRequest {
             return;
         }
         BetterHttpRequest.appContext = context.getApplicationContext();
-        context.registerReceiver(new ConnectionChangedBroadcastReceiver(),
-            new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+        context.registerReceiver(new ConnectionChangedBroadcastReceiver(), new IntentFilter(
+                ConnectivityManager.CONNECTIVITY_ACTION));
     }
 
     public static void setPortForScheme(String scheme, int port) {
-        Scheme _scheme = new Scheme(scheme, PlainSocketFactory
-            .getSocketFactory(), port);
+        Scheme _scheme = new Scheme(scheme, PlainSocketFactory.getSocketFactory(), port);
         httpClient.getConnectionManager().getSchemeRegistry().register(_scheme);
     }
 
@@ -246,8 +234,7 @@ public abstract class BetterHttpRequest {
                 if (oauthConsumer != null) {
                     oauthConsumer.sign(request);
                 }
-                return httpClient
-                    .execute(request, responseHandler, httpContext);
+                return httpClient.execute(request, responseHandler, httpContext);
             } catch (Exception e) {
                 waitAndContinue(e, numAttempts, MAX_RETRIES);
             }
@@ -255,8 +242,8 @@ public abstract class BetterHttpRequest {
         return null;
     }
 
-    private void waitAndContinue(Exception cause, int numAttempts,
-            int maxAttempts) throws ConnectException {
+    private void waitAndContinue(Exception cause, int numAttempts, int maxAttempts)
+            throws ConnectException {
         if (numAttempts == maxAttempts) {
             Log.e(LOG_TAG, "request failed after " + numAttempts + " attempts");
             ConnectException ex = new ConnectException();
@@ -264,8 +251,8 @@ public abstract class BetterHttpRequest {
             throw ex;
         } else {
             cause.printStackTrace();
-            Log.e(LOG_TAG, "request failed, will retry after "
-                    + RETRY_SLEEP_TIME_MILLIS / 1000 + " secs...");
+            Log.e(LOG_TAG, "request failed, will retry after " + RETRY_SLEEP_TIME_MILLIS / 1000
+                    + " secs...");
             try {
                 Thread.sleep(RETRY_SLEEP_TIME_MILLIS);
             } catch (InterruptedException e1) {

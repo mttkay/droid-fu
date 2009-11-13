@@ -32,6 +32,6 @@ public interface BetterActivity {
 
     public void showErrorDialog(Exception error);
 
-    public <T> Dialog newListDialog(final List<T> elements,
-            final DialogClickListener<T> listener, boolean closeOnSelect);
+    public <T> Dialog newListDialog(final List<T> elements, final DialogClickListener<T> listener,
+            boolean closeOnSelect);
 }
