@@ -6,7 +6,6 @@ import android.graphics.drawable.Drawable;
 import android.os.Message;
 import android.util.AttributeSet;
 import android.view.Gravity;
-import android.view.ViewGroup;
 import android.view.animation.AlphaAnimation;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -121,8 +120,8 @@ public class WebImageView extends ViewSwitcher {
             }
         }
 
-        LayoutParams lp = new LayoutParams(progressDrawable.getIntrinsicWidth(), progressDrawable
-            .getIntrinsicHeight());
+        LayoutParams lp = new LayoutParams(progressDrawable.getIntrinsicWidth(),
+                progressDrawable.getIntrinsicHeight());
         lp.gravity = Gravity.CENTER;
 
         addView(loadingSpinner, 0, lp);
@@ -131,8 +130,8 @@ public class WebImageView extends ViewSwitcher {
     private void addImageView(Context context) {
         imageView = new ImageView(context);
         imageView.setScaleType(scaleType);
-        ViewGroup.LayoutParams lp = new ViewGroup.LayoutParams(LayoutParams.WRAP_CONTENT,
-            LayoutParams.WRAP_CONTENT);
+        LayoutParams lp = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+        lp.gravity = Gravity.CENTER;
         addView(imageView, 1, lp);
     }
 
@@ -141,7 +140,11 @@ public class WebImageView extends ViewSwitcher {
      * autoLoad to false.
      */
     public void loadImage() {
-        ImageLoader.start(imageUrl, new GalleryImageLoaderHandler());
+        if (imageUrl == null) {
+            throw new IllegalStateException(
+                    "image URL is null; did you forget to set it for this view?");
+        }
+        ImageLoader.start(imageUrl, new DefaultImageLoaderHandler());
     }
 
     public boolean isLoaded() {
@@ -156,9 +159,29 @@ public class WebImageView extends ViewSwitcher {
         this.progressDrawable = progressDrawable;
     }
 
-    private class GalleryImageLoaderHandler extends ImageLoaderHandler {
+    /**
+     * Often you have resources which usually have an image, but some don't. For
+     * these cases, use this method to supply a placeholder drawable which will
+     * be loaded instead of a web image.
+     * 
+     * @param imageResourceId
+     *        the resource of the placeholder image drawable
+     */
+    public void setNoImageDrawable(int imageResourceId) {
+        imageView.setImageDrawable(getContext().getResources().getDrawable(imageResourceId));
+        setDisplayedChild(1);
+    }
 
-        public GalleryImageLoaderHandler() {
+    @Override
+    public void reset() {
+        super.reset();
+
+        this.setDisplayedChild(0);
+    }
+
+    private class DefaultImageLoaderHandler extends ImageLoaderHandler {
+
+        public DefaultImageLoaderHandler() {
             super(imageView);
         }
 
