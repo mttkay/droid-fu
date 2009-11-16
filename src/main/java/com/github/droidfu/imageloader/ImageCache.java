@@ -36,7 +36,7 @@ import android.graphics.Bitmap.CompressFormat;
 @SuppressWarnings("serial")
 class ImageCache extends LinkedHashMap<String, Bitmap> {
 
-    private static int firstLevelCacheSize = 10;
+    static int firstLevelCacheSize = 10;
 
     private static int cachedImageQuality = 75;
 
@@ -47,15 +47,6 @@ class ImageCache extends LinkedHashMap<String, Bitmap> {
     public static void initialize(Context context) {
         secondLevelCacheDir = context.getCacheDir() + "/droidfu/imagecache";
         new File(secondLevelCacheDir).mkdirs();
-    }
-
-    /**
-     * @param cacheSize
-     *        the maximum number of images being kept in memory (1st level
-     *        cache)
-     */
-    public static void setFirstLevelCacheSize(int cacheSize) {
-        ImageCache.firstLevelCacheSize = cacheSize;
     }
 
     /**

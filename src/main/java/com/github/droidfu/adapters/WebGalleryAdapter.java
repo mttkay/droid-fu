@@ -28,6 +28,10 @@ public class WebGalleryAdapter extends BaseAdapter {
 
     private Drawable progressDrawable;
 
+    public WebGalleryAdapter(Context context) {
+        initialize(context, null, null);
+    }
+
     /**
      * @param context
      *        the current context
@@ -35,8 +39,7 @@ public class WebGalleryAdapter extends BaseAdapter {
      *        the set of image URLs which are to be loaded and displayed
      */
     public WebGalleryAdapter(Context context, List<String> imageUrls) {
-        this.imageUrls = imageUrls;
-        this.context = context;
+        initialize(context, imageUrls, null);
     }
 
     /**
@@ -49,9 +52,13 @@ public class WebGalleryAdapter extends BaseAdapter {
      *        progress
      */
     public WebGalleryAdapter(Context context, List<String> imageUrls, int progressDrawableResId) {
+        initialize(context, imageUrls, context.getResources().getDrawable(progressDrawableResId));
+    }
+
+    private void initialize(Context context, List<String> imageUrls, Drawable progressDrawable) {
         this.imageUrls = imageUrls;
         this.context = context;
-        this.progressDrawable = context.getResources().getDrawable(progressDrawableResId);
+        this.progressDrawable = progressDrawable;
     }
 
     public int getCount() {
@@ -64,6 +71,22 @@ public class WebGalleryAdapter extends BaseAdapter {
 
     public long getItemId(int position) {
         return position;
+    }
+
+    public void setImageUrls(List<String> imageUrls) {
+        this.imageUrls = imageUrls;
+    }
+
+    public List<String> getImageUrls() {
+        return imageUrls;
+    }
+
+    public void setProgressDrawable(Drawable progressDrawable) {
+        this.progressDrawable = progressDrawable;
+    }
+
+    public Drawable getProgressDrawable() {
+        return progressDrawable;
     }
 
     // TODO: leverage convert view for better performance
