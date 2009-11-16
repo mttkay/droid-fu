@@ -48,12 +48,10 @@ public class WebGalleryAdapter extends BaseAdapter {
      *        the resource ID of the drawable that will be used for rendering
      *        progress
      */
-    public WebGalleryAdapter(Context context, List<String> imageUrls,
-            int progressDrawableResId) {
+    public WebGalleryAdapter(Context context, List<String> imageUrls, int progressDrawableResId) {
         this.imageUrls = imageUrls;
         this.context = context;
-        this.progressDrawable = context.getResources().getDrawable(
-            progressDrawableResId);
+        this.progressDrawable = context.getResources().getDrawable(progressDrawableResId);
     }
 
     public int getCount() {
@@ -74,13 +72,12 @@ public class WebGalleryAdapter extends BaseAdapter {
         String imageUrl = (String) getItem(position);
 
         FrameLayout container = new FrameLayout(context);
-        container.setLayoutParams(new Gallery.LayoutParams(
-            LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT));
+        container.setLayoutParams(new Gallery.LayoutParams(LayoutParams.FILL_PARENT,
+                LayoutParams.FILL_PARENT));
 
-        WebImageView item = new WebImageView(context, imageUrl,
-            progressDrawable, false);
-        FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(
-            LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+        WebImageView item = new WebImageView(context, imageUrl, progressDrawable, false);
+        FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(LayoutParams.WRAP_CONTENT,
+                LayoutParams.WRAP_CONTENT);
         lp.gravity = Gravity.CENTER;
         item.setLayoutParams(lp);
 
@@ -88,7 +85,11 @@ public class WebGalleryAdapter extends BaseAdapter {
 
         item.loadImage();
 
+        onGetView(position, convertView, parent);
+
         return container;
     }
 
+    protected void onGetView(int position, View convertView, ViewGroup parent) {
+    }
 }
