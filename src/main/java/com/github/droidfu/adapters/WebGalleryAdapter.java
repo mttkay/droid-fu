@@ -28,6 +28,10 @@ public class WebGalleryAdapter extends BaseAdapter {
 
     private Drawable progressDrawable;
 
+    public WebGalleryAdapter(Context context) {
+        initialize(context, null, null);
+    }
+
     /**
      * @param context
      *        the current context
@@ -35,8 +39,7 @@ public class WebGalleryAdapter extends BaseAdapter {
      *        the set of image URLs which are to be loaded and displayed
      */
     public WebGalleryAdapter(Context context, List<String> imageUrls) {
-        this.imageUrls = imageUrls;
-        this.context = context;
+        initialize(context, imageUrls, null);
     }
 
     /**
@@ -48,12 +51,14 @@ public class WebGalleryAdapter extends BaseAdapter {
      *        the resource ID of the drawable that will be used for rendering
      *        progress
      */
-    public WebGalleryAdapter(Context context, List<String> imageUrls,
-            int progressDrawableResId) {
+    public WebGalleryAdapter(Context context, List<String> imageUrls, int progressDrawableResId) {
+        initialize(context, imageUrls, context.getResources().getDrawable(progressDrawableResId));
+    }
+
+    private void initialize(Context context, List<String> imageUrls, Drawable progressDrawable) {
         this.imageUrls = imageUrls;
         this.context = context;
-        this.progressDrawable = context.getResources().getDrawable(
-            progressDrawableResId);
+        this.progressDrawable = progressDrawable;
     }
 
     public int getCount() {
@@ -68,19 +73,34 @@ public class WebGalleryAdapter extends BaseAdapter {
         return position;
     }
 
+    public void setImageUrls(List<String> imageUrls) {
+        this.imageUrls = imageUrls;
+    }
+
+    public List<String> getImageUrls() {
+        return imageUrls;
+    }
+
+    public void setProgressDrawable(Drawable progressDrawable) {
+        this.progressDrawable = progressDrawable;
+    }
+
+    public Drawable getProgressDrawable() {
+        return progressDrawable;
+    }
+
     // TODO: leverage convert view for better performance
     public View getView(int position, View convertView, ViewGroup parent) {
 
         String imageUrl = (String) getItem(position);
 
         FrameLayout container = new FrameLayout(context);
-        container.setLayoutParams(new Gallery.LayoutParams(
-            LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT));
+        container.setLayoutParams(new Gallery.LayoutParams(LayoutParams.FILL_PARENT,
+                LayoutParams.FILL_PARENT));
 
-        WebImageView item = new WebImageView(context, imageUrl,
-            progressDrawable, false);
-        FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(
-            LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+        WebImageView item = new WebImageView(context, imageUrl, progressDrawable, false);
+        FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(LayoutParams.WRAP_CONTENT,
+                LayoutParams.WRAP_CONTENT);
         lp.gravity = Gravity.CENTER;
         item.setLayoutParams(lp);
 
@@ -88,7 +108,11 @@ public class WebGalleryAdapter extends BaseAdapter {
 
         item.loadImage();
 
+        onGetView(position, convertView, parent);
+
         return container;
     }
 
+    protected void onGetView(int position, View convertView, ViewGroup parent) {
+    }
 }

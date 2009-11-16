@@ -59,6 +59,25 @@ public class ImageLoader implements Runnable {
         ImageLoader.numAttempts = numAttempts;
     }
 
+    /**
+     * @param count
+     *        how many images loaded from the web should be cached in memory,
+     *        i.e. in the 1st level cache. Be careful not to set this too high,
+     *        otherwise you will meet the dreaded {@link OutOfMemoryError}.
+     */
+    public static void setMaximumNumberOfImagesInMemory(int count) {
+        ImageCache.firstLevelCacheSize = count;
+    }
+
+    /**
+     * @return how many images loaded from the web should be cached in memory,
+     *         i.e. in the 1st level cache. Be careful not to set this too high,
+     *         otherwise you will meet the dreaded {@link OutOfMemoryError}.
+     */
+    public static int getMaximumNumberOfImagesInMemory() {
+        return ImageCache.firstLevelCacheSize;
+    }
+
     public static void initialize(Context context) {
         ImageCache.initialize(context);
     }
