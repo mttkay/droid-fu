@@ -5,6 +5,7 @@ import java.util.List;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.Intent;
 import android.content.DialogInterface.OnClickListener;
 import android.os.Bundle;
 
@@ -19,10 +20,15 @@ public class BetterDefaultActivity extends Activity implements BetterActivity {
 
     private int progressDialogMsgId;
 
+    private Intent currentIntent;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        wasCreated = true;
+
+        this.wasCreated = true;
+        this.currentIntent = getIntent();
+
         ((DroidFuApplication) getApplication()).setActiveContext(getClass().getCanonicalName(),
             this);
     }
@@ -44,6 +50,12 @@ public class BetterDefaultActivity extends Activity implements BetterActivity {
     protected void onPause() {
         super.onPause();
         wasCreated = wasInterrupted = false;
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        this.currentIntent = intent;
     }
 
     @Override
@@ -74,6 +86,10 @@ public class BetterDefaultActivity extends Activity implements BetterActivity {
 
     public boolean isLaunching() {
         return !wasInterrupted && wasCreated;
+    }
+
+    public Intent getCurrentIntent() {
+        return currentIntent;
     }
 
     public AlertDialog newYesNoDialog(int titleResourceId, int messageResourceId,
