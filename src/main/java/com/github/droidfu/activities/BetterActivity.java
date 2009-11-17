@@ -2,7 +2,9 @@ package com.github.droidfu.activities;
 
 import java.util.List;
 
+import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.DialogInterface.OnClickListener;
 
 import com.github.droidfu.dialogs.DialogClickListener;
 
@@ -20,18 +22,17 @@ public interface BetterActivity {
 
     public boolean isLaunching();
 
-    public void showInfoDialog(int titleResourceId, int messageResourceId);
+    public AlertDialog newYesNoDialog(int titleResourceId, int messageResourceId,
+            OnClickListener listener);
 
-    public void showInfoDialog(int messageResourceId);
+    public AlertDialog newInfoDialog(int titleResourceId, int messageResourceId);
 
-    public void showAlertDialog(int titleResourceId, int messageResourceId);
+    public AlertDialog newAlertDialog(int titleResourceId, int messageResourceId);
 
-    public void showAlertDialog(int messageResourceId);
+    public AlertDialog newErrorDialog(int titleResourceId, Exception error);
 
-    public void showErrorDialog(int titleResourceId, Exception error);
+    public AlertDialog newErrorDialog(Exception error);
 
-    public void showErrorDialog(Exception error);
-
-    public <T> Dialog newListDialog(final List<T> elements,
-            final DialogClickListener<T> listener, boolean closeOnSelect);
+    public <T> Dialog newListDialog(final List<T> elements, final DialogClickListener<T> listener,
+            boolean closeOnSelect);
 }
