@@ -10,7 +10,6 @@ import android.app.AlertDialog.Builder;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
-import android.util.Log;
 import android.view.Window;
 
 import com.github.droidfu.dialogs.DialogClickListener;
@@ -23,10 +22,6 @@ class BetterActivityHelper {
     private static final String PROGRESS_DIALOG_MESSAGE_RESOURCE = "droidfu_progress_dialog_message";
 
     public static final String ERROR_DIALOG_TITLE_RESOURCE = "droidfu_error_dialog_title";
-
-    public static final String ALERT_DIALOG_TITLE_RESOURCE = "droidfu_alert_dialog_title";
-
-    public static final String INFO_DIALOG_TITLE_RESOURCE = "droidfu_info_dialog_title";
 
     // FIXME: this method currently doesn't work as advertised
     public static int getWindowFeatures(Activity activity) {
@@ -67,49 +62,49 @@ class BetterActivityHelper {
         return progressDialog;
     }
 
-    public static void showMessageDialog(final Activity activity, String dialogTitle,
-            String screenMessage, int iconResourceId) {
-        try {
-            Log.e("ERROR", screenMessage);
+    public static AlertDialog newYesNoDialog(final Activity activity, String dialogTitle,
+            String screenMessage, int iconResourceId, OnClickListener listener) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+        builder.setCancelable(false);
+        builder.setPositiveButton(android.R.string.yes, listener);
+        builder.setNegativeButton(android.R.string.no, listener);
 
-            AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-            builder.setCancelable(false);
-            builder.setPositiveButton("Okay", new OnClickListener() {
+        builder.setTitle(dialogTitle);
+        builder.setMessage(screenMessage);
+        builder.setIcon(iconResourceId);
 
-                public void onClick(DialogInterface dialog, int which) {
-                    dialog.dismiss();
-                    if (activity != null && !activity.isFinishing()) {
-                        activity.setResult(Activity.RESULT_CANCELED);
-                    }
-                }
-            });
-
-            builder.setTitle(dialogTitle);
-            builder.setMessage(screenMessage);
-            builder.setIcon(iconResourceId);
-
-            AlertDialog dialog = builder.create();
-            dialog.show();
-
-        } catch (Throwable e) {
-            e.printStackTrace();
-            // this can happen if the context the dialog was attached to has
-            // become invalid. we just swallow this error and ignore it,
-            // because there is no window anymore which could display the
-            // message
-        }
+        return builder.create();
     }
 
-    public static void showMessageDialog(Activity activity, String dialogTitle, Exception error) {
+    public static AlertDialog newMessageDialog(final Activity activity, String dialogTitle,
+            String screenMessage, int iconResourceId) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+        builder.setCancelable(false);
+        builder.setPositiveButton("Okay", new OnClickListener() {
+
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+
+        builder.setTitle(dialogTitle);
+        builder.setMessage(screenMessage);
+        builder.setIcon(iconResourceId);
+
+        return builder.create();
+    }
+
+    public static AlertDialog newMessageDialog(Activity activity, String dialogTitle,
+            Exception error) {
         error.printStackTrace();
         String screenMessage = "";
         if (error instanceof ResourceMessageException) {
-            screenMessage = activity.getString(((ResourceMessageException) error)
-                .getClientMessageResourceId());
+            screenMessage = activity.getString(((ResourceMessageException) error).getClientMessageResourceId());
         } else {
             screenMessage = error.getLocalizedMessage();
         }
-        showMessageDialog(activity, dialogTitle, screenMessage, android.R.drawable.ic_dialog_alert);
+        return newMessageDialog(activity, dialogTitle, screenMessage,
+            android.R.drawable.ic_dialog_alert);
     }
 
     public static <T> Dialog newListDialog(Context context, final List<T> elements,
