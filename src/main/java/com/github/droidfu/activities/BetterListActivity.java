@@ -111,6 +111,14 @@ public class BetterListActivity extends ListActivity implements BetterActivity {
         return currentIntent;
     }
 
+    public boolean isLandscapeMode() {
+        return getWindowManager().getDefaultDisplay().getOrientation() == 1;
+    }
+
+    public boolean isPortraitMode() {
+        return !isLandscapeMode();
+    }
+
     public AlertDialog newYesNoDialog(int titleResourceId, int messageResourceId,
             OnClickListener listener) {
         return BetterActivityHelper.newYesNoDialog(this, getString(titleResourceId),
