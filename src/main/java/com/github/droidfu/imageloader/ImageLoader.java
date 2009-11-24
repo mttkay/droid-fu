@@ -122,6 +122,14 @@ public class ImageLoader implements Runnable {
         }
     }
 
+    /**
+     * Clears the 1st-level cache (in-memory cache). A good candidate for
+     * calling in {@link Application#onLowMemory()}.
+     */
+    public static void clearCache() {
+        imageCache.clear();
+    }
+
     public void run() {
         Bitmap bitmap = null;
         int timesTried = 1;
