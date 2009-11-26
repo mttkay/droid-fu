@@ -50,8 +50,8 @@ public abstract class BetterAsyncTask<ParameterT, ProgressT, ReturnT> extends
     protected Context getCallingContext() {
         try {
             Context caller = (Context) appContext.getActiveContext(callerId);
-            if (caller == null
-                    || !this.callerId.equals(caller.getClass().getCanonicalName())) {
+            if (caller == null || !this.callerId.equals(caller.getClass().getCanonicalName())
+                    || (caller instanceof Activity && ((Activity) caller).isFinishing())) {
                 // the context that started this task has died and/or was
                 // replaced with a different one
                 return null;
@@ -67,9 +67,8 @@ public abstract class BetterAsyncTask<ParameterT, ProgressT, ReturnT> extends
     protected final void onPreExecute() {
         Context context = getCallingContext();
         if (context == null) {
-            Log.d(BetterAsyncTask.class.getSimpleName(),
-                    "skipping pre-exec handler for task " + hashCode()
-                            + " (context is null)");
+            Log.d(BetterAsyncTask.class.getSimpleName(), "skipping pre-exec handler for task "
+                    + hashCode() + " (context is null)");
             cancel(true);
             return;
         }
@@ -103,8 +102,7 @@ public abstract class BetterAsyncTask<ParameterT, ProgressT, ReturnT> extends
         return result;
     }
 
-    protected ReturnT doCheckedInBackground(Context context,
-            ParameterT... params) throws Exception {
+    protected ReturnT doCheckedInBackground(Context context, ParameterT... params) throws Exception {
         if (callable != null) {
             return callable.call(this);
         }
@@ -117,9 +115,8 @@ public abstract class BetterAsyncTask<ParameterT, ProgressT, ReturnT> extends
     protected final void onPostExecute(ReturnT result) {
         Context context = getCallingContext();
         if (context == null) {
-            Log.d(BetterAsyncTask.class.getSimpleName(),
-                    "skipping post-exec handler for task " + hashCode()
-                            + " (context is null)");
+            Log.d(BetterAsyncTask.class.getSimpleName(), "skipping post-exec handler for task "
+                    + hashCode() + " (context is null)");
             return;
         }
 
@@ -148,8 +145,7 @@ public abstract class BetterAsyncTask<ParameterT, ProgressT, ReturnT> extends
         return error != null;
     }
 
-    public void setCallable(
-            BetterAsyncTaskCallable<ParameterT, ProgressT, ReturnT> callable) {
+    public void setCallable(BetterAsyncTaskCallable<ParameterT, ProgressT, ReturnT> callable) {
         this.callable = callable;
     }
 
