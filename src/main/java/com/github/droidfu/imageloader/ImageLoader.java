@@ -24,9 +24,9 @@ import android.widget.ImageView;
  */
 public class ImageLoader implements Runnable {
 
-    private static final ThreadPoolExecutor executor;
+    private static ThreadPoolExecutor executor;
 
-    private static final ImageCache imageCache;
+    private static ImageCache imageCache;
 
     private static final int DEFAULT_POOL_SIZE = 2;
 
@@ -35,11 +35,6 @@ public class ImageLoader implements Runnable {
     static final String BITMAP_EXTRA = "droidfu:extra_bitmap";
 
     private static int numAttempts = 3;
-
-    static {
-        executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(DEFAULT_POOL_SIZE);
-        imageCache = new ImageCache();
-    }
 
     /**
      * @param numThreads
@@ -59,27 +54,28 @@ public class ImageLoader implements Runnable {
         ImageLoader.numAttempts = numAttempts;
     }
 
-    /**
-     * @param count
-     *        how many images loaded from the web should be cached in memory,
-     *        i.e. in the 1st level cache. Be careful not to set this too high,
-     *        otherwise you will meet the dreaded {@link OutOfMemoryError}.
-     */
-    public static void setMaximumNumberOfImagesInMemory(int count) {
-        ImageCache.firstLevelCacheSize = count;
-    }
-
-    /**
-     * @return how many images loaded from the web should be cached in memory,
-     *         i.e. in the 1st level cache. Be careful not to set this too high,
-     *         otherwise you will meet the dreaded {@link OutOfMemoryError}.
-     */
-    public static int getMaximumNumberOfImagesInMemory() {
-        return ImageCache.firstLevelCacheSize;
-    }
+    // /**
+    // * @param count
+    // * how many images loaded from the web should be cached in memory,
+    // * i.e. in the 1st level cache. Be careful not to set this too high,
+    // * otherwise you will meet the dreaded {@link OutOfMemoryError}.
+    // */
+    // public static void setMaximumNumberOfImagesInMemory(int count) {
+    // imageCache.setFirstLevelCacheSize(count);
+    // }
+    //
+    // /**
+    // * @return how many images loaded from the web should be cached in memory,
+    // * i.e. in the 1st level cache. Be careful not to set this too high,
+    // * otherwise you will meet the dreaded {@link OutOfMemoryError}.
+    // */
+    // public static int getMaximumNumberOfImagesInMemory() {
+    // return imageCache.getFirstLevelCacheSize();
+    // }
 
     public static void initialize(Context context) {
-        ImageCache.initialize(context);
+        executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(DEFAULT_POOL_SIZE);
+        imageCache = new ImageCache(context, 25, 5);
     }
 
     private String imageUrl;
