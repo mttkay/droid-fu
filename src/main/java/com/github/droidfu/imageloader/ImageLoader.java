@@ -73,9 +73,13 @@ public class ImageLoader implements Runnable {
     // return imageCache.getFirstLevelCacheSize();
     // }
 
-    public static void initialize(Context context) {
-        executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(DEFAULT_POOL_SIZE);
-        imageCache = new ImageCache(context, 25, 5);
+    public static synchronized void initialize(Context context) {
+        if (executor == null) {
+            executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(DEFAULT_POOL_SIZE);
+        }
+        if (imageCache == null) {
+            imageCache = new ImageCache(context, 25, 5);
+        }
     }
 
     private String imageUrl;
@@ -123,7 +127,9 @@ public class ImageLoader implements Runnable {
      * calling in {@link Application#onLowMemory()}.
      */
     public static void clearCache() {
-        imageCache.clear();
+        synchronized (imageCache) {
+            imageCache.clear();
+        }
     }
 
     public void run() {
