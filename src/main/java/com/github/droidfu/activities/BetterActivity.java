@@ -49,6 +49,10 @@ public interface BetterActivity {
      */
     public Intent getCurrentIntent();
 
+    public boolean isLandscapeMode();
+
+    public boolean isPortraitMode();
+
     public AlertDialog newYesNoDialog(int titleResourceId, int messageResourceId,
             OnClickListener listener);
 
