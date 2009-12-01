@@ -190,7 +190,7 @@ public class WebImageView extends ViewSwitcher {
             super.handleMessage(msg);
             isLoaded = true;
 
-            showNext();
+            setDisplayedChild(1);
         }
     }
 }
