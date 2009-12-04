@@ -88,6 +88,10 @@ public class BetterDefaultActivity extends Activity implements BetterActivity {
         return !wasInterrupted && wasCreated;
     }
 
+    public boolean isApplicationBroughtToBackground() {
+        return BetterActivityHelper.isApplicationBroughtToBackground(this);
+    }
+
     public Intent getCurrentIntent() {
         return currentIntent;
     }
