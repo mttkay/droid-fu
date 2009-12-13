@@ -3,10 +3,13 @@ package com.github.droidfu.activities;
 import java.util.List;
 
 import android.app.Activity;
+import android.app.ActivityManager;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.app.ActivityManager.RunningTaskInfo;
 import android.app.AlertDialog.Builder;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
@@ -17,7 +20,7 @@ import android.view.Window;
 import com.github.droidfu.dialogs.DialogClickListener;
 import com.github.droidfu.exception.ResourceMessageException;
 
-class BetterActivityHelper {
+public class BetterActivityHelper {
 
     private static final String PROGRESS_DIALOG_TITLE_RESOURCE = "droidfu_progress_dialog_title";
 
@@ -136,4 +139,16 @@ class BetterActivityHelper {
         return builder.create();
     }
 
+    public static boolean isApplicationBroughtToBackground(Context context) {
+        ActivityManager am = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+        List<RunningTaskInfo> taskInfo = am.getRunningTasks(1);
+        if (!taskInfo.isEmpty()) {
+            ComponentName topActivity = taskInfo.get(0).topActivity;
+            if (!topActivity.getPackageName().equals(context.getPackageName())) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }

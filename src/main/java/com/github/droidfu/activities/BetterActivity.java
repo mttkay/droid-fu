@@ -38,6 +38,17 @@ public interface BetterActivity {
     public boolean isLaunching();
 
     /**
+     * Android doesn't distinguish between your Activity being paused by another
+     * Activity of your own application, or by an Activity of an entirely
+     * different application. This function only returns true, if your Activity
+     * is being paused by an Activity of another app, thus hiding yours.
+     * 
+     * @return true, if the Activity is being paused because an Activity of
+     *         another application received focus.
+     */
+    public boolean isApplicationBroughtToBackground();
+
+    /**
      * Retrieves the current intent that was used to create or resume this
      * activity. If the activity received a call to
      * {@link Activity#onNewIntent()} (e.g. because it was launched in singleTop
