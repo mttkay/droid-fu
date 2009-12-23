@@ -43,8 +43,8 @@ public class WebImageView extends ViewSwitcher {
      *        the URL of the image to download and show
      * @param autoLoad
      *        Whether the download should start immediately after creating the
-     *        view. If set to false, use {@link WebImageView.loadImage()} to
-     *        manually trigger the image download.
+     *        view. If set to false, use {@link #loadImage()} to manually
+     *        trigger the image download.
      */
     public WebImageView(Context context, String imageUrl, boolean autoLoad) {
         super(context);
@@ -61,8 +61,8 @@ public class WebImageView extends ViewSwitcher {
      *        displayed while the image is loading
      * @param autoLoad
      *        Whether the download should start immediately after creating the
-     *        view. If set to false, use {@link WebImageView.loadImage()} to
-     *        manually trigger the image download.
+     *        view. If set to false, use {@link #loadImage()} to manually
+     *        trigger the image download.
      */
     public WebImageView(Context context, String imageUrl, Drawable progressDrawable,
             boolean autoLoad) {

@@ -13,6 +13,9 @@ import android.os.Message;
 import android.util.Log;
 import android.widget.ImageView;
 
+import com.github.droidfu.adapters.WebGalleryAdapter;
+import com.github.droidfu.widgets.WebImageView;
+
 /**
  * Realizes an background image loader backed by a two-level FIFO cache. If the
  * image to be loaded is present in the cache, it is set immediately on the
@@ -54,25 +57,17 @@ public class ImageLoader implements Runnable {
         ImageLoader.numAttempts = numAttempts;
     }
 
-    // /**
-    // * @param count
-    // * how many images loaded from the web should be cached in memory,
-    // * i.e. in the 1st level cache. Be careful not to set this too high,
-    // * otherwise you will meet the dreaded {@link OutOfMemoryError}.
-    // */
-    // public static void setMaximumNumberOfImagesInMemory(int count) {
-    // imageCache.setFirstLevelCacheSize(count);
-    // }
-    //
-    // /**
-    // * @return how many images loaded from the web should be cached in memory,
-    // * i.e. in the 1st level cache. Be careful not to set this too high,
-    // * otherwise you will meet the dreaded {@link OutOfMemoryError}.
-    // */
-    // public static int getMaximumNumberOfImagesInMemory() {
-    // return imageCache.getFirstLevelCacheSize();
-    // }
-
+    /**
+     * This method must be called before any other method is invoked on this
+     * class. Please note that when using ImageLoader as part of
+     * {@link WebImageView} or {@link WebGalleryAdapter}, then there is no need
+     * to call this method, since those classes will already do that for you.
+     * This method is idempotent. You may call it multiple times without any
+     * side effects.
+     * 
+     * @param context
+     *        the current context
+     */
     public static synchronized void initialize(Context context) {
         if (executor == null) {
             executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(DEFAULT_POOL_SIZE);
@@ -96,6 +91,17 @@ public class ImageLoader implements Runnable {
         this.handler = handler;
     }
 
+    /**
+     * Triggers the image loader for the given image and view. The image loading
+     * will be performed concurrently to the UI main thread, using a fixed size
+     * thread pool. The loaded image will be posted back to the given ImageView
+     * upon completion.
+     * 
+     * @param imageUrl
+     *        the URL of the image to download
+     * @param imageView
+     *        the ImageView which should be updated with the new image
+     */
     public static void start(String imageUrl, ImageView imageView) {
         ImageLoader loader = new ImageLoader(imageUrl, imageView);
         synchronized (imageCache) {
@@ -109,6 +115,19 @@ public class ImageLoader implements Runnable {
         }
     }
 
+    /**
+     * Triggers the image loader for the given image and handler. The image
+     * loading will be performed concurrently to the UI main thread, using a
+     * fixed size thread pool. The loaded image will not be automatically posted
+     * to an ImageView; instead, you can pass a custom
+     * {@link ImageLoaderHandler} and handle the loaded image yourself (e.g.
+     * cache it for later use).
+     * 
+     * @param imageUrl
+     *        the URL of the image to download
+     * @param handler
+     *        the handler which is used to handle the downloaded image
+     */
     public static void start(String imageUrl, ImageLoaderHandler handler) {
         ImageLoader loader = new ImageLoader(imageUrl, handler);
         synchronized (imageCache) {
@@ -124,7 +143,7 @@ public class ImageLoader implements Runnable {
 
     /**
      * Clears the 1st-level cache (in-memory cache). A good candidate for
-     * calling in {@link Application#onLowMemory()}.
+     * calling in {@link android.app.Application#onLowMemory()}.
      */
     public static void clearCache() {
         synchronized (imageCache) {

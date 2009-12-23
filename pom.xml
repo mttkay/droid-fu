@@ -42,6 +42,10 @@
     <maven>2.0.9</maven>
   </prerequisites>
 
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>  
+
   <!-- build settings -->
   <packaging>jar</packaging>
   
@@ -76,6 +80,7 @@
       </plugin>
       
       <!-- we always wanna have a nice up-to-date JavaDoc JAR -->
+      <!-- 
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
@@ -90,7 +95,7 @@
           </execution>
         </executions>
       </plugin>
-      
+      -->
       <!-- config for release builds -->
       <plugin>
         <artifactId>maven-release-plugin</artifactId>

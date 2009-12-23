@@ -24,12 +24,11 @@ public abstract class ListAdapterWithProgress<T> extends BaseAdapter {
 
     protected LayoutInflater inflater;
 
-    public ListAdapterWithProgress(ListActivity activity,
-            int progressDrawableResourceId) {
+    public ListAdapterWithProgress(ListActivity activity, int progressDrawableResourceId) {
         this.context = activity;
         this.listView = activity.getListView();
-        this.progressView = activity.getLayoutInflater().inflate(
-                progressDrawableResourceId, listView, false);
+        this.progressView = activity.getLayoutInflater().inflate(progressDrawableResourceId,
+            listView, false);
         this.inflater = LayoutInflater.from(activity);
     }
 
@@ -37,7 +36,7 @@ public abstract class ListAdapterWithProgress<T> extends BaseAdapter {
      * {@inheritDoc}
      * <p>
      * Don't use this to check for the presence of actual data items; use
-     * {@link hasItems()} instead.
+     * {@link #hasItems()} instead.
      * </p>
      */
     public int getCount() {
@@ -55,7 +54,7 @@ public abstract class ListAdapterWithProgress<T> extends BaseAdapter {
      * {@inheritDoc}
      * <p>
      * Don't use this to check for the presence of actual data items; use
-     * {@link hasItems()} instead.
+     * {@link #hasItems()} instead.
      * </p>
      */
     @Override
@@ -127,8 +126,7 @@ public abstract class ListAdapterWithProgress<T> extends BaseAdapter {
         return doGetView(position, convertView, parent);
     }
 
-    protected abstract View doGetView(int position, View convertView,
-            ViewGroup parent);
+    protected abstract View doGetView(int position, View convertView, ViewGroup parent);
 
     private boolean isPositionOfProgressElement(int position) {
         return isLoadingData && position == data.size();

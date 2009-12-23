@@ -2,7 +2,6 @@ package com.github.droidfu.activities;
 
 import java.util.List;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Intent;
@@ -20,20 +19,19 @@ public interface BetterActivity {
 
     /**
      * @return true, if the activity is recovering from in interruption (i.e.
-     *         {@link Activity#onRestoreInstanceState()} was called.
+     *         onRestoreInstanceState was called.
      */
     public boolean isRestoring();
 
     /**
-     * @return true, if the activity is "soft-resuming", i.e.
-     *         {@link Activity#onResume()} has been called without a prior call
-     *         to {@link Activity#onCreate()}
+     * @return true, if the activity is "soft-resuming", i.e. onResume has been
+     *         called without a prior call to onCreate
      */
     public boolean isResuming();
 
     /**
      * @return true, if the activity is launching, i.e. is going through
-     *         {@link Activity#onCreate()} but is not restoring.
+     *         onCreate but is not restoring.
      */
     public boolean isLaunching();
 
@@ -50,11 +48,11 @@ public interface BetterActivity {
 
     /**
      * Retrieves the current intent that was used to create or resume this
-     * activity. If the activity received a call to
-     * {@link Activity#onNewIntent()} (e.g. because it was launched in singleTop
-     * mode), then the Intent passed to that method is returned. Otherwise the
-     * returned Intent is the intent returned by getIntent() (which is the
-     * Intent which was used to initially launch this activity).
+     * activity. If the activity received a call to onNewIntent (e.g. because it
+     * was launched in singleTop mode), then the Intent passed to that method is
+     * returned. Otherwise the returned Intent is the intent returned by
+     * getIntent (which is the Intent which was used to initially launch this
+     * activity).
      * 
      * @return the current {@link Intent}
      */
@@ -128,6 +126,20 @@ public interface BetterActivity {
      */
     public AlertDialog newErrorHandlerDialog(Exception error);
 
-    public <T> Dialog newListDialog(final List<T> elements, final DialogClickListener<T> listener,
+    /**
+     * Creates a new list style dialog from a list of objects. The toString()
+     * method of any such object will be used to generate the list item's label.
+     * 
+     * @param <T>
+     *        the type of the list items
+     * @param listItems
+     *        the list items
+     * @param listener
+     *        the listener used for processing list item clicks
+     * @param closeOnSelect
+     *        if true, the dialog will close when an item has been clicked
+     * @return the dialog
+     */
+    public <T> Dialog newListDialog(final List<T> listItems, final DialogClickListener<T> listener,
             boolean closeOnSelect);
 }
