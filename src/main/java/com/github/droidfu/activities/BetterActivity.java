@@ -71,9 +71,62 @@ public interface BetterActivity {
 
     public AlertDialog newAlertDialog(int titleResourceId, int messageResourceId);
 
-    public AlertDialog newErrorDialog(int titleResourceId, Exception error);
+    /**
+     * <p>
+     * Creates a new error dialog, with the option to either dismiss or -- if an
+     * email application is installed -- report the given error. Clicking the
+     * report button will cause the app to collect diagnostic information,
+     * compile it to a single text body, and launch the email application with
+     * the error report being preset as the email's body.
+     * </p>
+     * <p>
+     * For this to work, you must define the following string resources in your
+     * application:
+     * <ul>
+     * <li>droidfu_dialog_button_send_error_report - The label of the button
+     * used to report the error</li>
+     * <li>droidfu_error_report_email_address - The email address where the
+     * report should be sent</li>
+     * <li>droidfu_error_report_email_subject - The subject line used in the
+     * email</li>
+     * </ul>
+     * </p>
+     * 
+     * @param titleResourceId
+     *        the string resource that should be used as the dialog title
+     * @param error
+     *        the exception that should be displayed and/or reported
+     * @return the dialog
+     */
+    public AlertDialog newErrorHandlerDialog(int titleResourceId, Exception error);
 
-    public AlertDialog newErrorDialog(Exception error);
+    /**
+     * <p>
+     * Creates a new error dialog, with the option to either dismiss or -- if an
+     * email application is installed -- report the given error. Clicking the
+     * report button will cause the app to collect diagnostic information,
+     * compile it to a single text body, and launch the email application with
+     * the error report being preset as the email's body.
+     * </p>
+     * <p>
+     * For this to work, you must define the following string resources in your
+     * application:
+     * <ul>
+     * <li>droidfu_error_dialog_title - The dialog title</li>
+     * <li>droidfu_dialog_button_send_error_report - The label of the button
+     * used to report the error</li>
+     * <li>droidfu_error_report_email_address - The email address where the
+     * report should be sent</li>
+     * <li>droidfu_error_report_email_subject - The subject line used in the
+     * email</li>
+     * </ul>
+     * </p>
+     * 
+     * @param error
+     *        the exception that should be displayed and/or reported
+     * @return the dialog
+     */
+    public AlertDialog newErrorHandlerDialog(Exception error);
 
     public <T> Dialog newListDialog(final List<T> elements, final DialogClickListener<T> listener,
             boolean closeOnSelect);

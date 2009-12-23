@@ -139,12 +139,12 @@ public class BetterListActivity extends ListActivity implements BetterActivity {
             getString(messageResourceId), android.R.drawable.ic_dialog_alert);
     }
 
-    public AlertDialog newErrorDialog(int titleResourceId, Exception error) {
-        return BetterActivityHelper.newMessageDialog(this, getString(titleResourceId), error);
+    public AlertDialog newErrorHandlerDialog(int titleResourceId, Exception error) {
+        return BetterActivityHelper.newErrorHandlerDialog(this, getString(titleResourceId), error);
     }
 
-    public AlertDialog newErrorDialog(Exception error) {
-        return newErrorDialog(getResources().getIdentifier(
+    public AlertDialog newErrorHandlerDialog(Exception error) {
+        return newErrorHandlerDialog(getResources().getIdentifier(
             BetterActivityHelper.ERROR_DIALOG_TITLE_RESOURCE, "string", getPackageName()), error);
     }
 

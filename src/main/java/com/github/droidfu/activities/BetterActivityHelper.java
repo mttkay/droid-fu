@@ -12,6 +12,7 @@ import android.app.AlertDialog.Builder;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.DialogInterface.OnClickListener;
 import android.content.DialogInterface.OnKeyListener;
 import android.view.KeyEvent;
@@ -19,6 +20,8 @@ import android.view.Window;
 
 import com.github.droidfu.dialogs.DialogClickListener;
 import com.github.droidfu.exception.ResourceMessageException;
+import com.github.droidfu.support.DiagnosticSupport;
+import com.github.droidfu.support.IntentSupport;
 
 public class BetterActivityHelper {
 
@@ -105,17 +108,52 @@ public class BetterActivityHelper {
         return builder.create();
     }
 
-    public static AlertDialog newMessageDialog(Activity activity, String dialogTitle,
+    public static AlertDialog newErrorHandlerDialog(Activity activity, String dialogTitle,
             Exception error) {
-        error.printStackTrace();
         String screenMessage = "";
         if (error instanceof ResourceMessageException) {
             screenMessage = activity.getString(((ResourceMessageException) error).getClientMessageResourceId());
         } else {
             screenMessage = error.getLocalizedMessage();
         }
-        return newMessageDialog(activity, dialogTitle, screenMessage,
-            android.R.drawable.ic_dialog_alert);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+        builder.setTitle(dialogTitle);
+        builder.setMessage(screenMessage);
+        builder.setIcon(android.R.drawable.ic_dialog_alert);
+        builder.setCancelable(false);
+        builder.setPositiveButton(activity.getString(android.R.string.ok), new OnClickListener() {
+
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+
+        if (IntentSupport.isIntentAvailable(activity, Intent.ACTION_SEND,
+            IntentSupport.MIME_TYPE_EMAIL)) {
+            int buttonId = activity.getResources().getIdentifier(
+                "droidfu_dialog_button_send_error_report", "string", activity.getPackageName());
+            String buttonText = activity.getString(buttonId);
+            int bugEmailAddressId = activity.getResources().getIdentifier(
+                "droidfu_error_report_email_address", "string", activity.getPackageName());
+            String bugReportEmailAddress = activity.getString(bugEmailAddressId);
+            int bugEmailSubjectId = activity.getResources().getIdentifier(
+                "droidfu_error_report_email_subject", "string", activity.getPackageName());
+            String bugReportEmailSubject = activity.getString(bugEmailSubjectId);
+            final String diagnosis = DiagnosticSupport.createDiagnosis(activity, error);
+            final Intent intent = IntentSupport.newEmailIntent(activity, bugReportEmailAddress,
+                bugReportEmailSubject, diagnosis);
+            final Activity a = activity;
+            builder.setNegativeButton(buttonText, new OnClickListener() {
+
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss();
+                    a.startActivity(intent);
+                }
+            });
+        }
+
+        return builder.create();
     }
 
     public static <T> Dialog newListDialog(Context context, final List<T> elements,
