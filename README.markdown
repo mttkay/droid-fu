@@ -22,13 +22,13 @@ Droid-Fu is deployed as a JAR. Just drop it in your app's lib folder and add it 
 
 You can get the Droid-Fu JAR in several ways.
 
-The easiest one is probably to download a pre-built version from [GitHub][http://github.com/kaeppler/droid-fu/downloads]. Just know that these builds may not contain the most recent changes you see in the master branch.
+The easiest one is probably to download a pre-built version from [GitHub](http://github.com/kaeppler/droid-fu/downloads). Just know that these builds may not contain the most recent changes you see in the master branch.
 
-If you want to stay on the bleeding edge, you must download the sources and roll the JAR yourself. It's a little elaborate, but don't run off scared. Just follow these steps and you'll be fine. Droid-Fu employs a managed build process, driven by the wonderful [Maven build system][http://maven.apache.org] system. This means you have to install both Maven (v2.2.1 or newer), and the [maven-android SDK deployer][http://github.com/mosabua/maven-android-sdk-deployer]. Droid-Fu is currently built against the Android 1.5 R3 APIs, so you must have the proper Android JAR installed, too. Consult the Android SDK docs to learn about how to download and install different Android platform versions using the AVD/SDK Manager bundled with the ADT.
+If you want to stay on the bleeding edge, you must download the sources and roll the JAR yourself. It's a little elaborate, but don't run off scared. Just follow these steps and you'll be fine. Droid-Fu employs a managed build process, driven by the wonderful [Maven build system](http://maven.apache.org) system. This means you have to install both Maven (v2.2.1 or newer), and the [maven-android SDK deployer](http://github.com/mosabua/maven-android-sdk-deployer). Droid-Fu is currently built against the Android 1.5 R3 APIs, so you must have the proper Android JAR installed, too. Consult the Android SDK docs to learn about how to download and install different Android platform versions using the AVD/SDK Manager bundled with the ADT.
 
 #### Step 1: Getting the source codes
 
-If you're using [git][http://www.git-scm.com], do a 
+If you're using [git](http://www.git-scm.com), do a 
 
     git clone git://github.com/kaeppler/droid-fu.git
 
@@ -38,7 +38,7 @@ and
 
 now.
 
-Alternatively, you can simply download the archived source codes from the master branches, [here][http://github.com/kaeppler/droid-fu/archives/master] and [here][git://github.com/mosabua/maven-android-sdk-deployer/archives/master].
+Alternatively, you can simply download the archived source codes from the master branches, [here](http://github.com/kaeppler/droid-fu/archives/master) and [here](git://github.com/mosabua/maven-android-sdk-deployer/archives/master).
 
 #### Step 2: Install the Android JAR to your local Maven repository
 
