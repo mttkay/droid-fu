@@ -39,7 +39,7 @@
   </issueManagement>
 
   <prerequisites>
-    <maven>2.0.9</maven>
+    <maven>2.2.1</maven>
   </prerequisites>
 
   <properties>
@@ -127,7 +127,7 @@
     <dependency>
       <groupId>android</groupId>
       <artifactId>android</artifactId>
-      <version>1.5_r2</version>
+      <version>1.5_r3</version>
       <scope>provided</scope>
     </dependency>
   
