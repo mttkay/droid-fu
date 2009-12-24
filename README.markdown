@@ -75,22 +75,21 @@ This will create a JavaDoc JAR under `target`.
 
 ## How do I use it?
 
-1.  link the JAR to your application's classpath, as you would with any other JAR in any other Java or Android project
+1.  Link the JAR to your application's classpath, as you would with any other JAR in any other Java or Android project.
 
-1.  if you haven't yet created an [Application](file:///home/matthias/devel/frameworks/android-sdk/docs/reference/android/app/Application.html) class for your app, create a new class and let it inherit from `com.github.droidfu.DroidFuApplication`. Otherwise, just alter your app class to include said inheritance relation.
+1.  If you haven't yet created an [Application](file:///home/matthias/devel/frameworks/android-sdk/docs/reference/android/app/Application.html) class for your app, create a new class and let it inherit from `com.github.droidfu.DroidFuApplication`. Otherwise, just alter your app class to include said inheritance relation.
 
-1.  if you had to create a new app class in the previous step, modify your `AndroidManifest.xml` and change the `application` element so that its `android:name` attribute points to the name of the new class, e.g.:
+1.  If you had to create a new app class in the previous step, modify your `AndroidManifest.xml` and change the `application` element so that its `android:name` attribute points to the name of the new class, e.g.:
 
-    <?xml version="1.0" encoding="utf-8"?>
-    <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-      package="com.test"
-      android:versionCode="1"
-      android:versionName="1.0">
-        <application android:icon="@drawable/icon" android:label="@string/app_name" android:name="MyApplication">
+    <code>
+        <?xml version="1.0" encoding="utf-8"?>
+        <manifest xmlns:android="http://schemas.android.com/apk/res/android" ...>
+            <application android:name="MyApplication" ...>
+                ...
+            </application>
             ...
-        </application>
-       ...
-    </manifest>
+        </manifest>
+    </code>
 
 ## How is it licensed?
 
