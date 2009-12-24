@@ -38,7 +38,7 @@ and
 
 now.
 
-Alternatively, you can simply download the archived source codes from the master branches, [here](http://github.com/kaeppler/droid-fu/archives/master) and [here](git://github.com/mosabua/maven-android-sdk-deployer/archives/master).
+Alternatively, you can simply download the archived source codes from the master branches, [here](http://github.com/kaeppler/droid-fu/archives/master) and [here](http://github.com/mosabua/maven-android-sdk-deployer/archives/master).
 
 #### Step 2: Install the Android JAR to your local Maven repository
 
@@ -72,5 +72,5 @@ This will create a JavaDoc JAR under `target`.
 
 ## How is it licensed?
 
-Droid-Fu is free and open source and may be used under the terms of the Apache License, version 2.
+Droid-Fu is free and open source and may be used under the terms of the [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0).
 
