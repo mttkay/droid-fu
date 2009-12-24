@@ -86,7 +86,6 @@ This will create a JavaDoc JAR under `target`.
       package="com.test"
       android:versionCode="1"
       android:versionName="1.0">
-
         <application android:icon="@drawable/icon" android:label="@string/app_name" android:name="MyApplication">
             ...
         </application>
