@@ -81,7 +81,6 @@ This will create a JavaDoc JAR under `target`.
 
 1.  If you had to create a new app class in the previous step, modify your `AndroidManifest.xml` and change the `application` element so that its `android:name` attribute points to the name of the new class, e.g.:
 
-    <code>
         <?xml version="1.0" encoding="utf-8"?>
         <manifest xmlns:android="http://schemas.android.com/apk/res/android" ...>
             <application android:name="MyApplication" ...>
@@ -89,7 +88,6 @@ This will create a JavaDoc JAR under `target`.
             </application>
             ...
         </manifest>
-    </code>
 
 ## How is it licensed?
 
