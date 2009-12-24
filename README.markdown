@@ -1,3 +1,9 @@
+# Just looking for the API docs?
+
+You can find them [here](http://kaeppler.github.com/droid-fu).
+
+---
+
 # Droid-Fu - for your Android needs
 
 Droid-Fu is an open-source effort aiming to collect and bundle solutions to common concerns in the development of applications for the [Google Android platform](http://developer.android.com/index.html). Currently it mostly contains code which I pulled out of [Qype Radar](http://www.qype.co.uk/go-mobile), and which I believe may prove useful to other developers. This is _very_ much a work-in-progress, and both content and APIs are still in flux. There is not much documentation (yet), and I intend to change that. For now, you may want to read all related articles [on my weblog](http://en.wordpress.com/tag/droid-fu/). You can also find me on [Twitter](http://twitter.com/twoofour).
