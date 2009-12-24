@@ -17,7 +17,7 @@ The areas tackled by Droid-Fu include:
 
 I suggest you read [this introductory article](http://brainflush.wordpress.com/2009/11/16/introducing-droid-fu-for-android-betteractivity-betterservice-and-betterasynctask/), and anything that follows.
 
-## How do I use it?
+## How do I install it?
 
 Droid-Fu is deployed as a JAR. Just drop it in your app's lib folder and add it to the classpath.
 
@@ -72,6 +72,26 @@ If you want a JavaDoc JAR to get inline docs in Eclipse, do this:
     $ mvn javadoc:jar
 
 This will create a JavaDoc JAR under `target`.
+
+## How do I use it?
+
+1.  link the JAR to your application's classpath, as you would with any other JAR in any other Java or Android project
+
+1.  if you haven't yet created an [Application](file:///home/matthias/devel/frameworks/android-sdk/docs/reference/android/app/Application.html) class for your app, create a new class and let it inherit from `com.github.droidfu.DroidFuApplication`. Otherwise, just alter your app class to include said inheritance relation.
+
+1.  if you had to create a new app class in the previous step, modify your `AndroidManifest.xml` and change the `application` element so that its `android:name` attribute points to the name of the new class, e.g.:
+
+    <?xml version="1.0" encoding="utf-8"?>
+    <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+      package="com.test"
+      android:versionCode="1"
+      android:versionName="1.0">
+
+        <application android:icon="@drawable/icon" android:label="@string/app_name" android:name="MyApplication">
+            ...
+        </application>
+       ...
+    </manifest>
 
 ## How is it licensed?
 
