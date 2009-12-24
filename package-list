@@ -1,0 +1,14 @@
+com.github.droidfu
+com.github.droidfu.activities
+com.github.droidfu.adapters
+com.github.droidfu.concurrent
+com.github.droidfu.dialogs
+com.github.droidfu.exception
+com.github.droidfu.http
+com.github.droidfu.imageloader
+com.github.droidfu.services
+com.github.droidfu.support
+com.github.droidfu.widgets
+com.google.common.base
+com.google.common.base.internal
+com.google.common.collect
