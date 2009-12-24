@@ -16,7 +16,59 @@ I suggest you read the [introductory article](http://brainflush.wordpress.com/20
 
 ## How do I use it?
 
-Droid-Fu is deployed as a JAR. Just link it to your app.
+Droid-Fu is deployed as a JAR. Just drop it in your app's lib folder and add it to the classpath.
+
+### Getting the JAR
+
+You can get the Droid-Fu JAR in several ways.
+
+The easiest one is probably to download a pre-built version from [GitHub][http://github.com/kaeppler/droid-fu/downloads]. Just know that these builds may not contain the most recent changes you see in the master branch.
+
+If you want to stay on the bleeding edge, you must download the sources and roll the JAR yourself. It's a little elaborate, but don't run off scared. Just follow these steps and you'll be fine. Droid-Fu employs a managed build process, driven by the wonderful [Maven build system][http://maven.apache.org] system. This means you have to install both Maven (v2.2.1 or newer), and the [maven-android SDK deployer][http://github.com/mosabua/maven-android-sdk-deployer]. Droid-Fu is currently built against the Android 1.5 R3 APIs, so you must have the proper Android JAR installed, too. Consult the Android SDK docs to learn about how to download and install different Android platform versions using the AVD/SDK Manager bundled with the ADT.
+
+#### Step 1: Getting the source codes
+
+If you're using [git][http://www.git-scm.com], do a 
+
+    git clone git://github.com/kaeppler/droid-fu.git
+
+and
+
+    git clone git://github.com/mosabua/maven-android-sdk-deployer.git
+
+now.
+
+Alternatively, you can simply download the archived source codes from the master branches, [here][http://github.com/kaeppler/droid-fu/archives/master] and [here][git://github.com/mosabua/maven-android-sdk-deployer/archives/master].
+
+#### Step 2: Install the Android JAR to your local Maven repository
+
+Droid-Fu must be compiled against the Android 1.5 R3 JAR. Since the build is driven by Maven, we must provide the Android JAR to Maven during the compile stage, otherwise the build will fail. Change to the folder to which you downloaded the maven-android SDK deployer source code, and into the platforms/android-1.5 sub-directory, e.g.:
+
+    $ cd ~/projects/maven-android-sdk-deployer/platforms/android-1.5
+
+Then install the Android JAR:
+
+    $ mvn install -Dandroid.sdk.path=/path/to/your/android/sdk/root
+
+If the build fails, you probably provided a wrong SDK root. An `ls` in the `android.sdk.path` should list (among other files) a `platforms` and `add-ons` folder.
+
+#### Step 3: Build and install the Droid-Fu JAR
+
+If you just want to build the JAR, and copy it around manually, change to the folder where you downloaded/cloned the Droid-Fu sources, and run:
+
+    $ mvn package
+
+This will build the JAR and place it under the `target` directory. To make your life easier, I included a switch which lets you deploy the JAR directly to your application's lib folder:
+
+    $ mvn install -DcopyTo=/path/to/your/apps/lib/folder
+
+This will build the JAR and copy it to the given folder.
+
+If you want a JavaDoc JAR to get inline docs in Eclipse, do this:
+
+    $ mvn javadoc:jar
+
+This will create a JavaDoc JAR under `target`.
 
 ## How is it licensed?
 
