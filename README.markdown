@@ -1,18 +1,21 @@
 # Droid-Fu - for your Android needs
 
-Droid-Fu is an effort to collect solutions for common concerns in Android applications, especially those Web based. Currently it mostly contains code which I pulled out of Qype Radar, and which I believe may prove useful to other developers. This is VERY much a work-in-progress, and both content and API are still in flux. There is not much documentation (yet), and I intend to change that. For now, you may want to read all related articles [here](http://en.wordpress.com/tag/droid-fu/). You can also find me on [Twitter](http://twitter.com/twoofour).
+Droid-Fu is an open-source effort aiming to collect and bundle solutions to common concerns in the development of applications for the [Google Android platform](http://developer.android.com/index.html). Currently it mostly contains code which I pulled out of [Qype Radar](http://www.qype.co.uk/go-mobile), and which I believe may prove useful to other developers. This is _very_ much a work-in-progress, and both content and APIs are still in flux. There is not much documentation (yet), and I intend to change that. For now, you may want to read all related articles [on my weblog](http://en.wordpress.com/tag/droid-fu/). You can also find me on [Twitter](http://twitter.com/twoofour).
 
 ## What does it offer?
 
-Droid-Fu offers both support classes meant to be used alongside existing Android code, as well as self-contained components such as new adapters and widgets. This includes:
+Droid-Fu offers both support classes meant to be used alongside existing Android code, as well as self-contained, ready-to-be-used components like new adapters and widgets.
+
+The areas tackled by Droid-Fu include:
 
   * application life-cycle helpers
+  * support classes for handling Intents and diagnostics
   * better support for background tasks
-  * easy and robust HTTP messaging
-  * (remote) image handling
+  * super-easy and robust HTTP messaging
+  * (remote) image handling and caching
   * custom adapters and views
 
-I suggest you read the [introductory article](http://brainflush.wordpress.com/2009/11/16/introducing-droid-fu-for-android-betteractivity-betterservice-and-betterasynctask/) here, and everything that follows.
+I suggest you read [this introductory article](http://brainflush.wordpress.com/2009/11/16/introducing-droid-fu-for-android-betteractivity-betterservice-and-betterasynctask/), and anything that follows.
 
 ## How do I use it?
 
