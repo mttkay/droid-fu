@@ -24,8 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import oauth.signpost.OAuthConsumer;
-import oauth.signpost.exception.OAuthExpectationFailedException;
-import oauth.signpost.exception.OAuthMessageSignerException;
+import oauth.signpost.exception.OAuthException;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
@@ -220,8 +219,7 @@ public abstract class BetterHttpRequest {
         return this;
     }
 
-    public BetterHttpRequest signed(OAuthConsumer oauthConsumer)
-            throws OAuthMessageSignerException, OAuthExpectationFailedException {
+    public BetterHttpRequest signed(OAuthConsumer oauthConsumer) throws OAuthException {
         this.oauthConsumer = oauthConsumer;
         oauthConsumer.sign(this.unwrap());
         return this;
