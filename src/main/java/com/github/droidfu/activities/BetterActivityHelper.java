@@ -65,7 +65,7 @@ public class BetterActivityHelper {
     }
 
     /**
-     * Creates a new progress dialog
+     * Creates a new ProgressDialog
      *
      * @param activity
      * @param progressDialogTitleId The resource id for the title. If this is less than or equal to 0, a default title is used.
@@ -97,18 +97,18 @@ public class BetterActivityHelper {
     }
 
     /**
-     * Creates a new Yes/No Alter dialog
+     * Creates a new Yes/No AlertDialog
      *
-     * @param activity
+     * @param context
      * @param dialogTitle
      * @param screenMessage
      * @param iconResourceId
      * @param listener
      * @return
      */
-    public static AlertDialog newYesNoDialog(final Activity activity, String dialogTitle,
+    public static AlertDialog newYesNoDialog(final Context context, String dialogTitle,
             String screenMessage, int iconResourceId, OnClickListener listener) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setCancelable(false);
         builder.setPositiveButton(android.R.string.yes, listener);
         builder.setNegativeButton(android.R.string.no, listener);
@@ -123,15 +123,15 @@ public class BetterActivityHelper {
     /**
      * Creates a new AlertDialog to display a simple message
      *
-     * @param activity
+     * @param context
      * @param dialogTitle
      * @param screenMessage
      * @param iconResourceId
      * @return
      */
-    public static AlertDialog newMessageDialog(final Activity activity, String dialogTitle,
+    public static AlertDialog newMessageDialog(final Context context, String dialogTitle,
             String screenMessage, int iconResourceId) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setCancelable(false);
         builder.setPositiveButton("Okay", new OnClickListener() {
 
@@ -161,7 +161,7 @@ public class BetterActivityHelper {
      * @param error
      * @return
      */
-    public static AlertDialog newErrorHandlerDialog(Activity activity, String dialogTitle,
+    public static AlertDialog newErrorHandlerDialog(final Activity activity, String dialogTitle,
             Exception error) {
         String screenMessage = "";
         if (error instanceof ResourceMessageException) {
@@ -196,12 +196,11 @@ public class BetterActivityHelper {
             final String diagnosis = DiagnosticSupport.createDiagnosis(activity, error);
             final Intent intent = IntentSupport.newEmailIntent(activity, bugReportEmailAddress,
                 bugReportEmailSubject, diagnosis);
-            final Activity a = activity;
             builder.setNegativeButton(buttonText, new OnClickListener() {
 
                 public void onClick(DialogInterface dialog, int which) {
                     dialog.dismiss();
-                    a.startActivity(intent);
+                    activity.startActivity(intent);
                 }
             });
         }
@@ -222,11 +221,12 @@ public class BetterActivityHelper {
      *
      * @return The new dialog.
      */
-    public static <T> Dialog newListDialog(Context context, final List<T> elements,
+    public static <T> Dialog newListDialog(final Context context, final List<T> elements,
             final DialogClickListener<T> listener, final boolean closeOnSelect) {
 
-        String[] entries = new String[elements.size()];
-        for (int i = 0; i < elements.size(); i++) {
+        final int entriesSize = elements.size();
+        String[] entries = new String[entriesSize];
+        for (int i = 0; i < entriesSize; i++) {
             entries[i] = elements.get(i).toString();
         }
 
@@ -248,7 +248,7 @@ public class BetterActivityHelper {
      * @param context
      * @return true if another application is above this one.
      */
-    public static boolean isApplicationBroughtToBackground(Context context) {
+    public static boolean isApplicationBroughtToBackground(final Context context) {
         ActivityManager am = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
         List<RunningTaskInfo> taskInfo = am.getRunningTasks(1);
         if (!taskInfo.isEmpty()) {
