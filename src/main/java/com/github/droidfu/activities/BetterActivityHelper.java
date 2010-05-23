@@ -75,19 +75,16 @@ public class BetterActivityHelper {
     public static ProgressDialog createProgressDialog(final Activity activity,
             int progressDialogTitleId, int progressDialogMsgId) {
         ProgressDialog progressDialog = new ProgressDialog(activity);
-        if (progressDialogTitleId > 0) {
-            progressDialog.setTitle(progressDialogTitleId);
-        } else {
-            progressDialog.setTitle(activity.getResources().getIdentifier(
-                PROGRESS_DIALOG_TITLE_RESOURCE, "string", activity.getPackageName()));
+        if (progressDialogTitleId <= 0) {
+            progressDialogTitleId = activity.getResources().getIdentifier(
+                PROGRESS_DIALOG_TITLE_RESOURCE, "string", activity.getPackageName());
         }
-        if (progressDialogMsgId > 0) {
-            progressDialog.setMessage(activity.getString(progressDialogMsgId));
-        } else {
+        progressDialog.setTitle(progressDialogTitleId);
+        if (progressDialogMsgId <= 0) {
             progressDialogMsgId = activity.getResources().getIdentifier(
                 PROGRESS_DIALOG_MESSAGE_RESOURCE, "string", activity.getPackageName());
-            progressDialog.setMessage(activity.getString(progressDialogMsgId));
         }
+        progressDialog.setMessage(activity.getString(progressDialogMsgId));
         progressDialog.setIndeterminate(true);
         progressDialog.setOnKeyListener(new OnKeyListener() {
             public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent event) {
