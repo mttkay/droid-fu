@@ -24,6 +24,29 @@ import android.view.Window;
 import com.github.droidfu.DroidFuApplication;
 import com.github.droidfu.activities.BetterActivity;
 
+/**
+ * Works in a similar way to AsyncTask but provides extra functionality.
+ *
+ * 1) It keeps track of the active instance of each Context, ensuring that the
+ * correct instance is reported to. This is very useful if your Activity is
+ * forced into the background, or the user rotates his device.
+ *
+ * 2) A progress dialog is automatically shown. See useCustomDialog()
+ * disableDialog()
+ *
+ * 3) If an Exception is thrown from inside doInBackground, this is now handled
+ * by the handleError method.
+ *
+ * 4) You should now longer override onPreExecute(), doInBackground() and
+ * onPostExecute(), instead you should use before(), doCheckedInBackground() and
+ * after() respectively.
+ *
+ * These features require that the Application extends DroidFuApplication.
+ *
+ * @param <ParameterT>
+ * @param <ProgressT>
+ * @param <ReturnT>
+ */
 public abstract class BetterAsyncTask<ParameterT, ProgressT, ReturnT> extends
         AsyncTask<ParameterT, ProgressT, ReturnT> {
 
@@ -40,6 +63,11 @@ public abstract class BetterAsyncTask<ParameterT, ProgressT, ReturnT> extends
 
     private int dialogId = 0;
 
+    /**
+     * Creates a new BetterAsyncTask who displays a progress dialog on the specified Context.
+     *
+     * @param context
+     */
     public BetterAsyncTask(Context context) {
 
         if (!(context.getApplicationContext() instanceof DroidFuApplication)) {
@@ -62,6 +90,13 @@ public abstract class BetterAsyncTask<ParameterT, ProgressT, ReturnT> extends
         }
     }
 
+    /**
+     * Gets the most recent instance of this Context.
+     * This may not be the Context used to construct this BetterAsyncTask as that Context might have been destroyed
+     * when a incoming call was received, or the user rotated the screen.
+     *
+     * @return The current Context, or null if the current Context has ended, and a new one has not spawned.
+     */
     protected Context getCallingContext() {
         try {
             Context caller = (Context) appContext.getActiveContext(callerId);
@@ -102,6 +137,11 @@ public abstract class BetterAsyncTask<ParameterT, ProgressT, ReturnT> extends
         before(context);
     }
 
+    /**
+     * Override to run code in the UI thread before this Task is run.
+     *
+     * @param context
+     */
     protected void before(Context context) {
     }
 
@@ -117,6 +157,14 @@ public abstract class BetterAsyncTask<ParameterT, ProgressT, ReturnT> extends
         return result;
     }
 
+    /**
+     * Override to perform computation in a background thread
+     *
+     * @param context
+     * @param params
+     * @return
+     * @throws Exception
+     */
     protected ReturnT doCheckedInBackground(Context context, ParameterT... params) throws Exception {
         if (callable != null) {
             return callable.call(this);
@@ -124,6 +172,12 @@ public abstract class BetterAsyncTask<ParameterT, ProgressT, ReturnT> extends
         return null;
     }
 
+    /**
+     * Runs in the UI thread if there was an exception throw from doCheckedInBackground
+     *
+     * @param context The most recent instance of the Context that executed this BetterAsyncTask
+     * @param error The thrown exception.
+     */
     protected abstract void handleError(Context context, Exception error);
 
     @Override
@@ -154,20 +208,43 @@ public abstract class BetterAsyncTask<ParameterT, ProgressT, ReturnT> extends
         }
     }
 
+    /**
+     * A replacement for onPostExecute. Runs in the UI thread after doCheckedInBackground returns.
+     *
+     * @param context The most recent instance of the Context that executed this BetterAsyncTask
+     * @param result The result returned from doCheckedInBackground
+     */
     protected abstract void after(Context context, ReturnT result);
 
+    /**
+     * Has an exception been thrown inside doCheckedInBackground()
+     * @return
+     */
     public boolean failed() {
         return error != null;
     }
 
+    /**
+     * Use a BetterAsyncTaskCallable instead of overriding doCheckedInBackground()
+     *
+     * @param callable
+     */
     public void setCallable(BetterAsyncTaskCallable<ParameterT, ProgressT, ReturnT> callable) {
         this.callable = callable;
     }
 
+    /**
+     * Use a custom resource ID for the progress dialog
+     *
+     * @param dialogId
+     */
     public void useCustomDialog(int dialogId) {
         this.dialogId = dialogId;
     }
 
+    /**
+     * Disable the display of a dialog during the execution of this task.
+     */
     public void disableDialog() {
         this.dialogId = -1;
     }
