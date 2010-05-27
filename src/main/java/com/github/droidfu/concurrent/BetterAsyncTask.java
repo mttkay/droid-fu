@@ -50,14 +50,15 @@ import com.github.droidfu.activities.BetterActivity;
 public abstract class BetterAsyncTask<ParameterT, ProgressT, ReturnT> extends
         AsyncTask<ParameterT, ProgressT, ReturnT> {
 
-    private DroidFuApplication appContext;
+    private final DroidFuApplication appContext;
+    private final boolean contextIsDroidFuActivity;
 
     private Exception error;
 
-    private boolean contextIsDroidFuActivity, isTitleProgressEnabled,
+    private boolean isTitleProgressEnabled,
             isTitleProgressIndeterminateEnabled = true;
 
-    private String callerId;
+    private final String callerId;
 
     private BetterAsyncTaskCallable<ParameterT, ProgressT, ReturnT> callable;
 
