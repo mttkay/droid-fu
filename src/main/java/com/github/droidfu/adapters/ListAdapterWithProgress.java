@@ -15,7 +15,7 @@
 
 package com.github.droidfu.adapters;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 import android.app.ListActivity;
@@ -31,7 +31,7 @@ public abstract class ListAdapterWithProgress<T> extends BaseAdapter {
 
     private View progressView;
 
-    protected List<T> data = new LinkedList<T>();
+    protected List<T> data = new ArrayList<T>();
 
     protected ListActivity context;
 
