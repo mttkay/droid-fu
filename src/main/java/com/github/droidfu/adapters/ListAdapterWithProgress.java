@@ -92,7 +92,7 @@ public abstract class ListAdapterWithProgress<T> extends BaseAdapter {
      * @return true if there are actual data items, ignoring the progress item.
      */
     public boolean hasItems() {
-        return getItemCount() != 0;
+        return data != null && !data.isEmpty();
     }
 
     public Object getItem(int position) {
