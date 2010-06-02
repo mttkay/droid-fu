@@ -30,7 +30,12 @@ public class DroidFuApplication extends Application {
         if (ref == null) {
             return null;
         }
-        return ref.get();
+
+        final Context c = ref.get();
+        if (c == null) // If the WeakReference is no longer valid, ensure it is removed.
+            contextObjects.remove(className);
+
+        return c;
     }
 
     public synchronized void setActiveContext(String className, Context context) {
