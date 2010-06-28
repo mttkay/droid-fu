@@ -1,4 +1,4 @@
-/* Copyright (c) 2009 Matthias Käppler
+/* Copyright (c) 2009 Matthias Kaeppler
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,9 +17,12 @@ package com.github.droidfu.http;
 
 import java.util.HashMap;
 
+import org.apache.http.impl.client.AbstractHttpClient;
+
 class HttpGet extends BetterHttpRequest {
 
-    HttpGet(String url, HashMap<String, String> defaultHeaders) {
+    HttpGet(AbstractHttpClient httpClient, String url, HashMap<String, String> defaultHeaders) {
+        super(httpClient);
         request = new org.apache.http.client.methods.HttpGet(url);
         for (String header : defaultHeaders.keySet()) {
             request.setHeader(header, defaultHeaders.get(header));

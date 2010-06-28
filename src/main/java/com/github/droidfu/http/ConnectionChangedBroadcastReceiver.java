@@ -1,4 +1,4 @@
-/* Copyright (c) 2009 Matthias KÃ¤ppler
+/* Copyright (c) 2009 Matthias KŠppler
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,8 +23,8 @@ public class ConnectionChangedBroadcastReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        System.out.println("CONN CHANGE");
-        BetterHttpRequest.updateProxySettings(context);
+        BetterHttp.setContext(context);
+        BetterHttp.updateProxySettings();
     }
 
 }
