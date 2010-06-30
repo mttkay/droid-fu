@@ -60,7 +60,7 @@ public abstract class BetterHttpRequest {
     private ResponseHandler<BetterHttpResponse> responseHandler = new ResponseHandler<BetterHttpResponse>() {
         public BetterHttpResponse handleResponse(HttpResponse response)
                 throws ClientProtocolException, IOException {
-            return handleResponse(response);
+            return BetterHttpRequest.this.handleResponse(response);
         }
     };
 
