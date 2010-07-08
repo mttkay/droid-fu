@@ -1,4 +1,4 @@
-package com.github.droidfu;
+package com.github.droidfu.testsupport;
 
 import java.util.LinkedList;
 
