@@ -8,7 +8,8 @@ public class DroidFuAssertions {
 
     public static <E> void assertEqualElements(Collection<E> expected, Collection<E> actual) {
         expected.removeAll(actual);
-        assertTrue(expected.isEmpty());
+        assertTrue("collections expected to contain the same elements, but didn't",
+            expected.isEmpty());
     }
 
 }
