@@ -181,7 +181,11 @@
         <updatePolicy>daily</updatePolicy>
         <checksumPolicy>warn</checksumPolicy>
       </snapshots>
-    </repository>    
+    </repository>
+    <repository>
+      <id>powermock-repo</id>
+      <url>http://powermock.googlecode.com/svn/repo/</url>
+    </repository>
   </repositories>
 
   <distributionManagement>
