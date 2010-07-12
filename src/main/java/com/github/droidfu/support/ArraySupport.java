@@ -1,20 +1,23 @@
 package com.github.droidfu.support;
 
+import java.lang.reflect.Array;
+
 
 public class ArraySupport {
 
     @SuppressWarnings("unchecked")
-    public static <T> T[] join(T[] one, T[] two) {
-        if (one == null) {
-            return two;
+    public static <T> T[] join(T[] head, T[] tail) {
+        if (head == null) {
+            return tail;
         }
-        if (two == null) {
-            return one;
+        if (tail == null) {
+            return head;
         }
-        Object[] array = new Object[one.length + two.length];
+        Class type = head.getClass().getComponentType();
+        T[] array = (T[]) Array.newInstance(type, head.length + tail.length);
 
-        System.arraycopy(one, 0, array, 0, one.length);
-        System.arraycopy(two, 0, array, one.length, two.length);
+        System.arraycopy(head, 0, array, 0, head.length);
+        System.arraycopy(tail, 0, array, head.length, tail.length);
 
         return (T[]) array;
     }
