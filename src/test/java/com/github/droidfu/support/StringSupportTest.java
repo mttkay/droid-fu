@@ -16,7 +16,7 @@ import android.text.TextUtils;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest( { TextUtils.class })
-public class TestStringSupport {
+public class StringSupportTest {
 
     @Before
     public void mockAndroidFrameWorkClasses() {
