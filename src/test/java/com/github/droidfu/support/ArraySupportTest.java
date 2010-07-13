@@ -1,6 +1,7 @@
 package com.github.droidfu.support;
 
 import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -20,4 +21,15 @@ public class ArraySupportTest {
         assertArrayEquals(two, ArraySupport.join(null, two));
     }
 
+    @Test
+    public void deleteElement() {
+        String[] array = { "a", "b", "c" };
+
+        assertEquals(2, ArraySupport.delete(array, 0).length);
+
+        assertArrayEquals(new String[] { "b", "c" }, ArraySupport.delete(array, 0));
+        assertArrayEquals(new String[] { "a", "c" }, ArraySupport.delete(array, 1));
+        assertArrayEquals(new String[] { "a", "b" }, ArraySupport.delete(array, 2));
+
+    }
 }
