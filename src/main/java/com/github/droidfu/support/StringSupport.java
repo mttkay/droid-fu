@@ -17,7 +17,7 @@ public class StringSupport {
      */
     public static String underscore(String camelCaseString) {
         String[] words = splitByCharacterTypeCamelCase(camelCaseString);
-        return TextUtils.join("_", words);
+        return TextUtils.join("_", words).toLowerCase();
     }
 
     /**

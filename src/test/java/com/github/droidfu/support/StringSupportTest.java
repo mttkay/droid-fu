@@ -40,7 +40,7 @@ public class StringSupportTest {
     @Test
     public void underscore() {
 
-        when(TextUtils.join("_", new String[] { "Hello", "World" })).thenReturn("hello_world");
+        when(TextUtils.join("_", new String[] { "Hello", "World" })).thenReturn("Hello_World");
 
         assertEquals("hello_world", StringSupport.underscore("HelloWorld"));
 
