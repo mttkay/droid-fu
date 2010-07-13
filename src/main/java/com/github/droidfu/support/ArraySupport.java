@@ -37,4 +37,23 @@ public class ArraySupport {
         return result;
     }
 
+    /**
+     * Attempts to find an object in a potentially unsorted array. Complexity is
+     * O(N).
+     * 
+     * @param <T>
+     * @param array
+     *        the input array
+     * @param object
+     *        the object to find
+     * @return the index of the object if found, -1 otherwise.
+     */
+    public static <T> int find(T[] array, T object) {
+        for (int i = 0; i < array.length; i++) {
+            if (array[i].equals(object)) {
+                return i;
+            }
+        }
+        return -1;
+    }
 }

@@ -32,4 +32,14 @@ public class ArraySupportTest {
         assertArrayEquals(new String[] { "a", "b" }, ArraySupport.delete(array, 2));
 
     }
+
+    @Test
+    public void findElement() {
+        String[] array = { "a", "b", "c" };
+
+        assertEquals(-1, ArraySupport.find(array, "x"));
+        assertEquals(0, ArraySupport.find(array, "a"));
+        assertEquals(1, ArraySupport.find(array, "b"));
+        assertEquals(2, ArraySupport.find(array, "c"));
+    }
 }
