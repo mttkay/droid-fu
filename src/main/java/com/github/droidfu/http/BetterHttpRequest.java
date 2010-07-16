@@ -15,16 +15,9 @@
 
 package com.github.droidfu.http;
 
-import java.io.IOException;
-import java.net.ConnectException;
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
+import android.util.Log;
 import oauth.signpost.OAuthConsumer;
 import oauth.signpost.exception.OAuthException;
-
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpRequestRetryHandler;
@@ -37,7 +30,12 @@ import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.ExecutionContext;
 import org.apache.http.protocol.HttpContext;
 
-import android.util.Log;
+import java.io.IOException;
+import java.net.ConnectException;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public abstract class BetterHttpRequest {
 
@@ -56,6 +54,8 @@ public abstract class BetterHttpRequest {
     protected AbstractHttpClient httpClient;
 
     protected HttpUriRequest request;
+
+    protected int retries = MAX_RETRIES;
 
     private ResponseHandler<BetterHttpResponse> responseHandler = new ResponseHandler<BetterHttpResponse>() {
         public BetterHttpResponse handleResponse(HttpResponse response)
@@ -90,6 +90,17 @@ public abstract class BetterHttpRequest {
         return this;
     }
 
+    public BetterHttpRequest retry(int retries) {
+        if (retries < 0) {
+            this.retries = 0;
+        } else if (retries > MAX_RETRIES) {
+            this.retries = MAX_RETRIES;
+        } else {
+            this.retries = retries;
+        }
+        return this;
+    }
+
     public BetterHttpResponse send() throws ConnectException {
 
         BetterHttp.updateProxySettings();
@@ -104,25 +115,25 @@ public abstract class BetterHttpRequest {
 
         int numAttempts = 0;
 
-        while (numAttempts < MAX_RETRIES) {
-
+        do {
             numAttempts++;
-
             try {
                 if (oauthConsumer != null) {
                     oauthConsumer.sign(request);
                 }
                 return httpClient.execute(request, responseHandler, httpContext);
             } catch (Exception e) {
-                waitAndContinue(e, numAttempts, MAX_RETRIES);
+                waitAndContinue(e, numAttempts, retries);
             }
-        }
+        } while (numAttempts < retries);
+
         return null;
     }
 
     protected void waitAndContinue(Exception cause, int numAttempts, int maxAttempts)
             throws ConnectException {
-        if (numAttempts == maxAttempts) {
+        // since maxAttempts may be set to 0 through the retry() method, we need to assume that numAttempts can be bigger then maxAttempts
+        if (numAttempts >= maxAttempts) {
             Log.e(LOG_TAG, "request failed after " + numAttempts + " attempts");
             ConnectException ex = new ConnectException();
             ex.initCause(cause);
@@ -148,7 +159,7 @@ public abstract class BetterHttpRequest {
     }
 
     protected boolean retryRequest(IOException exception, int executionCount, HttpContext context) {
-        if (executionCount > MAX_RETRIES) {
+        if (executionCount > retries) {
             return false;
         }
 
