@@ -1,4 +1,4 @@
-/* Copyright (c) 2009 Matthias KŠppler
+/* Copyright (c) 2009 Matthias Kï¿½ppler
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,14 +26,13 @@ import org.apache.http.util.EntityUtils;
 public class BetterHttpResponse {
 
     private HttpResponse response;
-
-    private InputStream responseBody;
+    private HttpEntity entity;
 
     public BetterHttpResponse(HttpResponse response) throws IOException {
         this.response = response;
-        HttpEntity entity = response.getEntity();
-        if (entity != null) {
-            this.responseBody = new BufferedHttpEntity(entity).getContent();
+        HttpEntity temp = response.getEntity();
+        if (temp != null) {
+            entity = new BufferedHttpEntity(temp);
         }
     }
 
@@ -42,11 +41,11 @@ public class BetterHttpResponse {
     }
 
     public InputStream getResponseBody() throws IOException {
-        return this.responseBody;
+        return entity.getContent();
     }
 
     public String getResponseBodyAsString() throws IOException {
-        return EntityUtils.toString(this.response.getEntity());
+        return EntityUtils.toString(entity);
     }
 
     public int getStatusCode() {
