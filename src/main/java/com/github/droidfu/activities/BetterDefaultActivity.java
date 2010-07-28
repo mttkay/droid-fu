@@ -19,6 +19,7 @@ import java.util.List;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Application;
 import android.app.Dialog;
 import android.content.Intent;
 import android.content.DialogInterface.OnClickListener;
@@ -44,8 +45,10 @@ public class BetterDefaultActivity extends Activity implements BetterActivity {
         this.wasCreated = true;
         this.currentIntent = getIntent();
 
-        ((DroidFuApplication) getApplication()).setActiveContext(getClass().getCanonicalName(),
-            this);
+        Application application = getApplication();
+        if (application instanceof DroidFuApplication) {
+            ((DroidFuApplication) application).setActiveContext(getClass().getCanonicalName(), this);
+        }
     }
 
     @Override
