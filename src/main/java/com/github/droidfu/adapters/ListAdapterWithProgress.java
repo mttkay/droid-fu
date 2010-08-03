@@ -44,7 +44,8 @@ public abstract class ListAdapterWithProgress<T> extends BaseAdapter {
         this(activity, activity.getListView(), progressDrawableResourceId);
     }
 
-    public ListAdapterWithProgress(Activity activity, ListView listView, int progressDrawableResourceId) {
+    public ListAdapterWithProgress(Activity activity, ListView listView,
+            int progressDrawableResourceId) {
         this.activity = activity;
         this.listView = listView;
         this.progressView = activity.getLayoutInflater().inflate(progressDrawableResourceId,
@@ -125,8 +126,14 @@ public abstract class ListAdapterWithProgress<T> extends BaseAdapter {
     }
 
     public void setIsLoadingData(boolean isLoadingData) {
+        setIsLoadingData(isLoadingData, true);
+    }
+
+    public void setIsLoadingData(boolean isLoadingData, boolean redrawList) {
         this.isLoadingData = isLoadingData;
-        notifyDataSetChanged();
+        if (redrawList) {
+            notifyDataSetChanged();
+        }
     }
 
     public boolean isLoadingData() {
@@ -159,6 +166,13 @@ public abstract class ListAdapterWithProgress<T> extends BaseAdapter {
     public void addAll(List<T> items) {
         data.addAll(items);
         notifyDataSetChanged();
+    }
+
+    public void addAll(List<T> items, boolean redrawList) {
+        data.addAll(items);
+        if (redrawList) {
+            notifyDataSetChanged();
+        }
     }
 
     public void clear() {
