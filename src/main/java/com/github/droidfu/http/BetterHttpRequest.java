@@ -15,9 +15,16 @@
 
 package com.github.droidfu.http;
 
-import android.util.Log;
+import java.io.IOException;
+import java.net.ConnectException;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import oauth.signpost.OAuthConsumer;
 import oauth.signpost.exception.OAuthException;
+
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpRequestRetryHandler;
@@ -30,12 +37,7 @@ import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.ExecutionContext;
 import org.apache.http.protocol.HttpContext;
 
-import java.io.IOException;
-import java.net.ConnectException;
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import android.util.Log;
 
 public abstract class BetterHttpRequest {
 
@@ -67,7 +69,39 @@ public abstract class BetterHttpRequest {
     private HttpRequestRetryHandler retryHandler = new HttpRequestRetryHandler() {
 
         public boolean retryRequest(IOException exception, int executionCount, HttpContext context) {
-            return retryRequest(exception, executionCount, context);
+            if (executionCount > retries) {
+                return false;
+            }
+
+            exception.printStackTrace();
+            Log.d(BetterHttpRequest.class.getSimpleName(), "Retrying "
+                    + request.getRequestLine().getUri() + " (tried: " + executionCount + " times)");
+
+            // Apache HttpClient rewrites the request URI to be relative
+            // before
+            // sending a request, but we need the full URI for OAuth
+            // signing,
+            // so restore it before proceeding.
+            RequestWrapper request = (RequestWrapper) context.getAttribute(ExecutionContext.HTTP_REQUEST);
+            URI rewrittenUri = request.getURI();
+            URI originalUri = (URI) context.getAttribute(REQUEST_URI_BACKUP);
+            request.setURI(originalUri);
+
+            // re-sign the request, otherwise this may yield 401s
+            if (oauthConsumer != null) {
+                try {
+                    oauthConsumer.sign(request);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    // no reason to retry this
+                    return false;
+                }
+            }
+
+            // restore URI to whatever Apache HttpClient expects
+            request.setURI(rewrittenUri);
+
+            return true;
         }
     };
 
@@ -132,7 +166,8 @@ public abstract class BetterHttpRequest {
 
     protected void waitAndContinue(Exception cause, int numAttempts, int maxAttempts)
             throws ConnectException {
-        // since maxAttempts may be set to 0 through the retry() method, we need to assume that numAttempts can be bigger then maxAttempts
+        // since maxAttempts may be set to 0 through the retry() method, we need
+        // to assume that numAttempts can be bigger then maxAttempts
         if (numAttempts >= maxAttempts) {
             Log.e(LOG_TAG, "request failed after " + numAttempts + " attempts");
             ConnectException ex = new ConnectException();
@@ -156,41 +191,5 @@ public abstract class BetterHttpRequest {
         }
 
         return new BetterHttpResponse(response);
-    }
-
-    protected boolean retryRequest(IOException exception, int executionCount, HttpContext context) {
-        if (executionCount > retries) {
-            return false;
-        }
-
-        exception.printStackTrace();
-        Log.d(BetterHttpRequest.class.getSimpleName(), "Retrying "
-                + request.getRequestLine().getUri() + " (tried: " + executionCount + " times)");
-
-        // Apache HttpClient rewrites the request URI to be relative
-        // before
-        // sending a request, but we need the full URI for OAuth
-        // signing,
-        // so restore it before proceeding.
-        RequestWrapper request = (RequestWrapper) context.getAttribute(ExecutionContext.HTTP_REQUEST);
-        URI rewrittenUri = request.getURI();
-        URI originalUri = (URI) context.getAttribute(REQUEST_URI_BACKUP);
-        request.setURI(originalUri);
-
-        // re-sign the request, otherwise this may yield 401s
-        if (oauthConsumer != null) {
-            try {
-                oauthConsumer.sign(request);
-            } catch (Exception e) {
-                e.printStackTrace();
-                // no reason to retry this
-                return false;
-            }
-        }
-
-        // restore URI to whatever Apache HttpClient expects
-        request.setURI(rewrittenUri);
-
-        return true;
     }
 }
