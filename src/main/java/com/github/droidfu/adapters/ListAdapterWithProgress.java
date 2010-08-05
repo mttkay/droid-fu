@@ -21,7 +21,6 @@ import java.util.List;
 import android.app.Activity;
 import android.app.ExpandableListActivity;
 import android.app.ListActivity;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -33,11 +32,9 @@ public abstract class ListAdapterWithProgress<T> extends BaseAdapter {
 
     private View progressView;
 
-    protected List<T> data = new ArrayList<T>();
+    private ArrayList<T> data = new ArrayList<T>();
 
-    protected Activity activity;
-
-    protected LayoutInflater inflater;
+    private ListView listView;
 
     public ListAdapterWithProgress(ListActivity activity, int progressDrawableResourceId) {
         this(activity, activity.getListView(), progressDrawableResourceId);
@@ -49,10 +46,17 @@ public abstract class ListAdapterWithProgress<T> extends BaseAdapter {
 
     public ListAdapterWithProgress(Activity activity, ListView listView,
             int progressDrawableResourceId) {
-        this.activity = activity;
+        this.listView = listView;
         this.progressView = activity.getLayoutInflater().inflate(progressDrawableResourceId,
             listView, false);
-        this.inflater = LayoutInflater.from(activity);
+    }
+
+    public ListView getListView() {
+        return listView;
+    }
+
+    public View getProgressView() {
+        return progressView;
     }
 
     /**
@@ -103,7 +107,7 @@ public abstract class ListAdapterWithProgress<T> extends BaseAdapter {
         return data != null && !data.isEmpty();
     }
 
-    public Object getItem(int position) {
+    public T getItem(int position) {
         if (data == null) {
             return null;
         }
