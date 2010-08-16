@@ -115,7 +115,7 @@ public abstract class BetterAsyncTask<ParameterT, ProgressT, ReturnT> extends
     }
 
     @Override
-    protected void onPreExecute() {
+    protected final void onPreExecute() {
         Context context = getCallingContext();
         if (context == null) {
             Log.d(BetterAsyncTask.class.getSimpleName(), "skipping pre-exec handler for task "
@@ -174,19 +174,15 @@ public abstract class BetterAsyncTask<ParameterT, ProgressT, ReturnT> extends
     }
 
     /**
-     * Runs in the UI thread if there was an exception throw from
-     * doCheckedInBackground
-     * 
-     * @param context
-     *        The most recent instance of the Context that executed this
-     *        BetterAsyncTask
-     * @param error
-     *        The thrown exception.
+     * Runs in the UI thread if there was an exception throw from doCheckedInBackground
+     *
+     * @param context The most recent instance of the Context that executed this BetterAsyncTask
+     * @param error The thrown exception.
      */
     protected abstract void handleError(Context context, Exception error);
 
     @Override
-    protected void onPostExecute(ReturnT result) {
+    protected final void onPostExecute(ReturnT result) {
         Context context = getCallingContext();
         if (context == null) {
             Log.d(BetterAsyncTask.class.getSimpleName(), "skipping post-exec handler for task "
