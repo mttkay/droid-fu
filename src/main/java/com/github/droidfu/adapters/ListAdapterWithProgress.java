@@ -19,8 +19,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.app.Activity;
+import android.app.ExpandableListActivity;
 import android.app.ListActivity;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -32,24 +32,31 @@ public abstract class ListAdapterWithProgress<T> extends BaseAdapter {
 
     private View progressView;
 
-    protected List<T> data = new ArrayList<T>();
+    private ArrayList<T> data = new ArrayList<T>();
 
-    protected Activity activity;
-
-    protected ListView listView;
-
-    protected LayoutInflater inflater;
+    private ListView listView;
 
     public ListAdapterWithProgress(ListActivity activity, int progressDrawableResourceId) {
         this(activity, activity.getListView(), progressDrawableResourceId);
     }
 
-    public ListAdapterWithProgress(Activity activity, ListView listView, int progressDrawableResourceId) {
-        this.activity = activity;
+    public ListAdapterWithProgress(ExpandableListActivity activity, int progressDrawableResourceId) {
+        this(activity, activity.getExpandableListView(), progressDrawableResourceId);
+    }
+
+    public ListAdapterWithProgress(Activity activity, ListView listView,
+            int progressDrawableResourceId) {
         this.listView = listView;
         this.progressView = activity.getLayoutInflater().inflate(progressDrawableResourceId,
             listView, false);
-        this.inflater = LayoutInflater.from(activity);
+    }
+
+    public ListView getListView() {
+        return listView;
+    }
+
+    public View getProgressView() {
+        return progressView;
     }
 
     /**
@@ -100,7 +107,7 @@ public abstract class ListAdapterWithProgress<T> extends BaseAdapter {
         return data != null && !data.isEmpty();
     }
 
-    public Object getItem(int position) {
+    public T getItem(int position) {
         if (data == null) {
             return null;
         }
@@ -125,8 +132,14 @@ public abstract class ListAdapterWithProgress<T> extends BaseAdapter {
     }
 
     public void setIsLoadingData(boolean isLoadingData) {
+        setIsLoadingData(isLoadingData, true);
+    }
+
+    public void setIsLoadingData(boolean isLoadingData, boolean redrawList) {
         this.isLoadingData = isLoadingData;
-        notifyDataSetChanged();
+        if (redrawList) {
+            notifyDataSetChanged();
+        }
     }
 
     public boolean isLoadingData() {
@@ -159,6 +172,13 @@ public abstract class ListAdapterWithProgress<T> extends BaseAdapter {
     public void addAll(List<T> items) {
         data.addAll(items);
         notifyDataSetChanged();
+    }
+
+    public void addAll(List<T> items, boolean redrawList) {
+        data.addAll(items);
+        if (redrawList) {
+            notifyDataSetChanged();
+        }
     }
 
     public void clear() {

@@ -17,10 +17,9 @@ package com.github.droidfu.activities;
 
 import java.util.List;
 
-import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.Application;
 import android.app.Dialog;
+import android.app.ExpandableListActivity;
 import android.content.Intent;
 import android.content.DialogInterface.OnClickListener;
 import android.os.Bundle;
@@ -28,7 +27,7 @@ import android.os.Bundle;
 import com.github.droidfu.DroidFuApplication;
 import com.github.droidfu.dialogs.DialogClickListener;
 
-public class BetterDefaultActivity extends Activity implements BetterActivity {
+public class BetterExpandableListActivity extends ExpandableListActivity implements BetterActivity {
 
     private boolean wasCreated, wasInterrupted;
 
@@ -45,17 +44,13 @@ public class BetterDefaultActivity extends Activity implements BetterActivity {
         this.wasCreated = true;
         this.currentIntent = getIntent();
 
-        Application application = getApplication();
-        if (application instanceof DroidFuApplication) {
-            ((DroidFuApplication) application).setActiveContext(getClass().getCanonicalName(), this);
-        }
+        ((DroidFuApplication) getApplication()).setActiveContext(getClass().getCanonicalName(),
+            this);
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        // ((DroidFuApplication)
-        // getApplication()).resetActiveContext(getClass().getCanonicalName());
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
     }
 
     @Override
@@ -151,5 +146,4 @@ public class BetterDefaultActivity extends Activity implements BetterActivity {
             boolean closeOnSelect) {
         return BetterActivityHelper.newListDialog(this, elements, listener, closeOnSelect);
     }
-
 }
