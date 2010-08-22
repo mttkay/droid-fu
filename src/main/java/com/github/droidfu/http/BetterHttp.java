@@ -9,9 +9,9 @@ import org.apache.http.conn.params.ConnManagerParams;
 import org.apache.http.conn.params.ConnPerRouteBean;
 import org.apache.http.conn.params.ConnRoutePNames;
 import org.apache.http.conn.scheme.PlainSocketFactory;
-import org.apache.http.conn.ssl.SSLSocketFactory;
 import org.apache.http.conn.scheme.Scheme;
 import org.apache.http.conn.scheme.SchemeRegistry;
+import org.apache.http.conn.ssl.SSLSocketFactory;
 import org.apache.http.impl.client.AbstractHttpClient;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
@@ -24,7 +24,6 @@ import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Proxy;
-import android.util.Log;
 
 public class BetterHttp {
 
@@ -72,13 +71,19 @@ public class BetterHttp {
             return;
         }
         if (nwInfo.getType() == ConnectivityManager.TYPE_MOBILE) {
-            String proxyHost = Proxy.getDefaultHost();
-            int proxyPort = Proxy.getDefaultPort();
+            String proxyHost = Proxy.getHost(appContext);
+            if (proxyHost == null) {
+                proxyHost = Proxy.getDefaultHost();
+            }
+            int proxyPort = Proxy.getPort(appContext);
+            if (proxyPort == -1) {
+                proxyPort = Proxy.getDefaultPort();
+            }
             if (proxyHost != null && proxyPort > -1) {
-                Log.d(BetterHttp.class.getSimpleName(), "Detected carrier proxy " + proxyHost + ":"
-                        + proxyPort);
                 HttpHost proxy = new HttpHost(proxyHost, proxyPort);
                 httpParams.setParameter(ConnRoutePNames.DEFAULT_PROXY, proxy);
+            } else {
+                httpParams.setParameter(ConnRoutePNames.DEFAULT_PROXY, null);
             }
         } else {
             httpParams.setParameter(ConnRoutePNames.DEFAULT_PROXY, null);
