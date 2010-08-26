@@ -165,7 +165,7 @@ public abstract class ListAdapterWithProgress<T> extends BaseAdapter {
         return isLoadingData && position == data.size();
     }
 
-    public List<T> getData() {
+    public ArrayList<T> getData() {
         return data;
     }
 
