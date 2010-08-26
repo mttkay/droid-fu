@@ -1,13 +1,41 @@
 package com.github.droidfu.testsupport;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 
 public class DroidFuAssertions {
+
+    private static boolean junit4 = true;
+
+    static {
+        try {
+            Class.forName("org.junit.Assert");
+        } catch (ClassNotFoundException e) {
+            System.out.println("JUnit4 not found on class path, will use JUnit3 assertions!");
+            junit4 = false;
+        }
+    }
+
+    public static void useJUnit3() {
+        junit4 = false;
+    }
+
+    private static void assertTrue(String message, boolean condition) {
+        if (junit4) {
+            org.junit.Assert.assertTrue(message, condition);
+        } else {
+            junit.framework.Assert.assertTrue(message, condition);
+        }
+    }
+
+    private static void assertEquals(String message, Object expected, Object actual) {
+        if (junit4) {
+            org.junit.Assert.assertEquals(message, expected, actual);
+        } else {
+            junit.framework.Assert.assertEquals(message, expected, actual);
+        }
+    }
 
     public static <E> void assertEqualElements(Collection<E> expected, Collection<E> actual) {
         expected.removeAll(actual);
