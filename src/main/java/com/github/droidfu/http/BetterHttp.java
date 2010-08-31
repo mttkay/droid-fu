@@ -98,6 +98,10 @@ public class BetterHttp {
         return new HttpPost(httpClient, url, payload, defaultHeaders);
     }
 
+    public static BetterHttpRequest put(String url, HttpEntity payload) {
+        return new HttpPut(httpClient, url, payload, defaultHeaders);
+    }
+
     public static void setMaximumConnections(int maxConnections) {
         BetterHttp.maxConnections = maxConnections;
     }
