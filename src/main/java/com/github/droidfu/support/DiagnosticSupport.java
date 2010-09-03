@@ -30,6 +30,18 @@ import android.provider.Settings.SettingNotFoundException;
 
 public class DiagnosticSupport {
 
+    public static final int ANDROID_API_LEVEL;
+
+    static {
+        int apiLevel = -1;
+        try {
+            apiLevel = Build.VERSION.class.getField("SDK_INT").getInt(null);
+        } catch (Exception e) {
+            apiLevel = Integer.parseInt(Build.VERSION.SDK);
+        }
+        ANDROID_API_LEVEL = apiLevel;
+    }
+
     public static String getApplicationVersionString(Context context) {
         try {
             PackageManager pm = context.getPackageManager();
