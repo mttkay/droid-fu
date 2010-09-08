@@ -62,7 +62,7 @@ public class ImageCache implements Map<String, Bitmap> {
 
     private Map<String, Bitmap> cache;
 
-    private CompressFormat compressedImageFormat = CompressFormat.JPEG;
+    private CompressFormat compressedImageFormat = CompressFormat.PNG;
 
     public ImageCache(Context context, int initialCapacity, int concurrencyLevel) {
         this.cache = new MapMaker().initialCapacity(initialCapacity).concurrencyLevel(
@@ -72,26 +72,22 @@ public class ImageCache implements Map<String, Bitmap> {
         new File(secondLevelCacheDir).mkdirs();
     }
 
-    // /**
-    // * Changing the in-memory cache size will invalidate the cache if new
-    // value
-    // * < old value.
-    // *
-    // * @param firstLevelCacheSize
-    // * maximum number of objects that should be held in memory at any
-    // * time
-    // */
-    // public void setFirstLevelCacheSize(int firstLevelCacheSize) {
-    // this.firstLevelCacheSize = firstLevelCacheSize;
-    // // invalidate the cache
-    // if (firstLevelCacheSize < this.firstLevelCacheSize) {
-    // this.clear();
-    // }
-    // }
-    //
-    // public int getFirstLevelCacheSize() {
-    // return firstLevelCacheSize;
-    // }
+    /**
+     * The image format that should be used when caching images on disk. The
+     * default value is {@link CompressFormat#PNG}. Note that when switching to
+     * a format like JPEG, you will lose any transparency that was part of the
+     * image.
+     * 
+     * @param compressedImageFormat
+     *        the {@link CompressFormat}
+     */
+    public void setCompressedImageFormat(CompressFormat compressedImageFormat) {
+        this.compressedImageFormat = compressedImageFormat;
+    }
+
+    public CompressFormat getCompressedImageFormat() {
+        return compressedImageFormat;
+    }
 
     /**
      * @param cachedImageQuality

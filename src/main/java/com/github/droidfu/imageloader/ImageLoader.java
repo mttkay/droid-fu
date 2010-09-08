@@ -166,6 +166,15 @@ public class ImageLoader implements Runnable {
         }
     }
 
+    /**
+     * Returns the image cache backing this image loader.
+     * 
+     * @return the {@link ImageCache}
+     */
+    public static ImageCache getImageCache() {
+        return imageCache;
+    }
+
     public void run() {
         Bitmap bitmap = null;
         int timesTried = 1;
