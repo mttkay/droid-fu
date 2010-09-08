@@ -38,8 +38,11 @@ public class ImageLoaderHandler extends Handler {
         }
     }
 
-    ImageView getImageView() {
+    public ImageView getImageView() {
         return imageView;
     }
 
+    public void setImageView(ImageView imageView) {
+        this.imageView = imageView;
+    }
 }

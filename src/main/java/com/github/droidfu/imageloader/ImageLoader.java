@@ -48,9 +48,9 @@ public class ImageLoader implements Runnable {
 
     private static final int DEFAULT_POOL_SIZE = 2;
 
-    static final int HANDLER_MESSAGE_ID = 0;
+    public static final int HANDLER_MESSAGE_ID = 0;
 
-    static final String BITMAP_EXTRA = "droidfu:extra_bitmap";
+    public static final String BITMAP_EXTRA = "droidfu:extra_bitmap";
 
     private static int numAttempts = 3;
 
