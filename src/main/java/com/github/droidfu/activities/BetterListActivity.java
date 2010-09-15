@@ -163,8 +163,8 @@ public class BetterListActivity extends ListActivity implements BetterActivity {
             BetterActivityHelper.ERROR_DIALOG_TITLE_RESOURCE, "string", getPackageName()), error);
     }
 
-    public <T> Dialog newListDialog(List<T> elements, DialogClickListener<T> listener,
-            boolean closeOnSelect) {
-        return BetterActivityHelper.newListDialog(this, elements, listener, closeOnSelect);
+    public <T> Dialog newListDialog(String title, List<T> elements,
+            DialogClickListener<T> listener, boolean closeOnSelect) {
+        return BetterActivityHelper.newListDialog(this, title, elements, listener, closeOnSelect);
     }
 }

@@ -147,6 +147,8 @@ public interface BetterActivity {
      * 
      * @param <T>
      *        the type of the list items
+     * @param dialogTitle
+     *        the title or null to disable the title
      * @param listItems
      *        the list items
      * @param listener
@@ -155,6 +157,6 @@ public interface BetterActivity {
      *        if true, the dialog will close when an item has been clicked
      * @return the dialog
      */
-    public <T> Dialog newListDialog(final List<T> listItems, final DialogClickListener<T> listener,
-            boolean closeOnSelect);
+    public <T> Dialog newListDialog(String title, final List<T> listItems,
+            final DialogClickListener<T> listener, boolean closeOnSelect);
 }

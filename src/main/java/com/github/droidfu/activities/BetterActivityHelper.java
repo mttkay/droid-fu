@@ -66,10 +66,13 @@ public class BetterActivityHelper {
 
     /**
      * Creates a new ProgressDialog
-     *
+     * 
      * @param activity
-     * @param progressDialogTitleId The resource id for the title. If this is less than or equal to 0, a default title is used.
-     * @param progressDialogMsgId   The resource id for the message.
+     * @param progressDialogTitleId
+     *        The resource id for the title. If this is less than or equal to 0,
+     *        a default title is used.
+     * @param progressDialogMsgId
+     *        The resource id for the message.
      * @return The new dialog
      */
     public static ProgressDialog createProgressDialog(final Activity activity,
@@ -98,7 +101,7 @@ public class BetterActivityHelper {
 
     /**
      * Creates a new Yes/No AlertDialog
-     *
+     * 
      * @param context
      * @param dialogTitle
      * @param screenMessage
@@ -122,7 +125,7 @@ public class BetterActivityHelper {
 
     /**
      * Creates a new AlertDialog to display a simple message
-     *
+     * 
      * @param context
      * @param dialogTitle
      * @param screenMessage
@@ -148,14 +151,13 @@ public class BetterActivityHelper {
     }
 
     /**
-     * Displays a error dialog with an exception as its body.
-     * Also displays a Send Email button to send the exception to the developer.
-     *
-     * Implement the following resource IDs
-     * droidfu_error_report_email_address - The email address the exception is sent to.
-     * droidfu_error_report_email_subject - The subject of the email.
-     * droidfu_dialog_button_send_error_report - The text on the Send Email button.
-     *
+     * Displays a error dialog with an exception as its body. Also displays a
+     * Send Email button to send the exception to the developer. Implement the
+     * following resource IDs droidfu_error_report_email_address - The email
+     * address the exception is sent to. droidfu_error_report_email_subject -
+     * The subject of the email. droidfu_dialog_button_send_error_report - The
+     * text on the Send Email button.
+     * 
      * @param activity
      * @param dialogTitle
      * @param error
@@ -209,20 +211,27 @@ public class BetterActivityHelper {
     }
 
     /**
-     * Creates a AlertDialog that shows a list of elements. The listener's onClick method
-     * gets called when the user taps a list item.
-     *
-     * @param <T> The type of each element
+     * Creates a AlertDialog that shows a list of elements. The listener's
+     * onClick method gets called when the user taps a list item.
+     * 
+     * @param <T>
+     *        The type of each element
      * @param context
-     * @param elements List of elements to be displayed. Each elements toString() method will be called.
-     * @param listener The listener to handle the onClick events.
-     * @param closeOnSelect If true the dialog closes as soon as one list item is selected, otherwise
-     *        multiple onClick events may be sent.
-     *
+     * @param dialogTitle
+     *        the title or null to disable the title
+     * @param elements
+     *        List of elements to be displayed. Each elements toString() method
+     *        will be called.
+     * @param listener
+     *        The listener to handle the onClick events.
+     * @param closeOnSelect
+     *        If true the dialog closes as soon as one list item is selected,
+     *        otherwise multiple onClick events may be sent.
      * @return The new dialog.
      */
-    public static <T> Dialog newListDialog(final Context context, final List<T> elements,
-            final DialogClickListener<T> listener, final boolean closeOnSelect) {
+    public static <T> Dialog newListDialog(final Activity context, String dialogTitle,
+            final List<T> elements, final DialogClickListener<T> listener,
+            final boolean closeOnSelect) {
 
         final int entriesSize = elements.size();
         String[] entries = new String[entriesSize];
@@ -231,6 +240,9 @@ public class BetterActivityHelper {
         }
 
         Builder builder = new AlertDialog.Builder(context);
+        if (dialogTitle != null) {
+            builder.setTitle(dialogTitle);
+        }
         builder.setSingleChoiceItems(entries, 0, new DialogInterface.OnClickListener() {
 
             public void onClick(DialogInterface dialog, int which) {
@@ -244,7 +256,9 @@ public class BetterActivityHelper {
     }
 
     /**
-     * Checks if the application is in the background (i.e behind another application's Activity).
+     * Checks if the application is in the background (i.e behind another
+     * application's Activity).
+     * 
      * @param context
      * @return true if another application is above this one.
      */
