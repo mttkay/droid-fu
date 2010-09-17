@@ -52,6 +52,8 @@ public class ImageLoader implements Runnable {
 
     public static final String BITMAP_EXTRA = "droidfu:extra_bitmap";
 
+    private static final int NO_POSITION = -1;
+
     private static int numAttempts = 3;
 
     /**
@@ -106,6 +108,11 @@ public class ImageLoader implements Runnable {
         this.handler = handler;
     }
 
+    public ImageLoader(String imageUrl, ImageView imageView, int position) {
+        this.imageUrl = imageUrl;
+        this.handler = new ImageLoaderHandler(imageView, position);
+    }
+
     /**
      * Triggers the image loader for the given image and view. The image loading
      * will be performed concurrently to the UI main thread, using a fixed size
@@ -118,7 +125,26 @@ public class ImageLoader implements Runnable {
      *        the ImageView which should be updated with the new image
      */
     public static void start(String imageUrl, ImageView imageView) {
-        ImageLoader loader = new ImageLoader(imageUrl, imageView);
+        start(imageUrl, imageView, NO_POSITION);
+    }
+
+    /**
+     * Triggers the image loader for the given image and view. The image loading
+     * will be performed concurrently to the UI main thread, using a fixed size
+     * thread pool. The loaded image will be posted back to the given ImageView
+     * upon completion. This method is intended to be used in a ListAdapter.
+     * 
+     * @param imageUrl the URL of the image to download
+     * @param imageView the ImageView which should be updated with the new image
+     * @param position the position of the item within the adapter's data set.
+     */
+    public static void start(String imageUrl, ImageView imageView, int position) {
+        ImageLoader loader;
+        if (position == NO_POSITION) {
+            loader = new ImageLoader(imageUrl, imageView);
+        } else {
+            loader = new ImageLoader(imageUrl, imageView, position);
+        }
         synchronized (imageCache) {
             Bitmap image = imageCache.get(imageUrl);
             if (image == null) {
@@ -129,7 +155,7 @@ public class ImageLoader implements Runnable {
             }
         }
     }
-
+    
     /**
      * Triggers the image loader for the given image and handler. The image
      * loading will be performed concurrently to the UI main thread, using a
