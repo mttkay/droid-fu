@@ -35,7 +35,7 @@ public class DiagnosticSupport {
     static {
         int apiLevel = -1;
         try {
-            apiLevel = Build.VERSION.SDK_INT;
+            apiLevel = Build.VERSION.class.getField("SDK_INT").getInt(null);
         } catch (Exception e) {
             apiLevel = Integer.parseInt(Build.VERSION.SDK);
         }
