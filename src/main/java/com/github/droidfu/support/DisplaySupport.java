@@ -47,7 +47,7 @@ public class DisplaySupport {
         if (screenDensity == -1) {
             DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
             try {
-                screenDensity = DisplayMetrics.class.getField("densityDpi").getFloat(displayMetrics);
+                screenDensity = displayMetrics.densityDpi;
             } catch (Exception e) {
                 screenDensity = SCREEN_DENSITY_MEDIUM;
             }
