@@ -15,7 +15,6 @@
 
 package com.github.droidfu.support;
 
-import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -31,7 +30,7 @@ public class DisplaySupport {
 
     private static float screenDensity = -1;
 
-    public static int dipToPx(Activity context, int dip) {
+    public static int dipToPx(Context context, int dip) {
         DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
         return (int) (dip * displayMetrics.density + 0.5f);
     }
