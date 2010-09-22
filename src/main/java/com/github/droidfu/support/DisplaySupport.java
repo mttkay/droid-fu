@@ -25,13 +25,14 @@ import android.util.DisplayMetrics;
 
 public class DisplaySupport {
 
-    private static DisplayMetrics displayMetrics;
+    public static final int SCREEN_DENSITY_LOW = 120;
+    public static final int SCREEN_DENSITY_MEDIUM = 160;
+    public static final int SCREEN_DENSITY_HIGH = 240;
+
+    private static float screenDensity = -1;
 
     public static int dipToPx(Activity context, int dip) {
-        if (displayMetrics == null) {
-            displayMetrics = new DisplayMetrics();
-            context.getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
-        }
+        DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
         return (int) (dip * displayMetrics.density + 0.5f);
     }
 
@@ -42,4 +43,15 @@ public class DisplaySupport {
         return new BitmapDrawable(Bitmap.createScaledBitmap(sourceBitmap, width, height, true));
     }
 
+    public static float getScreenDensity(Context context) {
+        if (screenDensity == -1) {
+            DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
+            try {
+                screenDensity = DisplayMetrics.class.getField("densityDpi").getFloat(displayMetrics);
+            } catch (Exception e) {
+                screenDensity = SCREEN_DENSITY_MEDIUM;
+            }
+        }
+        return screenDensity;
+    }
 }
