@@ -28,7 +28,7 @@ public class DisplaySupport {
     public static final int SCREEN_DENSITY_MEDIUM = 160;
     public static final int SCREEN_DENSITY_HIGH = 240;
 
-    private static float screenDensity = -1;
+    private static int screenDensity = -1;
 
     public static int dipToPx(Context context, int dip) {
         DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
@@ -42,11 +42,11 @@ public class DisplaySupport {
         return new BitmapDrawable(Bitmap.createScaledBitmap(sourceBitmap, width, height, true));
     }
 
-    public static float getScreenDensity(Context context) {
+    public static int getScreenDensity(Context context) {
         if (screenDensity == -1) {
             DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
             try {
-                screenDensity = DisplayMetrics.class.getField("densityDpi").getFloat(displayMetrics);
+                screenDensity = DisplayMetrics.class.getField("densityDpi").getInt(displayMetrics);
             } catch (Exception e) {
                 screenDensity = SCREEN_DENSITY_MEDIUM;
             }
