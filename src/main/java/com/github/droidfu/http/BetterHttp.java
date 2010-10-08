@@ -102,6 +102,10 @@ public class BetterHttp {
         return new HttpPut(httpClient, url, payload, defaultHeaders);
     }
 
+    public static BetterHttpRequest delete(String url) {
+        return new HttpDelete(httpClient, url, defaultHeaders);
+    }
+
     public static void setMaximumConnections(int maxConnections) {
         BetterHttp.maxConnections = maxConnections;
     }
