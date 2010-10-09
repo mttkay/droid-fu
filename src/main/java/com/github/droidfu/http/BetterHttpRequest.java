@@ -186,7 +186,8 @@ public abstract class BetterHttpRequest {
 
     protected BetterHttpResponse handleResponse(HttpResponse response) throws IOException {
         int status = response.getStatusLine().getStatusCode();
-        if (expectedStatusCodes != null && !expectedStatusCodes.contains(status)) {
+        if (expectedStatusCodes != null && !expectedStatusCodes.isEmpty()
+                && !expectedStatusCodes.contains(status)) {
             throw new HttpResponseException(status, "Unexpected status code: " + status);
         }
 
