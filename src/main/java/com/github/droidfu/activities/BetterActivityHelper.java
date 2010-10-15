@@ -232,7 +232,12 @@ public class BetterActivityHelper {
     public static <T> Dialog newListDialog(final Activity context, String dialogTitle,
             final List<T> elements, final DialogClickListener<T> listener,
             final boolean closeOnSelect) {
-
+        return newListDialog(context, dialogTitle, elements, listener, closeOnSelect, 0);
+    }
+    
+    public static <T> Dialog newListDialog(final Activity context, String dialogTitle,
+            final List<T> elements, final DialogClickListener<T> listener,
+            final boolean closeOnSelect, int selectedItem) {
         final int entriesSize = elements.size();
         String[] entries = new String[entriesSize];
         for (int i = 0; i < entriesSize; i++) {
@@ -243,7 +248,7 @@ public class BetterActivityHelper {
         if (dialogTitle != null) {
             builder.setTitle(dialogTitle);
         }
-        builder.setSingleChoiceItems(entries, 0, new DialogInterface.OnClickListener() {
+        builder.setSingleChoiceItems(entries, selectedItem, new DialogInterface.OnClickListener() {
 
             public void onClick(DialogInterface dialog, int which) {
                 if (closeOnSelect)
