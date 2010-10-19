@@ -104,23 +104,35 @@ public class WebGalleryAdapter extends BaseAdapter {
         return progressDrawable;
     }
 
-    // TODO: leverage convert view for better performance
     public View getView(int position, View convertView, ViewGroup parent) {
 
         String imageUrl = (String) getItem(position);
 
-        FrameLayout container = new FrameLayout(context);
-        container.setLayoutParams(new Gallery.LayoutParams(LayoutParams.FILL_PARENT,
-                LayoutParams.FILL_PARENT));
+        FrameLayout container;
+        WebImageView item;
 
-        WebImageView item = new WebImageView(context, imageUrl, progressDrawable, false);
-        FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(LayoutParams.WRAP_CONTENT,
-                LayoutParams.WRAP_CONTENT);
-        lp.gravity = Gravity.CENTER;
-        item.setLayoutParams(lp);
+        if (convertView == null) {
+            container = new FrameLayout(context);
+            container.setLayoutParams(new Gallery.LayoutParams(LayoutParams.FILL_PARENT,
+                    LayoutParams.FILL_PARENT));
 
-        container.addView(item);
+            item = new WebImageView(context, null, false);
+            item.setProgressDrawable(progressDrawable);
+            FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(LayoutParams.WRAP_CONTENT,
+                    LayoutParams.WRAP_CONTENT);
+            lp.gravity = Gravity.CENTER;
+            item.setLayoutParams(lp);
 
+            container.addView(item, 0);
+        } else {
+            container = (FrameLayout) convertView;
+            item = (WebImageView) container.getChildAt(0);
+        }
+
+        // calling reset is important to prevent old images from displaying in a recycled view.
+        item.reset();
+
+        item.setImageUrl(imageUrl);
         item.loadImage();
 
         onGetView(position, convertView, parent);
@@ -129,5 +141,6 @@ public class WebGalleryAdapter extends BaseAdapter {
     }
 
     protected void onGetView(int position, View convertView, ViewGroup parent) {
+        // for extension
     }
 }
