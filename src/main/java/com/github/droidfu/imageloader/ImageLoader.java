@@ -51,6 +51,7 @@ public class ImageLoader implements Runnable {
     public static final int HANDLER_MESSAGE_ID = 0;
 
     public static final String BITMAP_EXTRA = "droidfu:extra_bitmap";
+    public static final String IMAGE_URL_EXTRA = "droidfu:extra_image_url";
 
     private static final int NO_POSITION = -1;
 
@@ -189,7 +190,7 @@ public class ImageLoader implements Runnable {
                 // fetch the image in the background
                 executor.execute(loader);
             } else {
-                loader.notifyImageLoaded(image);
+                loader.notifyImageLoaded(imageUrl, image);
             }
         }
     }
@@ -238,14 +239,15 @@ public class ImageLoader implements Runnable {
         }
 
         if (bitmap != null) {
-            notifyImageLoaded(bitmap);
+            notifyImageLoaded(imageUrl, bitmap);
         }
     }
 
-    public void notifyImageLoaded(Bitmap bitmap) {
+    public void notifyImageLoaded(String url, Bitmap bitmap) {
         Message message = new Message();
         message.what = HANDLER_MESSAGE_ID;
         Bundle data = new Bundle();
+        data.putString(IMAGE_URL_EXTRA, url);
         data.putParcelable(BITMAP_EXTRA, bitmap);
         message.setData(data);
 

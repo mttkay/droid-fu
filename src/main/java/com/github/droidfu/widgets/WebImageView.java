@@ -18,6 +18,7 @@ package com.github.droidfu.widgets;
 import android.content.Context;
 import android.graphics.drawable.AnimationDrawable;
 import android.graphics.drawable.Drawable;
+import android.os.Bundle;
 import android.os.Message;
 import android.util.AttributeSet;
 import android.view.Gravity;
@@ -201,10 +202,22 @@ public class WebImageView extends ViewSwitcher {
         }
 
         @Override
-        public void handleMessage(Message msg) {
-            super.handleMessage(msg);
-            isLoaded = true;
+        protected void handleImageLoadedMessage(Message msg) {
 
+            Bundle data = msg.getData();
+            String loadedUrl = data.getString(ImageLoader.IMAGE_URL_EXTRA);
+
+            // if an image url is specified, make sure this is the one we are expecting now
+            if (loadedUrl != null && !loadedUrl.equals(imageUrl)) {
+                // this happens when multiple download requests are made concurrently.
+                // we always want to show the last requested image, so we discard when mismatched
+                return;
+            }
+
+
+            super.handleImageLoadedMessage(msg);
+
+            isLoaded = true;
             setDisplayedChild(1);
         }
     }
