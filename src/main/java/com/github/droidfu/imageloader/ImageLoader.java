@@ -51,6 +51,7 @@ public class ImageLoader implements Runnable {
     public static final int HANDLER_MESSAGE_ID = 0;
 
     public static final String BITMAP_EXTRA = "droidfu:extra_bitmap";
+    public static final String IMAGE_URL_EXTRA = "droidfu:extra_image_url";
 
     private static final int NO_POSITION = -1;
 
@@ -132,7 +133,17 @@ public class ImageLoader implements Runnable {
      * Triggers the image loader for the given image and view. The image loading
      * will be performed concurrently to the UI main thread, using a fixed size
      * thread pool. The loaded image will be posted back to the given ImageView
-     * upon completion. This method is intended to be used in a ListAdapter.
+     * upon completion.
+     *
+     * This method is intended to be used in a ListAdapter (for a ListView) after setting
+     * the list item's position to the ImageView using <code>setTag(position)</code>.
+     * Since ListViews re-use views for performance optimization, it is not guaranteed that when
+     * the image has finished downloading, the target ImageView will still be used to render the
+     * requested image.
+     * ImageLoaderHandler checks that the index originally intended for a given image is the same
+     * as the last index set using setTag(), and can prevent a flicker effect after many images are
+     * loaded for the same ImageView.
+     *
      * 
      * @param imageUrl the URL of the image to download
      * @param imageView the ImageView which should be updated with the new image
@@ -145,15 +156,7 @@ public class ImageLoader implements Runnable {
         } else {
             loader = new ImageLoader(imageUrl, imageView, position);
         }
-        synchronized (imageCache) {
-            Bitmap image = imageCache.get(imageUrl);
-            if (image == null) {
-                // fetch the image in the background
-                executor.execute(loader);
-            } else {
-                imageView.setImageBitmap(image);
-            }
-        }
+        doLoadImage(loader);
     }
     
     /**
@@ -171,13 +174,23 @@ public class ImageLoader implements Runnable {
      */
     public static void start(String imageUrl, ImageLoaderHandler handler) {
         ImageLoader loader = new ImageLoader(imageUrl, handler);
+        doLoadImage(loader);
+    }
+
+    /**
+     * Loads the target image either from the cache or by downloading it.
+     * @param loader loader instance that will be used if a download is required.
+     */
+    private static void doLoadImage(ImageLoader loader) {
+        String imageUrl = loader.imageUrl;
+
         synchronized (imageCache) {
             Bitmap image = imageCache.get(imageUrl);
             if (image == null) {
                 // fetch the image in the background
                 executor.execute(loader);
             } else {
-                loader.notifyImageLoaded(image);
+                loader.notifyImageLoaded(imageUrl, image);
             }
         }
     }
@@ -226,14 +239,15 @@ public class ImageLoader implements Runnable {
         }
 
         if (bitmap != null) {
-            notifyImageLoaded(bitmap);
+            notifyImageLoaded(imageUrl, bitmap);
         }
     }
 
-    public void notifyImageLoaded(Bitmap bitmap) {
+    public void notifyImageLoaded(String url, Bitmap bitmap) {
         Message message = new Message();
         message.what = HANDLER_MESSAGE_ID;
         Bundle data = new Bundle();
+        data.putString(IMAGE_URL_EXTRA, url);
         data.putParcelable(BITMAP_EXTRA, bitmap);
         message.setData(data);
 
