@@ -25,6 +25,8 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Proxy;
 
+import com.github.droidfu.cachefu.HttpResponseCache;
+
 public class BetterHttp {
 
     public static final int DEFAULT_MAX_CONNECTIONS = 4;
@@ -37,6 +39,8 @@ public class BetterHttp {
     private static HashMap<String, String> defaultHeaders = new HashMap<String, String>();
     private static AbstractHttpClient httpClient;
     private static Context appContext;
+
+    private static HttpResponseCache responseCache;
 
     static {
         setupHttpClient();
@@ -58,6 +62,20 @@ public class BetterHttp {
 
         ThreadSafeClientConnManager cm = new ThreadSafeClientConnManager(httpParams, schemeRegistry);
         httpClient = new DefaultHttpClient(cm, httpParams);
+    }
+
+    public static void enableResponseCache(int initialCapacity, long expirationInMinutes,
+            int maxConcurrentThreads) {
+        responseCache = new HttpResponseCache(initialCapacity, expirationInMinutes,
+                maxConcurrentThreads);
+    }
+
+    public static HttpResponseCache getResponseCache() {
+        return responseCache;
+    }
+
+    public static void setHttpClient(AbstractHttpClient httpClient) {
+        BetterHttp.httpClient = httpClient;
     }
 
     public static void updateProxySettings() {
@@ -91,6 +109,13 @@ public class BetterHttp {
     }
 
     public static BetterHttpRequest get(String url) {
+        return get(url, false);
+    }
+
+    public static BetterHttpRequest get(String url, boolean cached) {
+        if (cached && responseCache != null && responseCache.containsKey(url)) {
+            return new CachedHttpRequest(url);
+        }
         return new HttpGet(httpClient, url, defaultHeaders);
     }
 

@@ -21,7 +21,7 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpEntityEnclosingRequest;
 import org.apache.http.impl.client.AbstractHttpClient;
 
-class HttpPut extends BetterHttpRequest {
+class HttpPut extends BetterHttpRequestBase {
 
     HttpPut(AbstractHttpClient httpClient, String url, HttpEntity payload,
             HashMap<String, String> defaultHeaders) {

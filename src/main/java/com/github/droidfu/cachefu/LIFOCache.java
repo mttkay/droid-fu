@@ -62,7 +62,7 @@ public abstract class LIFOCache<KeyT, ValT> implements Map<KeyT, ValT> {
 
     private static final String LOG_TAG = "Droid-Fu[CacheFu]";
 
-    private boolean cacheToDisk;
+    private boolean shouldCacheToDisk;
 
     private String diskCacheDirectory;
 
@@ -97,13 +97,13 @@ public abstract class LIFOCache<KeyT, ValT> implements Map<KeyT, ValT> {
 
         this.diskCacheDirectory = rootDir + "/cachefu/"
                 + StringSupport.underscore(name.replaceAll("\\s", ""));
-        cacheToDisk = new File(diskCacheDirectory).mkdirs();
+        shouldCacheToDisk = new File(diskCacheDirectory).mkdirs();
 
-        if (!cacheToDisk) {
+        if (!shouldCacheToDisk) {
             Log.w(LOG_TAG, "Failed creating disk cache directory " + diskCacheDirectory);
         }
 
-        return cacheToDisk;
+        return shouldCacheToDisk;
     }
 
     public String getDiskCacheDirectory() {
@@ -114,7 +114,26 @@ public abstract class LIFOCache<KeyT, ValT> implements Map<KeyT, ValT> {
 
     protected abstract ValT readValueFromDisk(File file);
 
-    protected abstract void writeValueToDisk(FileOutputStream ostream, ValT value);
+    protected abstract void writeValueToDisk(FileOutputStream ostream, ValT value)
+            throws IOException;
+
+    protected void cacheToDisk(KeyT key, ValT value) {
+        File file = getFileNameForKey(key);
+        try {
+            file.createNewFile();
+
+            FileOutputStream ostream = new FileOutputStream(file);
+
+            writeValueToDisk(ostream, value);
+
+            ostream.close();
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     @SuppressWarnings("unchecked")
     public synchronized ValT get(Object elementKey) {
@@ -144,20 +163,8 @@ public abstract class LIFOCache<KeyT, ValT> implements Map<KeyT, ValT> {
     }
 
     public ValT put(KeyT key, ValT value) {
-        File file = getFileNameForKey(key);
-        try {
-            file.createNewFile();
-
-            FileOutputStream ostream = new FileOutputStream(file);
-
-            writeValueToDisk(ostream, value);
-
-            ostream.close();
-
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+        if (shouldCacheToDisk) {
+            cacheToDisk(key, value);
         }
 
         return cache.put(key, value);

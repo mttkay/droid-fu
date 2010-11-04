@@ -19,7 +19,7 @@ import java.util.HashMap;
 
 import org.apache.http.impl.client.AbstractHttpClient;
 
-class HttpDelete extends BetterHttpRequest {
+class HttpDelete extends BetterHttpRequestBase {
 
     HttpDelete(AbstractHttpClient httpClient, String url, HashMap<String, String> defaultHeaders) {
         super(httpClient);

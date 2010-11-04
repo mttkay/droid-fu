@@ -1,4 +1,4 @@
-/* Copyright (c) 2009 Matthias K�ppler
+/* Copyright (c) 2009 Matthias Kaeppler
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,44 +18,19 @@ package com.github.droidfu.http;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
-import org.apache.http.entity.BufferedHttpEntity;
-import org.apache.http.util.EntityUtils;
 
-public class BetterHttpResponse {
+public interface BetterHttpResponse {
 
-    private HttpResponse response;
-    private HttpEntity entity;
+    public HttpResponse unwrap();
 
-    public BetterHttpResponse(HttpResponse response) throws IOException {
-        this.response = response;
-        HttpEntity temp = response.getEntity();
-        if (temp != null) {
-            entity = new BufferedHttpEntity(temp);
-        }
-    }
+    public InputStream getResponseBody() throws IOException;
 
-    public HttpResponse unwrap() {
-        return response;
-    }
+    public byte[] getResponseBodyAsBytes() throws IOException;
 
-    public InputStream getResponseBody() throws IOException {
-        return entity.getContent();
-    }
+    public String getResponseBodyAsString() throws IOException;
 
-    public String getResponseBodyAsString() throws IOException {
-        return EntityUtils.toString(entity);
-    }
+    public int getStatusCode();
 
-    public int getStatusCode() {
-        return this.response.getStatusLine().getStatusCode();
-    }
-
-    public String getHeader(String header) {
-        if (!response.containsHeader(header)) {
-            return null;
-        }
-        return response.getFirstHeader(header).getValue();
-    }
+    public String getHeader(String header);
 }

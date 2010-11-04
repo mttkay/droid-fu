@@ -19,7 +19,7 @@ import java.util.HashMap;
 
 import org.apache.http.impl.client.AbstractHttpClient;
 
-class HttpGet extends BetterHttpRequest {
+class HttpGet extends BetterHttpRequestBase {
 
     HttpGet(AbstractHttpClient httpClient, String url, HashMap<String, String> defaultHeaders) {
         super(httpClient);
