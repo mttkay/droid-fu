@@ -1,4 +1,4 @@
-/* Copyright (c) 2009 Matthias Käppler
+/* Copyright (c) 2009 Matthias Kaeppler
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,6 +29,7 @@ import android.util.Log;
 import android.widget.ImageView;
 
 import com.github.droidfu.adapters.WebGalleryAdapter;
+import com.github.droidfu.cachefu.ImageCache;
 import com.github.droidfu.widgets.WebImageView;
 
 /**
@@ -47,6 +48,9 @@ public class ImageLoader implements Runnable {
     private static ImageCache imageCache;
 
     private static final int DEFAULT_POOL_SIZE = 2;
+
+    // expire images after a day
+    private static final int DEFAULT_TTL_MINUTES = 24 * 60;
 
     public static final int HANDLER_MESSAGE_ID = 0;
 
@@ -91,7 +95,8 @@ public class ImageLoader implements Runnable {
             executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(DEFAULT_POOL_SIZE);
         }
         if (imageCache == null) {
-            imageCache = new ImageCache(context, 25, 5);
+            imageCache = new ImageCache(25, DEFAULT_TTL_MINUTES, DEFAULT_POOL_SIZE);
+            imageCache.enableDiskCache(context, ImageCache.DISK_CACHE_SDCARD);
         }
     }
 
@@ -133,21 +138,22 @@ public class ImageLoader implements Runnable {
      * Triggers the image loader for the given image and view. The image loading
      * will be performed concurrently to the UI main thread, using a fixed size
      * thread pool. The loaded image will be posted back to the given ImageView
-     * upon completion.
-     *
-     * This method is intended to be used in a ListAdapter (for a ListView) after setting
-     * the list item's position to the ImageView using <code>setTag(position)</code>.
-     * Since ListViews re-use views for performance optimization, it is not guaranteed that when
-     * the image has finished downloading, the target ImageView will still be used to render the
-     * requested image.
-     * ImageLoaderHandler checks that the index originally intended for a given image is the same
-     * as the last index set using setTag(), and can prevent a flicker effect after many images are
-     * loaded for the same ImageView.
-     *
+     * upon completion. This method is intended to be used in a ListAdapter (for
+     * a ListView) after setting the list item's position to the ImageView using
+     * <code>setTag(position)</code>. Since ListViews re-use views for
+     * performance optimization, it is not guaranteed that when the image has
+     * finished downloading, the target ImageView will still be used to render
+     * the requested image. ImageLoaderHandler checks that the index originally
+     * intended for a given image is the same as the last index set using
+     * setTag(), and can prevent a flicker effect after many images are loaded
+     * for the same ImageView.
      * 
-     * @param imageUrl the URL of the image to download
-     * @param imageView the ImageView which should be updated with the new image
-     * @param position the position of the item within the adapter's data set.
+     * @param imageUrl
+     *        the URL of the image to download
+     * @param imageView
+     *        the ImageView which should be updated with the new image
+     * @param position
+     *        the position of the item within the adapter's data set.
      */
     public static void start(String imageUrl, ImageView imageView, int position) {
         ImageLoader loader;
@@ -158,7 +164,7 @@ public class ImageLoader implements Runnable {
         }
         doLoadImage(loader);
     }
-    
+
     /**
      * Triggers the image loader for the given image and handler. The image
      * loading will be performed concurrently to the UI main thread, using a
@@ -179,7 +185,9 @@ public class ImageLoader implements Runnable {
 
     /**
      * Loads the target image either from the cache or by downloading it.
-     * @param loader loader instance that will be used if a download is required.
+     * 
+     * @param loader
+     *        loader instance that will be used if a download is required.
      */
     private static void doLoadImage(ImageLoader loader) {
         String imageUrl = loader.imageUrl;
