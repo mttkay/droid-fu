@@ -190,6 +190,7 @@ public abstract class AbstractCache<KeyT, ValT> implements Map<KeyT, ValT> {
         File file = new File(diskCacheDirectory + "/" + getFileNameForKey(key));
         try {
             file.createNewFile();
+            file.deleteOnExit();
 
             BufferedOutputStream ostream = new BufferedOutputStream(new FileOutputStream(file));
 
@@ -283,9 +284,18 @@ public abstract class AbstractCache<KeyT, ValT> implements Map<KeyT, ValT> {
         return cache.containsValue(value);
     }
 
-    // TODO: also remove from disk
+    @SuppressWarnings("unchecked")
     public synchronized ValT remove(Object key) {
-        return cache.remove(key);
+        ValT value = cache.remove(key);
+
+        if (isDiskCacheEnabled) {
+            File cachedValue = getFileForKey((KeyT) key);
+            if (cachedValue.exists()) {
+                cachedValue.delete();
+            }
+        }
+
+        return value;
     }
 
     public Set<KeyT> keySet() {
@@ -306,6 +316,13 @@ public abstract class AbstractCache<KeyT, ValT> implements Map<KeyT, ValT> {
 
     public synchronized void clear() {
         cache.clear();
+
+        if (isDiskCacheEnabled) {
+            File[] cachedFiles = new File(diskCacheDirectory).listFiles();
+            for (File f : cachedFiles) {
+                f.delete();
+            }
+        }
     }
 
     public Collection<ValT> values() {
