@@ -15,6 +15,7 @@
 
 package com.github.droidfu.cachefu;
 
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -97,7 +98,10 @@ public abstract class LIFOCache<KeyT, ValT> implements Map<KeyT, ValT> {
 
         this.diskCacheDirectory = rootDir + "/cachefu/"
                 + StringSupport.underscore(name.replaceAll("\\s", ""));
-        shouldCacheToDisk = new File(diskCacheDirectory).mkdirs();
+        File outFile = new File(diskCacheDirectory);
+        outFile.mkdirs();
+
+        shouldCacheToDisk = outFile.exists();
 
         if (!shouldCacheToDisk) {
             Log.w(LOG_TAG, "Failed creating disk cache directory " + diskCacheDirectory);
@@ -110,19 +114,19 @@ public abstract class LIFOCache<KeyT, ValT> implements Map<KeyT, ValT> {
         return diskCacheDirectory;
     }
 
-    protected abstract File getFileNameForKey(KeyT key);
+    public abstract String getFileNameForKey(KeyT key);
 
-    protected abstract ValT readValueFromDisk(File file);
+    protected abstract ValT readValueFromDisk(File file) throws IOException;
 
-    protected abstract void writeValueToDisk(FileOutputStream ostream, ValT value)
+    protected abstract void writeValueToDisk(BufferedOutputStream ostream, ValT value)
             throws IOException;
 
     protected void cacheToDisk(KeyT key, ValT value) {
-        File file = getFileNameForKey(key);
+        File file = new File(diskCacheDirectory + "/" + getFileNameForKey(key));
         try {
             file.createNewFile();
 
-            FileOutputStream ostream = new FileOutputStream(file);
+            BufferedOutputStream ostream = new BufferedOutputStream(new FileOutputStream(file));
 
             writeValueToDisk(ostream, value);
 
@@ -135,23 +139,32 @@ public abstract class LIFOCache<KeyT, ValT> implements Map<KeyT, ValT> {
         }
     }
 
+    private File getFileForKey(KeyT key) {
+        return new File(diskCacheDirectory + "/" + getFileNameForKey(key));
+    }
+
     @SuppressWarnings("unchecked")
     public synchronized ValT get(Object elementKey) {
         KeyT key = (KeyT) elementKey;
         ValT value = cache.get(key);
-
+        System.out.println("cached value: " + value);
         if (value != null) {
             // memory hit
             return value;
         }
 
         // memory miss, try reading from disk
-        File file = getFileNameForKey(key);
+        File file = getFileForKey(key);
         if (file.exists()) {
             // disk hit
-            value = readValueFromDisk(file);
-            if (value == null) {
+            try {
+                value = readValueFromDisk(file);
+            } catch (IOException e) {
                 // treat decoding errors as a cache miss
+                e.printStackTrace();
+                return null;
+            }
+            if (value == null) {
                 return null;
             }
             cache.put(key, value);
@@ -162,7 +175,7 @@ public abstract class LIFOCache<KeyT, ValT> implements Map<KeyT, ValT> {
         return null;
     }
 
-    public ValT put(KeyT key, ValT value) {
+    public synchronized ValT put(KeyT key, ValT value) {
         if (shouldCacheToDisk) {
             cacheToDisk(key, value);
         }
@@ -170,19 +183,20 @@ public abstract class LIFOCache<KeyT, ValT> implements Map<KeyT, ValT> {
         return cache.put(key, value);
     }
 
-    public void putAll(Map<? extends KeyT, ? extends ValT> t) {
+    public synchronized void putAll(Map<? extends KeyT, ? extends ValT> t) {
         throw new UnsupportedOperationException();
     }
 
-    public boolean containsKey(Object key) {
-        return cache.containsKey(key);
+    @SuppressWarnings("unchecked")
+    public synchronized boolean containsKey(Object key) {
+        return cache.containsKey(key) || (shouldCacheToDisk && getFileForKey((KeyT) key).exists());
     }
 
-    public boolean containsValue(Object value) {
+    public synchronized boolean containsValue(Object value) {
         return cache.containsValue(value);
     }
 
-    public ValT remove(Object key) {
+    public synchronized ValT remove(Object key) {
         return cache.remove(key);
     }
 
@@ -194,15 +208,15 @@ public abstract class LIFOCache<KeyT, ValT> implements Map<KeyT, ValT> {
         return cache.entrySet();
     }
 
-    public int size() {
+    public synchronized int size() {
         return cache.size();
     }
 
-    public boolean isEmpty() {
+    public synchronized boolean isEmpty() {
         return cache.isEmpty();
     }
 
-    public void clear() {
+    public synchronized void clear() {
         cache.clear();
     }
 

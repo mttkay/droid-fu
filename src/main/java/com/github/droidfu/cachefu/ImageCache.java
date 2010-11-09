@@ -15,8 +15,8 @@
 
 package com.github.droidfu.cachefu;
 
+import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -85,10 +85,10 @@ public class ImageCache extends LIFOCache<String, Bitmap> {
     }
 
     @Override
-    protected File getFileNameForKey(String key) {
+    public String getFileNameForKey(String imageUrl) {
+        // TODO: is hashCode appropriate to avoid collisions?
         // the key is the image URL
-        String fileName = Integer.toHexString(key.hashCode()) + "." + compressedImageFormat.name();
-        return new File(getDiskCacheDirectory() + "/" + fileName);
+        return Integer.toHexString(imageUrl.hashCode()) + "." + compressedImageFormat.name();
     }
 
     @Override
@@ -97,7 +97,7 @@ public class ImageCache extends LIFOCache<String, Bitmap> {
     }
 
     @Override
-    protected void writeValueToDisk(FileOutputStream ostream, Bitmap value) {
+    protected void writeValueToDisk(BufferedOutputStream ostream, Bitmap value) {
         value.compress(compressedImageFormat, cachedImageQuality, ostream);
     }
 }

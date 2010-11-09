@@ -1,5 +1,6 @@
 package com.github.droidfu.http;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
@@ -27,7 +28,11 @@ import com.github.droidfu.cachefu.HttpResponseCache;
 @RunWith(MockitoJUnitRunner.class)
 public class HttpCacheTest {
 
-    private String url = "http://test.com";
+    private String responseBody = "Here be Jason.";
+
+    private String url = "http://api.qype.com/positions/1,1/places?x=y&a=%2Bc";
+
+    private HttpResponseCache cache;
 
     @Mock
     private AbstractHttpClient httpClientMock;
@@ -35,25 +40,24 @@ public class HttpCacheTest {
     @Mock
     private BetterHttpResponse mockResponse;
 
-    private static final String RESPONSE_BODY = "Here be Jason.";
-
     @SuppressWarnings("unchecked")
     @Before
     public void setupHttpClient() throws Exception {
 
         BetterHttp.enableResponseCache(10, 60, 1);
+        cache = BetterHttp.getResponseCache();
 
         when(mockResponse.getResponseBody()).thenReturn(
-            new ByteArrayInputStream(RESPONSE_BODY.getBytes()));
-        when(mockResponse.getResponseBodyAsBytes()).thenReturn(RESPONSE_BODY.getBytes());
-        when(mockResponse.getResponseBodyAsString()).thenReturn(RESPONSE_BODY);
+            new ByteArrayInputStream(responseBody.getBytes()));
+        when(mockResponse.getResponseBodyAsBytes()).thenReturn(responseBody.getBytes());
+        when(mockResponse.getResponseBodyAsString()).thenReturn(responseBody);
         when(mockResponse.getStatusCode()).thenReturn(200);
         when(
             httpClientMock.execute(any(HttpUriRequest.class), any(ResponseHandler.class),
                 any(HttpContext.class))).thenAnswer(new Answer<BetterHttpResponse>() {
             public BetterHttpResponse answer(InvocationOnMock invocation) throws Throwable {
                 HttpResponseCache cache = BetterHttp.getResponseCache();
-                cache.put(url, RESPONSE_BODY.getBytes());
+                cache.put(url, responseBody.getBytes());
                 return mockResponse;
             }
         });
@@ -63,7 +67,7 @@ public class HttpCacheTest {
 
     @SuppressWarnings("unchecked")
     @Test
-    public void shouldNotReturnCachedResponseIfCalledForFirstTime() throws Exception {
+    public void testBasicCachingFlow() throws Exception {
         // first time invocation should do an actual request
         BetterHttpResponse resp = BetterHttp.get(url, true).send();
         verify(httpClientMock, times(1)).execute(any(HttpUriRequest.class),
@@ -74,5 +78,11 @@ public class HttpCacheTest {
         resp = BetterHttp.get(url, true).send();
         assertNotSame(mockResponse, resp);
         assertTrue(resp instanceof CachedHttpResponse);
+    }
+
+    @Test
+    public void shouldGenerateCorrectFileNamesWhenCachingToDisk() {
+        assertEquals("http+api+qype+com+positions+1+1+places+x+y+a+2Bc",
+            cache.getFileNameForKey(url));
     }
 }

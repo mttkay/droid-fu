@@ -114,8 +114,10 @@ public class BetterHttp {
 
     public static BetterHttpRequest get(String url, boolean cached) {
         if (cached && responseCache != null && responseCache.containsKey(url)) {
+            System.out.println("HTTP cache hit for " + url);
             return new CachedHttpRequest(url);
         }
+        System.out.println("HTTP cache MISS for " + url);
         return new HttpGet(httpClient, url, defaultHeaders);
     }
 
