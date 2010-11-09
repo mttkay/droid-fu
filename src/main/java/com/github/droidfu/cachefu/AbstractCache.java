@@ -117,10 +117,11 @@ public abstract class AbstractCache<KeyT, ValT> implements Map<KeyT, ValT> {
         Context appContext = context.getApplicationContext();
 
         String rootDir = null;
-        // SD-card available
         if (storageDevice == DISK_CACHE_SDCARD
                 && Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())) {
-            rootDir = Environment.getExternalStorageDirectory().getAbsolutePath();
+            // SD-card available
+            rootDir = Environment.getExternalStorageDirectory().getAbsolutePath() + "/"
+                    + appContext.getPackageName();
         } else {
             rootDir = appContext.getCacheDir().getAbsolutePath();
         }
