@@ -80,7 +80,7 @@ public abstract class LIFOCache<KeyT, ValT> implements Map<KeyT, ValT> {
         mapMaker.initialCapacity(initialCapacity);
         mapMaker.expiration(expirationInMinutes * 60, TimeUnit.SECONDS);
         mapMaker.concurrencyLevel(maxConcurrentThreads);
-        mapMaker.weakValues();
+        mapMaker.softValues();
         this.cache = mapMaker.makeMap();
     }
 
