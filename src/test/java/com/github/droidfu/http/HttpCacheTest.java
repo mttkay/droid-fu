@@ -8,6 +8,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.powermock.api.mockito.PowerMockito.mockStatic;
 
 import java.io.ByteArrayInputStream;
 
@@ -20,12 +21,16 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.invocation.InvocationOnMock;
-import org.mockito.runners.MockitoJUnitRunner;
 import org.mockito.stubbing.Answer;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
+
+import android.util.Log;
 
 import com.github.droidfu.cachefu.HttpResponseCache;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(PowerMockRunner.class)
+@PrepareForTest( { Log.class })
 public class HttpCacheTest {
 
     private String responseBody = "Here be Jason.";
@@ -63,6 +68,22 @@ public class HttpCacheTest {
         });
 
         BetterHttp.setHttpClient(httpClientMock);
+    }
+
+    // TODO: this is really useful... move to separate test project and export
+    // as helper?
+    @Before
+    public void mockLogger() {
+        // redirect Logger output to STDOUT
+        mockStatic(Log.class);
+        when(Log.d(any(String.class), any(String.class))).thenAnswer(new Answer<Integer>() {
+            public Integer answer(InvocationOnMock invocation) throws Throwable {
+                String tag = (String) invocation.getArguments()[0];
+                String msg = (String) invocation.getArguments()[1];
+                System.out.println("[" + tag + "] " + msg);
+                return 0;
+            }
+        });
     }
 
     @SuppressWarnings("unchecked")

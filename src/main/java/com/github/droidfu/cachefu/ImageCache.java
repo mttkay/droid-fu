@@ -51,7 +51,7 @@ public class ImageCache extends AbstractCache<String, Bitmap> {
     private CompressFormat compressedImageFormat = CompressFormat.PNG;
 
     public ImageCache(int initialCapacity, long expirationInMinutes, int maxConcurrentThreads) {
-        super("WebImages", initialCapacity, expirationInMinutes, maxConcurrentThreads);
+        super("ImageCache", initialCapacity, expirationInMinutes, maxConcurrentThreads);
     }
 
     /**

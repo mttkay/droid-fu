@@ -16,7 +16,6 @@ public class CachedHttpResponse implements BetterHttpResponse {
 
     public CachedHttpResponse(String url) {
         responseCache = BetterHttp.getResponseCache();
-        System.out.println("response cache size = " + responseCache.size());
         cachedData = responseCache.get(url);
     }
 

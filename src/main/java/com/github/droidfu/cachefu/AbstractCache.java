@@ -93,7 +93,7 @@ public abstract class AbstractCache<KeyT, ValT> implements Map<KeyT, ValT> {
                 && Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())) {
             rootDir = Environment.getExternalStorageDirectory().getAbsolutePath();
         } else {
-            appContext.getCacheDir().getAbsolutePath();
+            rootDir = appContext.getCacheDir().getAbsolutePath();
         }
 
         this.diskCacheDirectory = rootDir + "/cachefu/"
@@ -105,6 +105,8 @@ public abstract class AbstractCache<KeyT, ValT> implements Map<KeyT, ValT> {
 
         if (!isDiskCacheEnabled) {
             Log.w(LOG_TAG, "Failed creating disk cache directory " + diskCacheDirectory);
+        } else {
+            Log.d(name, "enabled write through to " + diskCacheDirectory);
         }
 
         return isDiskCacheEnabled;
@@ -147,9 +149,9 @@ public abstract class AbstractCache<KeyT, ValT> implements Map<KeyT, ValT> {
     public synchronized ValT get(Object elementKey) {
         KeyT key = (KeyT) elementKey;
         ValT value = cache.get(key);
-        System.out.println("cached value: " + value);
         if (value != null) {
             // memory hit
+            Log.d(name, "MEM cache hit for " + key.toString());
             return value;
         }
 
@@ -157,6 +159,7 @@ public abstract class AbstractCache<KeyT, ValT> implements Map<KeyT, ValT> {
         File file = getFileForKey(key);
         if (file.exists()) {
             // disk hit
+            Log.d(name, "DISK cache hit for " + key.toString());
             try {
                 value = readValueFromDisk(file);
             } catch (IOException e) {

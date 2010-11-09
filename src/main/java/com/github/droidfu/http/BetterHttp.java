@@ -70,6 +70,12 @@ public class BetterHttp {
                 maxConcurrentThreads);
     }
 
+    public static void enableResponseCache(Context context, int initialCapacity,
+            long expirationInMinutes, int maxConcurrentThreads, int diskCacheStorageDevice) {
+        enableResponseCache(initialCapacity, expirationInMinutes, maxConcurrentThreads);
+        responseCache.enableDiskCache(context, diskCacheStorageDevice);
+    }
+
     public static HttpResponseCache getResponseCache() {
         return responseCache;
     }
@@ -114,10 +120,8 @@ public class BetterHttp {
 
     public static BetterHttpRequest get(String url, boolean cached) {
         if (cached && responseCache != null && responseCache.containsKey(url)) {
-            System.out.println("HTTP cache hit for " + url);
             return new CachedHttpRequest(url);
         }
-        System.out.println("HTTP cache MISS for " + url);
         return new HttpGet(httpClient, url, defaultHeaders);
     }
 
