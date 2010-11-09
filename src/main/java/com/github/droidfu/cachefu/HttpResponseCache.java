@@ -6,10 +6,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 
-public class HttpResponseCache extends LIFOCache<String, byte[]> {
+public class HttpResponseCache extends AbstractCache<String, byte[]> {
 
     public HttpResponseCache(int initialCapacity, long expirationInMinutes, int maxConcurrentThreads) {
-        super("WebServiceCache", initialCapacity, expirationInMinutes, maxConcurrentThreads);
+        super("HttpCache", initialCapacity, expirationInMinutes, maxConcurrentThreads);
     }
 
     @Override

@@ -44,7 +44,7 @@ import android.graphics.Bitmap.CompressFormat;
  * 
  * @author Matthias Kaeppler
  */
-public class ImageCache extends LIFOCache<String, Bitmap> {
+public class ImageCache extends AbstractCache<String, Bitmap> {
 
     private int cachedImageQuality = 75;
 

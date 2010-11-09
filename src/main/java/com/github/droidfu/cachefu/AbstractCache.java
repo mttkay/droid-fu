@@ -35,35 +35,35 @@ import com.google.common.collect.MapMaker;
 
 /**
  * <p>
- * A simple 2-level LIFO cache consisting of a small and fast in-memory cache
- * (1st level cache) and a slower but bigger disk cache (2nd level cache). For
- * disk caching, either the application's cache directory or the SD card can be
- * used. Please note that in the case of the app cache dir, Android may at any
- * point decide to wipe that entire directory if it runs low on internal
- * storage. The SD card cache is managed solely by this class instead.
+ * A simple 2-level cache consisting of a small and fast in-memory cache (1st
+ * level cache) and an (optional) slower but bigger disk cache (2nd level
+ * cache). For disk caching, either the application's cache directory or the SD
+ * card can be used. Please note that in the case of the app cache dir, Android
+ * may at any point decide to wipe that entire directory if it runs low on
+ * internal storage. The SD card cache <i>must</i> be managed by the
+ * application, e.g. by calling {@link #wipe} whenever the app quits.
  * </p>
  * <p>
  * When pulling from the cache, it will first attempt to load the data from
- * memory. If that fails, it will try to load it from disk. If that succeeds,
- * the data will be put in the in-memory cache and returned (read-through).
- * Otherwise it's a cache miss, and the caller is responsible for loading the
- * image from elsewhere (probably the Internet).
+ * memory. If that fails, it will try to load it from disk (assuming disk
+ * caching is enabled). If that succeeds, the data will be put in the in-memory
+ * cache and returned (read-through). Otherwise it's a cache miss.
  * </p>
  * <p>
- * Pushes to the cache are always write-through (i.e., the image will be stored
- * both on disk and in memory).
+ * Pushes to the cache are always write-through (i.e. the data will be stored
+ * both on disk, if disk caching is enabled, and in memory).
  * </p>
  * 
  * @author Matthias Kaeppler
  */
-public abstract class LIFOCache<KeyT, ValT> implements Map<KeyT, ValT> {
+public abstract class AbstractCache<KeyT, ValT> implements Map<KeyT, ValT> {
 
     public static final int DISK_CACHE_INTERNAL = 0;
     public static final int DISK_CACHE_SDCARD = 1;
 
     private static final String LOG_TAG = "Droid-Fu[CacheFu]";
 
-    private boolean shouldCacheToDisk;
+    private boolean isDiskCacheEnabled;
 
     private String diskCacheDirectory;
 
@@ -71,7 +71,7 @@ public abstract class LIFOCache<KeyT, ValT> implements Map<KeyT, ValT> {
 
     private String name;
 
-    public LIFOCache(String name, int initialCapacity, long expirationInMinutes,
+    public AbstractCache(String name, int initialCapacity, long expirationInMinutes,
             int maxConcurrentThreads) {
 
         this.name = name;
@@ -101,13 +101,13 @@ public abstract class LIFOCache<KeyT, ValT> implements Map<KeyT, ValT> {
         File outFile = new File(diskCacheDirectory);
         outFile.mkdirs();
 
-        shouldCacheToDisk = outFile.exists();
+        isDiskCacheEnabled = outFile.exists();
 
-        if (!shouldCacheToDisk) {
+        if (!isDiskCacheEnabled) {
             Log.w(LOG_TAG, "Failed creating disk cache directory " + diskCacheDirectory);
         }
 
-        return shouldCacheToDisk;
+        return isDiskCacheEnabled;
     }
 
     public String getDiskCacheDirectory() {
@@ -176,7 +176,7 @@ public abstract class LIFOCache<KeyT, ValT> implements Map<KeyT, ValT> {
     }
 
     public synchronized ValT put(KeyT key, ValT value) {
-        if (shouldCacheToDisk) {
+        if (isDiskCacheEnabled) {
             cacheToDisk(key, value);
         }
 
@@ -189,7 +189,7 @@ public abstract class LIFOCache<KeyT, ValT> implements Map<KeyT, ValT> {
 
     @SuppressWarnings("unchecked")
     public synchronized boolean containsKey(Object key) {
-        return cache.containsKey(key) || (shouldCacheToDisk && getFileForKey((KeyT) key).exists());
+        return cache.containsKey(key) || (isDiskCacheEnabled && getFileForKey((KeyT) key).exists());
     }
 
     public synchronized boolean containsValue(Object value) {
