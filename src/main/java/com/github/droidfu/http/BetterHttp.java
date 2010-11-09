@@ -25,6 +25,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Proxy;
 
+import com.github.droidfu.cachefu.AbstractCache;
 import com.github.droidfu.cachefu.HttpResponseCache;
 
 public class BetterHttp {
@@ -64,18 +65,57 @@ public class BetterHttp {
         httpClient = new DefaultHttpClient(cm, httpParams);
     }
 
+    /**
+     * Enables caching of HTTP responses. This will only enable the in-memory
+     * cache. If you also want to enable the disk cache, see
+     * {@link #enableResponseCache(Context, int, long, int, int)}.
+     * 
+     * @param initialCapacity
+     *        the initial element size of the cache
+     * @param expirationInMinutes
+     *        time in minutes after which elements will be purged from the cache
+     * @param maxConcurrentThreads
+     *        how many threads you think may at once access the cache; this need
+     *        not be an exact number, but it helps in fragmenting the cache
+     *        properly
+     * @see HttpResponseCache
+     */
     public static void enableResponseCache(int initialCapacity, long expirationInMinutes,
             int maxConcurrentThreads) {
         responseCache = new HttpResponseCache(initialCapacity, expirationInMinutes,
                 maxConcurrentThreads);
     }
 
+    /**
+     * Enables caching of HTTP responses. This will also enable the disk cache.
+     * 
+     * @param context
+     *        the current context
+     * @param initialCapacity
+     *        the initial element size of the cache
+     * @param expirationInMinutes
+     *        time in minutes after which elements will be purged from the cache
+     *        (NOTE: this only affects the memory cache, the disk cache does
+     *        currently NOT handle element TTLs!)
+     * @param maxConcurrentThreads
+     *        how many threads you think may at once access the cache; this need
+     *        not be an exact number, but it helps in fragmenting the cache
+     *        properly
+     * @param diskCacheStorageDevice
+     *        where files should be cached persistently (
+     *        {@link AbstractCache#DISK_CACHE_INTERNAL},
+     *        {@link AbstractCache#DISK_CACHE_SDCARD})
+     * @see HttpResponseCache
+     */
     public static void enableResponseCache(Context context, int initialCapacity,
             long expirationInMinutes, int maxConcurrentThreads, int diskCacheStorageDevice) {
         enableResponseCache(initialCapacity, expirationInMinutes, maxConcurrentThreads);
         responseCache.enableDiskCache(context, diskCacheStorageDevice);
     }
 
+    /**
+     * @return the response cache, if enabled, otherwise null
+     */
     public static HttpResponseCache getResponseCache() {
         return responseCache;
     }

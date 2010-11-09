@@ -71,6 +71,25 @@ public abstract class AbstractCache<KeyT, ValT> implements Map<KeyT, ValT> {
 
     private String name;
 
+    /**
+     * Creates a new cache instance.
+     * 
+     * @param name
+     *        a human readable identifier for this cache. Note that this value
+     *        will be used to derive a directory name if the disk cache is
+     *        enabled, so don't get too creative here (camel case names work
+     *        great)
+     * @param initialCapacity
+     *        the initial element size of the cache
+     * @param expirationInMinutes
+     *        time in minutes after which elements will be purged from the cache
+     *        (NOTE: this only affects the memory cache, the disk cache does
+     *        currently NOT handle element TTLs!)
+     * @param maxConcurrentThreads
+     *        how many threads you think may at once access the cache; this need
+     *        not be an exact number, but it helps in fragmenting the cache
+     *        properly
+     */
     public AbstractCache(String name, int initialCapacity, long expirationInMinutes,
             int maxConcurrentThreads) {
 
@@ -84,6 +103,16 @@ public abstract class AbstractCache<KeyT, ValT> implements Map<KeyT, ValT> {
         this.cache = mapMaker.makeMap();
     }
 
+    /**
+     * Enable caching to the phone's internal storage or SD card.
+     * 
+     * @param context
+     *        the current context
+     * @param storageDevice
+     *        where to store the cached files, either
+     *        {@link #DISK_CACHE_INTERNAL} or {@link #DISK_CACHE_SDCARD})
+     * @return
+     */
     public boolean enableDiskCache(Context context, int storageDevice) {
         Context appContext = context.getApplicationContext();
 
@@ -112,18 +141,52 @@ public abstract class AbstractCache<KeyT, ValT> implements Map<KeyT, ValT> {
         return isDiskCacheEnabled;
     }
 
+    /**
+     * Only meaningful if disk caching is enabled. See {@link #enableDiskCache}.
+     * 
+     * @return the full absolute path to the directory where files are cached,
+     *         if the disk cache is enabled, otherwise null
+     */
     public String getDiskCacheDirectory() {
         return diskCacheDirectory;
     }
 
+    /**
+     * Only meaningful if disk caching is enabled. See {@link #enableDiskCache}.
+     * Turns a cache key into the file name that will be used to persist the
+     * value to disk. Subclasses must implement this.
+     * 
+     * @param key
+     *        the cache key
+     * @return the file name
+     */
     public abstract String getFileNameForKey(KeyT key);
 
+    /**
+     * Only meaningful if disk caching is enabled. See {@link #enableDiskCache}.
+     * Restores a value previously persisted to the disk cache.
+     * 
+     * @param file
+     *        the file holding the cached value
+     * @return the cached value
+     * @throws IOException
+     */
     protected abstract ValT readValueFromDisk(File file) throws IOException;
 
+    /**
+     * Only meaningful if disk caching is enabled. See {@link #enableDiskCache}.
+     * Persists a value to the disk cache.
+     * 
+     * @param ostream
+     *        the file output stream (buffered).
+     * @param value
+     *        the cache value to persist
+     * @throws IOException
+     */
     protected abstract void writeValueToDisk(BufferedOutputStream ostream, ValT value)
             throws IOException;
 
-    protected void cacheToDisk(KeyT key, ValT value) {
+    private void cacheToDisk(KeyT key, ValT value) {
         File file = new File(diskCacheDirectory + "/" + getFileNameForKey(key));
         try {
             file.createNewFile();
@@ -145,6 +208,14 @@ public abstract class AbstractCache<KeyT, ValT> implements Map<KeyT, ValT> {
         return new File(diskCacheDirectory + "/" + getFileNameForKey(key));
     }
 
+    /**
+     * Reads a value from the cache by probing the in-memory cache, and if
+     * enabled and the in-memory probe was a miss, the disk cache.
+     * 
+     * @param elementKey
+     *        the cache key
+     * @return the cached value, or null if element was not cached
+     */
     @SuppressWarnings("unchecked")
     public synchronized ValT get(Object elementKey) {
         KeyT key = (KeyT) elementKey;
@@ -178,6 +249,11 @@ public abstract class AbstractCache<KeyT, ValT> implements Map<KeyT, ValT> {
         return null;
     }
 
+    /**
+     * Writes an element to the cache. NOTE: If disk caching is enabled, this
+     * will write through to the disk, which may introduce a performance
+     * penalty.
+     */
     public synchronized ValT put(KeyT key, ValT value) {
         if (isDiskCacheEnabled) {
             cacheToDisk(key, value);
@@ -190,6 +266,14 @@ public abstract class AbstractCache<KeyT, ValT> implements Map<KeyT, ValT> {
         throw new UnsupportedOperationException();
     }
 
+    /**
+     * Checks if a value is present in the cache. If the disk cached is enabled,
+     * this will also check whether the value has been persisted to disk.
+     * 
+     * @param key
+     *        the cache key
+     * @return true if the value is cached in memory or on disk, false otherwise
+     */
     @SuppressWarnings("unchecked")
     public synchronized boolean containsKey(Object key) {
         return cache.containsKey(key) || (isDiskCacheEnabled && getFileForKey((KeyT) key).exists());
@@ -199,6 +283,7 @@ public abstract class AbstractCache<KeyT, ValT> implements Map<KeyT, ValT> {
         return cache.containsValue(value);
     }
 
+    // TODO: also remove from disk
     public synchronized ValT remove(Object key) {
         return cache.remove(key);
     }
