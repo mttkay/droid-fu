@@ -106,4 +106,14 @@ public class HttpResponseCacheTest {
         assertEquals("http+api+qype+com+positions+1+1+places+x+y+a+2Bc",
             cache.getFileNameForKey(url));
     }
+
+    @Test
+    public void removingByPrefixShouldWork() {
+        cache.put("http://example.com/places", responseBody.getBytes());
+        cache.put("http://example.com/places/photos", responseBody.getBytes());
+        assertEquals(2, cache.size());
+
+        cache.removeAllWithPrefix("http://example.com/places");
+        assertTrue(cache.isEmpty());
+    }
 }
