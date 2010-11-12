@@ -31,7 +31,7 @@ import com.github.droidfu.cachefu.HttpResponseCache;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest( { Log.class })
-public class HttpCacheTest {
+public class HttpResponseCacheTest {
 
     private String responseBody = "Here be Jason.";
 
