@@ -5,11 +5,22 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.Set;
 
 public class HttpResponseCache extends AbstractCache<String, byte[]> {
 
     public HttpResponseCache(int initialCapacity, long expirationInMinutes, int maxConcurrentThreads) {
         super("HttpCache", initialCapacity, expirationInMinutes, maxConcurrentThreads);
+    }
+
+    public synchronized void removeAllWithPrefix(String urlPrefix) {
+        Set<String> keys = keySet();
+
+        for (String key : keys) {
+            if (key.startsWith(urlPrefix)) {
+                remove(key);
+            }
+        }
     }
 
     @Override
