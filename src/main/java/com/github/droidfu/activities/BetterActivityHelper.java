@@ -304,7 +304,7 @@ public class BetterActivityHelper {
             // and the next task is the Android home screen, then we know we're
             // about to close the app
             if (currentTask.topActivity.equals(currentTask.baseActivity)
-                    && "com.android.launcher".equals(nextTask.baseActivity.getPackageName())) {
+                    && nextTask.baseActivity.getPackageName().startsWith("com.android.launcher")) {
                 DroidFuApplication application = (DroidFuApplication) context
                         .getApplicationContext();
                 application.onClose();
