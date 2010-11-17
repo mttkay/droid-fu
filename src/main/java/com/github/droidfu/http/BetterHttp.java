@@ -52,7 +52,7 @@ public class BetterHttp {
 
         ConnManagerParams.setTimeout(httpParams, connectionTimeout);
         ConnManagerParams.setMaxConnectionsPerRoute(httpParams,
-            new ConnPerRouteBean(maxConnections));
+                new ConnPerRouteBean(maxConnections));
         ConnManagerParams.setMaxTotalConnections(httpParams, DEFAULT_MAX_CONNECTIONS);
         HttpProtocolParams.setVersion(httpParams, HttpVersion.HTTP_1_1);
         HttpProtocolParams.setUserAgent(httpParams, DEFAULT_HTTP_USER_AGENT);
@@ -66,18 +66,17 @@ public class BetterHttp {
     }
 
     /**
-     * Enables caching of HTTP responses. This will only enable the in-memory
-     * cache. If you also want to enable the disk cache, see
-     * {@link #enableResponseCache(Context, int, long, int, int)}.
+     * Enables caching of HTTP responses. This will only enable the in-memory cache. If you also
+     * want to enable the disk cache, see {@link #enableResponseCache(Context, int, long, int, int)}
+     * .
      * 
      * @param initialCapacity
-     *        the initial element size of the cache
+     *            the initial element size of the cache
      * @param expirationInMinutes
-     *        time in minutes after which elements will be purged from the cache
+     *            time in minutes after which elements will be purged from the cache
      * @param maxConcurrentThreads
-     *        how many threads you think may at once access the cache; this need
-     *        not be an exact number, but it helps in fragmenting the cache
-     *        properly
+     *            how many threads you think may at once access the cache; this need not be an exact
+     *            number, but it helps in fragmenting the cache properly
      * @see HttpResponseCache
      */
     public static void enableResponseCache(int initialCapacity, long expirationInMinutes,
@@ -90,21 +89,20 @@ public class BetterHttp {
      * Enables caching of HTTP responses. This will also enable the disk cache.
      * 
      * @param context
-     *        the current context
+     *            the current context
      * @param initialCapacity
-     *        the initial element size of the cache
+     *            the initial element size of the cache
      * @param expirationInMinutes
-     *        time in minutes after which elements will be purged from the cache
-     *        (NOTE: this only affects the memory cache, the disk cache does
-     *        currently NOT handle element TTLs!)
+     *            time in minutes after which elements will be purged from the cache (NOTE: this
+     *            only affects the memory cache, the disk cache does currently NOT handle element
+     *            TTLs!)
      * @param maxConcurrentThreads
-     *        how many threads you think may at once access the cache; this need
-     *        not be an exact number, but it helps in fragmenting the cache
-     *        properly
+     *            how many threads you think may at once access the cache; this need not be an exact
+     *            number, but it helps in fragmenting the cache properly
      * @param diskCacheStorageDevice
-     *        where files should be cached persistently (
-     *        {@link AbstractCache#DISK_CACHE_INTERNAL},
-     *        {@link AbstractCache#DISK_CACHE_SDCARD})
+     *            where files should be cached persistently (
+     *            {@link AbstractCache#DISK_CACHE_INTERNAL}, {@link AbstractCache#DISK_CACHE_SDCARD}
+     *            )
      * @see HttpResponseCache
      */
     public static void enableResponseCache(Context context, int initialCapacity,
@@ -129,7 +127,8 @@ public class BetterHttp {
             return;
         }
         HttpParams httpParams = httpClient.getParams();
-        ConnectivityManager connectivity = (ConnectivityManager) appContext.getSystemService(Context.CONNECTIVITY_SERVICE);
+        ConnectivityManager connectivity = (ConnectivityManager) appContext
+                .getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo nwInfo = connectivity.getActiveNetworkInfo();
         if (nwInfo == null) {
             return;
@@ -194,7 +193,7 @@ public class BetterHttp {
             return;
         }
         appContext = context.getApplicationContext();
-        context.registerReceiver(new ConnectionChangedBroadcastReceiver(), new IntentFilter(
+        appContext.registerReceiver(new ConnectionChangedBroadcastReceiver(), new IntentFilter(
                 ConnectivityManager.CONNECTIVITY_ACTION));
     }
 
