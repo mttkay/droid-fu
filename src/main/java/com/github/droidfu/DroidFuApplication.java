@@ -52,7 +52,7 @@ public class DroidFuApplication extends Application {
      * Invoked if the application is about to close. Application close is being defined as the
      * transition of the last running Activity of the current application to the Android home screen
      * using the BACK button. You can leverage this method to perform cleanup logic such as freeing
-     * resourced whenever your user "exits" your app using the back button.
+     * resources whenever your user "exits" your app using the back button.
      * </p>
      * <p>
      * Note that you must not rely on this callback as a general purpose "exit" handler, since
