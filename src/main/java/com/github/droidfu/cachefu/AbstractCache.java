@@ -35,23 +35,21 @@ import com.google.common.collect.MapMaker;
 
 /**
  * <p>
- * A simple 2-level cache consisting of a small and fast in-memory cache (1st
- * level cache) and an (optional) slower but bigger disk cache (2nd level
- * cache). For disk caching, either the application's cache directory or the SD
- * card can be used. Please note that in the case of the app cache dir, Android
- * may at any point decide to wipe that entire directory if it runs low on
- * internal storage. The SD card cache <i>must</i> be managed by the
- * application, e.g. by calling {@link #wipe} whenever the app quits.
+ * A simple 2-level cache consisting of a small and fast in-memory cache (1st level cache) and an
+ * (optional) slower but bigger disk cache (2nd level cache). For disk caching, either the
+ * application's cache directory or the SD card can be used. Please note that in the case of the app
+ * cache dir, Android may at any point decide to wipe that entire directory if it runs low on
+ * internal storage. The SD card cache <i>must</i> be managed by the application, e.g. by calling
+ * {@link #wipe} whenever the app quits.
  * </p>
  * <p>
- * When pulling from the cache, it will first attempt to load the data from
- * memory. If that fails, it will try to load it from disk (assuming disk
- * caching is enabled). If that succeeds, the data will be put in the in-memory
- * cache and returned (read-through). Otherwise it's a cache miss.
+ * When pulling from the cache, it will first attempt to load the data from memory. If that fails,
+ * it will try to load it from disk (assuming disk caching is enabled). If that succeeds, the data
+ * will be put in the in-memory cache and returned (read-through). Otherwise it's a cache miss.
  * </p>
  * <p>
- * Pushes to the cache are always write-through (i.e. the data will be stored
- * both on disk, if disk caching is enabled, and in memory).
+ * Pushes to the cache are always write-through (i.e. the data will be stored both on disk, if disk
+ * caching is enabled, and in memory).
  * </p>
  * 
  * @author Matthias Kaeppler
@@ -75,20 +73,18 @@ public abstract class AbstractCache<KeyT, ValT> implements Map<KeyT, ValT> {
      * Creates a new cache instance.
      * 
      * @param name
-     *        a human readable identifier for this cache. Note that this value
-     *        will be used to derive a directory name if the disk cache is
-     *        enabled, so don't get too creative here (camel case names work
-     *        great)
+     *            a human readable identifier for this cache. Note that this value will be used to
+     *            derive a directory name if the disk cache is enabled, so don't get too creative
+     *            here (camel case names work great)
      * @param initialCapacity
-     *        the initial element size of the cache
+     *            the initial element size of the cache
      * @param expirationInMinutes
-     *        time in minutes after which elements will be purged from the cache
-     *        (NOTE: this only affects the memory cache, the disk cache does
-     *        currently NOT handle element TTLs!)
+     *            time in minutes after which elements will be purged from the cache (NOTE: this
+     *            only affects the memory cache, the disk cache does currently NOT handle element
+     *            TTLs!)
      * @param maxConcurrentThreads
-     *        how many threads you think may at once access the cache; this need
-     *        not be an exact number, but it helps in fragmenting the cache
-     *        properly
+     *            how many threads you think may at once access the cache; this need not be an exact
+     *            number, but it helps in fragmenting the cache properly
      */
     public AbstractCache(String name, int initialCapacity, long expirationInMinutes,
             int maxConcurrentThreads) {
@@ -107,10 +103,10 @@ public abstract class AbstractCache<KeyT, ValT> implements Map<KeyT, ValT> {
      * Enable caching to the phone's internal storage or SD card.
      * 
      * @param context
-     *        the current context
+     *            the current context
      * @param storageDevice
-     *        where to store the cached files, either
-     *        {@link #DISK_CACHE_INTERNAL} or {@link #DISK_CACHE_SDCARD})
+     *            where to store the cached files, either {@link #DISK_CACHE_INTERNAL} or
+     *            {@link #DISK_CACHE_SDCARD})
      * @return
      */
     public boolean enableDiskCache(Context context, int storageDevice) {
@@ -145,43 +141,43 @@ public abstract class AbstractCache<KeyT, ValT> implements Map<KeyT, ValT> {
     /**
      * Only meaningful if disk caching is enabled. See {@link #enableDiskCache}.
      * 
-     * @return the full absolute path to the directory where files are cached,
-     *         if the disk cache is enabled, otherwise null
+     * @return the full absolute path to the directory where files are cached, if the disk cache is
+     *         enabled, otherwise null
      */
     public String getDiskCacheDirectory() {
         return diskCacheDirectory;
     }
 
     /**
-     * Only meaningful if disk caching is enabled. See {@link #enableDiskCache}.
-     * Turns a cache key into the file name that will be used to persist the
-     * value to disk. Subclasses must implement this.
+     * Only meaningful if disk caching is enabled. See {@link #enableDiskCache}. Turns a cache key
+     * into the file name that will be used to persist the value to disk. Subclasses must implement
+     * this.
      * 
      * @param key
-     *        the cache key
+     *            the cache key
      * @return the file name
      */
     public abstract String getFileNameForKey(KeyT key);
 
     /**
-     * Only meaningful if disk caching is enabled. See {@link #enableDiskCache}.
-     * Restores a value previously persisted to the disk cache.
+     * Only meaningful if disk caching is enabled. See {@link #enableDiskCache}. Restores a value
+     * previously persisted to the disk cache.
      * 
      * @param file
-     *        the file holding the cached value
+     *            the file holding the cached value
      * @return the cached value
      * @throws IOException
      */
     protected abstract ValT readValueFromDisk(File file) throws IOException;
 
     /**
-     * Only meaningful if disk caching is enabled. See {@link #enableDiskCache}.
-     * Persists a value to the disk cache.
+     * Only meaningful if disk caching is enabled. See {@link #enableDiskCache}. Persists a value to
+     * the disk cache.
      * 
      * @param ostream
-     *        the file output stream (buffered).
+     *            the file output stream (buffered).
      * @param value
-     *        the cache value to persist
+     *            the cache value to persist
      * @throws IOException
      */
     protected abstract void writeValueToDisk(BufferedOutputStream ostream, ValT value)
@@ -211,11 +207,11 @@ public abstract class AbstractCache<KeyT, ValT> implements Map<KeyT, ValT> {
     }
 
     /**
-     * Reads a value from the cache by probing the in-memory cache, and if
-     * enabled and the in-memory probe was a miss, the disk cache.
+     * Reads a value from the cache by probing the in-memory cache, and if enabled and the in-memory
+     * probe was a miss, the disk cache.
      * 
      * @param elementKey
-     *        the cache key
+     *            the cache key
      * @return the cached value, or null if element was not cached
      */
     @SuppressWarnings("unchecked")
@@ -252,9 +248,8 @@ public abstract class AbstractCache<KeyT, ValT> implements Map<KeyT, ValT> {
     }
 
     /**
-     * Writes an element to the cache. NOTE: If disk caching is enabled, this
-     * will write through to the disk, which may introduce a performance
-     * penalty.
+     * Writes an element to the cache. NOTE: If disk caching is enabled, this will write through to
+     * the disk, which may introduce a performance penalty.
      */
     public synchronized ValT put(KeyT key, ValT value) {
         if (isDiskCacheEnabled) {
@@ -269,11 +264,11 @@ public abstract class AbstractCache<KeyT, ValT> implements Map<KeyT, ValT> {
     }
 
     /**
-     * Checks if a value is present in the cache. If the disk cached is enabled,
-     * this will also check whether the value has been persisted to disk.
+     * Checks if a value is present in the cache. If the disk cached is enabled, this will also
+     * check whether the value has been persisted to disk.
      * 
      * @param key
-     *        the cache key
+     *            the cache key
      * @return true if the value is cached in memory or on disk, false otherwise
      */
     @SuppressWarnings("unchecked")
