@@ -33,6 +33,7 @@ import android.content.DialogInterface.OnKeyListener;
 import android.view.KeyEvent;
 import android.view.Window;
 
+import com.github.droidfu.DroidFuApplication;
 import com.github.droidfu.dialogs.DialogClickListener;
 import com.github.droidfu.exception.ResourceMessageException;
 import com.github.droidfu.support.DiagnosticSupport;
@@ -69,10 +70,10 @@ public class BetterActivityHelper {
      * 
      * @param activity
      * @param progressDialogTitleId
-     *        The resource id for the title. If this is less than or equal to 0,
-     *        a default title is used.
+     *            The resource id for the title. If this is less than or equal to 0, a default title
+     *            is used.
      * @param progressDialogMsgId
-     *        The resource id for the message.
+     *            The resource id for the message.
      * @return The new dialog
      */
     public static ProgressDialog createProgressDialog(final Activity activity,
@@ -80,12 +81,12 @@ public class BetterActivityHelper {
         ProgressDialog progressDialog = new ProgressDialog(activity);
         if (progressDialogTitleId <= 0) {
             progressDialogTitleId = activity.getResources().getIdentifier(
-                PROGRESS_DIALOG_TITLE_RESOURCE, "string", activity.getPackageName());
+                    PROGRESS_DIALOG_TITLE_RESOURCE, "string", activity.getPackageName());
         }
         progressDialog.setTitle(progressDialogTitleId);
         if (progressDialogMsgId <= 0) {
             progressDialogMsgId = activity.getResources().getIdentifier(
-                PROGRESS_DIALOG_MESSAGE_RESOURCE, "string", activity.getPackageName());
+                    PROGRESS_DIALOG_MESSAGE_RESOURCE, "string", activity.getPackageName());
         }
         progressDialog.setMessage(activity.getString(progressDialogMsgId));
         progressDialog.setIndeterminate(true);
@@ -151,12 +152,11 @@ public class BetterActivityHelper {
     }
 
     /**
-     * Displays a error dialog with an exception as its body. Also displays a
-     * Send Email button to send the exception to the developer. Implement the
-     * following resource IDs droidfu_error_report_email_address - The email
-     * address the exception is sent to. droidfu_error_report_email_subject -
-     * The subject of the email. droidfu_dialog_button_send_error_report - The
-     * text on the Send Email button.
+     * Displays a error dialog with an exception as its body. Also displays a Send Email button to
+     * send the exception to the developer. Implement the following resource IDs
+     * droidfu_error_report_email_address - The email address the exception is sent to.
+     * droidfu_error_report_email_subject - The subject of the email.
+     * droidfu_dialog_button_send_error_report - The text on the Send Email button.
      * 
      * @param activity
      * @param dialogTitle
@@ -167,7 +167,8 @@ public class BetterActivityHelper {
             Exception error) {
         String screenMessage = "";
         if (error instanceof ResourceMessageException) {
-            screenMessage = activity.getString(((ResourceMessageException) error).getClientMessageResourceId());
+            screenMessage = activity.getString(((ResourceMessageException) error)
+                    .getClientMessageResourceId());
         } else {
             screenMessage = error.getLocalizedMessage();
         }
@@ -185,19 +186,19 @@ public class BetterActivityHelper {
         });
 
         if (IntentSupport.isIntentAvailable(activity, Intent.ACTION_SEND,
-            IntentSupport.MIME_TYPE_EMAIL)) {
+                IntentSupport.MIME_TYPE_EMAIL)) {
             int buttonId = activity.getResources().getIdentifier(
-                "droidfu_dialog_button_send_error_report", "string", activity.getPackageName());
+                    "droidfu_dialog_button_send_error_report", "string", activity.getPackageName());
             String buttonText = activity.getString(buttonId);
             int bugEmailAddressId = activity.getResources().getIdentifier(
-                "droidfu_error_report_email_address", "string", activity.getPackageName());
+                    "droidfu_error_report_email_address", "string", activity.getPackageName());
             String bugReportEmailAddress = activity.getString(bugEmailAddressId);
             int bugEmailSubjectId = activity.getResources().getIdentifier(
-                "droidfu_error_report_email_subject", "string", activity.getPackageName());
+                    "droidfu_error_report_email_subject", "string", activity.getPackageName());
             String bugReportEmailSubject = activity.getString(bugEmailSubjectId);
             final String diagnosis = DiagnosticSupport.createDiagnosis(activity, error);
             final Intent intent = IntentSupport.newEmailIntent(activity, bugReportEmailAddress,
-                bugReportEmailSubject, diagnosis);
+                    bugReportEmailSubject, diagnosis);
             builder.setNegativeButton(buttonText, new OnClickListener() {
 
                 public void onClick(DialogInterface dialog, int which) {
@@ -211,22 +212,21 @@ public class BetterActivityHelper {
     }
 
     /**
-     * Creates a AlertDialog that shows a list of elements. The listener's
-     * onClick method gets called when the user taps a list item.
+     * Creates a AlertDialog that shows a list of elements. The listener's onClick method gets
+     * called when the user taps a list item.
      * 
      * @param <T>
-     *        The type of each element
+     *            The type of each element
      * @param context
      * @param dialogTitle
-     *        the title or null to disable the title
+     *            the title or null to disable the title
      * @param elements
-     *        List of elements to be displayed. Each elements toString() method
-     *        will be called.
+     *            List of elements to be displayed. Each elements toString() method will be called.
      * @param listener
-     *        The listener to handle the onClick events.
+     *            The listener to handle the onClick events.
      * @param closeOnSelect
-     *        If true the dialog closes as soon as one list item is selected,
-     *        otherwise multiple onClick events may be sent.
+     *            If true the dialog closes as soon as one list item is selected, otherwise multiple
+     *            onClick events may be sent.
      * @return The new dialog.
      */
     public static <T> Dialog newListDialog(final Activity context, String dialogTitle,
@@ -234,7 +234,7 @@ public class BetterActivityHelper {
             final boolean closeOnSelect) {
         return newListDialog(context, dialogTitle, elements, listener, closeOnSelect, 0);
     }
-    
+
     public static <T> Dialog newListDialog(final Activity context, String dialogTitle,
             final List<T> elements, final DialogClickListener<T> listener,
             final boolean closeOnSelect, int selectedItem) {
@@ -261,17 +261,16 @@ public class BetterActivityHelper {
     }
 
     /**
-     * Checks if the application is in the background (i.e behind another
-     * application's Activity).
+     * Checks if the application is in the background (i.e behind another application's Activity).
      * 
      * @param context
      * @return true if another application is above this one.
      */
     public static boolean isApplicationBroughtToBackground(final Context context) {
         ActivityManager am = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
-        List<RunningTaskInfo> taskInfo = am.getRunningTasks(1);
-        if (!taskInfo.isEmpty()) {
-            ComponentName topActivity = taskInfo.get(0).topActivity;
+        List<RunningTaskInfo> tasks = am.getRunningTasks(1);
+        if (!tasks.isEmpty()) {
+            ComponentName topActivity = tasks.get(0).topActivity;
             if (!topActivity.getPackageName().equals(context.getPackageName())) {
                 return true;
             }
