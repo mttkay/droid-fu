@@ -40,6 +40,7 @@ import org.apache.http.protocol.HttpContext;
 import android.util.Log;
 
 import com.github.droidfu.cachefu.HttpResponseCache;
+import com.github.droidfu.http.CachedHttpResponse.ResponseData;
 
 public abstract class BetterHttpRequestBase implements BetterHttpRequest {
 
@@ -84,7 +85,8 @@ public abstract class BetterHttpRequestBase implements BetterHttpRequest {
             // sending a request, but we need the full URI for OAuth
             // signing,
             // so restore it before proceeding.
-            RequestWrapper request = (RequestWrapper) context.getAttribute(ExecutionContext.HTTP_REQUEST);
+            RequestWrapper request = (RequestWrapper) context
+                    .getAttribute(ExecutionContext.HTTP_REQUEST);
             URI rewrittenUri = request.getURI();
             URI originalUri = (URI) context.getAttribute(REQUEST_URI_BACKUP);
             request.setURI(originalUri);
@@ -200,7 +202,8 @@ public abstract class BetterHttpRequestBase implements BetterHttpRequest {
         BetterHttpResponse bhttpr = new BetterHttpResponseImpl(response);
         HttpResponseCache responseCache = BetterHttp.getResponseCache();
         if (responseCache != null) {
-            responseCache.put(getRequestUrl(), bhttpr.getResponseBodyAsBytes());
+            ResponseData responseData = new ResponseData(status, bhttpr.getResponseBodyAsBytes());
+            responseCache.put(getRequestUrl(), responseData);
         }
         return bhttpr;
     }

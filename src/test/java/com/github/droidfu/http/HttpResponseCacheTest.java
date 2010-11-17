@@ -28,6 +28,7 @@ import org.powermock.modules.junit4.PowerMockRunner;
 import android.util.Log;
 
 import com.github.droidfu.cachefu.HttpResponseCache;
+import com.github.droidfu.http.CachedHttpResponse.ResponseData;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest( { Log.class })
@@ -53,16 +54,16 @@ public class HttpResponseCacheTest {
         cache = BetterHttp.getResponseCache();
 
         when(mockResponse.getResponseBody()).thenReturn(
-            new ByteArrayInputStream(responseBody.getBytes()));
+                new ByteArrayInputStream(responseBody.getBytes()));
         when(mockResponse.getResponseBodyAsBytes()).thenReturn(responseBody.getBytes());
         when(mockResponse.getResponseBodyAsString()).thenReturn(responseBody);
         when(mockResponse.getStatusCode()).thenReturn(200);
         when(
-            httpClientMock.execute(any(HttpUriRequest.class), any(ResponseHandler.class),
-                any(HttpContext.class))).thenAnswer(new Answer<BetterHttpResponse>() {
+                httpClientMock.execute(any(HttpUriRequest.class), any(ResponseHandler.class),
+                        any(HttpContext.class))).thenAnswer(new Answer<BetterHttpResponse>() {
             public BetterHttpResponse answer(InvocationOnMock invocation) throws Throwable {
                 HttpResponseCache cache = BetterHttp.getResponseCache();
-                cache.put(url, responseBody.getBytes());
+                cache.put(url, new ResponseData(200, responseBody.getBytes()));
                 return mockResponse;
             }
         });
@@ -92,7 +93,7 @@ public class HttpResponseCacheTest {
         // first time invocation should do an actual request
         BetterHttpResponse resp = BetterHttp.get(url, true).send();
         verify(httpClientMock, times(1)).execute(any(HttpUriRequest.class),
-            any(ResponseHandler.class), any(HttpContext.class));
+                any(ResponseHandler.class), any(HttpContext.class));
         assertSame(mockResponse, resp);
 
         // any subsequent invocation should return the cached response
@@ -103,14 +104,15 @@ public class HttpResponseCacheTest {
 
     @Test
     public void shouldGenerateCorrectFileNamesWhenCachingToDisk() {
-        assertEquals("http+api+qype+com+positions+1+1+places+x+y+a+2Bc",
-            cache.getFileNameForKey(url));
+        assertEquals("http+api+qype+com+positions+1+1+places+x+y+a+2Bc", cache
+                .getFileNameForKey(url));
     }
 
     @Test
     public void removingByPrefixShouldWork() {
-        cache.put("http://example.com/places", responseBody.getBytes());
-        cache.put("http://example.com/places/photos", responseBody.getBytes());
+        cache.put("http://example.com/places", new ResponseData(200, responseBody.getBytes()));
+        cache.put("http://example.com/places/photos",
+                new ResponseData(200, responseBody.getBytes()));
         assertEquals(2, cache.size());
 
         cache.removeAllWithPrefix("http://example.com/places");

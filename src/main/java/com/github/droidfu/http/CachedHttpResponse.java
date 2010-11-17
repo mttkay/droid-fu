@@ -8,11 +8,34 @@ import org.apache.http.HttpResponse;
 
 import com.github.droidfu.cachefu.HttpResponseCache;
 
+/**
+ * A response proxy returning data from a {@link HttpResponseCache}
+ * 
+ * @author Matthias Kaeppler
+ */
 public class CachedHttpResponse implements BetterHttpResponse {
+
+    public static final class ResponseData {
+        public ResponseData(int statusCode, byte[] responseBody) {
+            this.statusCode = statusCode;
+            this.responseBody = responseBody;
+        }
+
+        private int statusCode;
+        private byte[] responseBody;
+
+        public int getStatusCode() {
+            return statusCode;
+        }
+
+        public byte[] getResponseBody() {
+            return responseBody;
+        }
+    }
 
     private HttpResponseCache responseCache;
 
-    private byte[] cachedData;
+    private ResponseData cachedData;
 
     public CachedHttpResponse(String url) {
         responseCache = BetterHttp.getResponseCache();
@@ -24,19 +47,19 @@ public class CachedHttpResponse implements BetterHttpResponse {
     }
 
     public InputStream getResponseBody() throws IOException {
-        return new ByteArrayInputStream(cachedData);
+        return new ByteArrayInputStream(cachedData.responseBody);
     }
 
     public byte[] getResponseBodyAsBytes() throws IOException {
-        return cachedData;
+        return cachedData.responseBody;
     }
 
     public String getResponseBodyAsString() throws IOException {
-        return new String(cachedData);
+        return new String(cachedData.responseBody);
     }
 
     public int getStatusCode() {
-        return -1;
+        return cachedData.statusCode;
     }
 
     public HttpResponse unwrap() {
