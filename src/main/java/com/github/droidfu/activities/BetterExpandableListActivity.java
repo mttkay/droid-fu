@@ -23,6 +23,7 @@ import android.app.ExpandableListActivity;
 import android.content.Intent;
 import android.content.DialogInterface.OnClickListener;
 import android.os.Bundle;
+import android.view.KeyEvent;
 
 import com.github.droidfu.DroidFuApplication;
 import com.github.droidfu.dialogs.DialogClickListener;
@@ -146,5 +147,11 @@ public class BetterExpandableListActivity extends ExpandableListActivity impleme
             DialogClickListener<T> listener,
             boolean closeOnSelect) {
         return BetterActivityHelper.newListDialog(this, title, elements, listener, closeOnSelect);
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        BetterActivityHelper.handleApplicationClosing(this, keyCode);
+        return super.onKeyDown(keyCode, event);
     }
 }

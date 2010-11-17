@@ -279,4 +279,37 @@ public class BetterActivityHelper {
 
         return false;
     }
+
+    /**
+     * Determines whether an application is about to close, in which case it will invoke the
+     * {@link DroidFuApplication#onClose()} life-cycle handler. Application close is being defined
+     * as the transition of the last running Activity of the current application to the Android home
+     * screen using the BACK button.
+     * 
+     * @param context
+     *            the current context
+     * @param keyCode
+     *            the key code of the key event (if not {@link KeyEvent#KEYCODE_BACK}, this method
+     *            is a no-op)
+     */
+    static void handleApplicationClosing(final Context context, int keyCode) {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            ActivityManager am = (ActivityManager) context
+                    .getSystemService(Context.ACTIVITY_SERVICE);
+            List<RunningTaskInfo> tasks = am.getRunningTasks(2);
+
+            RunningTaskInfo currentTask = tasks.get(0);
+            RunningTaskInfo nextTask = tasks.get(1);
+
+            // if we're looking at this application's base/launcher Activity,
+            // and the next task is the Android home screen, then we know we're
+            // about to close the app
+            if (currentTask.topActivity.equals(currentTask.baseActivity)
+                    && "com.android.launcher".equals(nextTask.baseActivity.getPackageName())) {
+                DroidFuApplication application = (DroidFuApplication) context
+                        .getApplicationContext();
+                application.onClose();
+            }
+        }
+    }
 }

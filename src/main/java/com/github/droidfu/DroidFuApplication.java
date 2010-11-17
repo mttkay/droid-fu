@@ -46,4 +46,22 @@ public class DroidFuApplication extends Application {
     public synchronized void resetActiveContext(String className) {
         contextObjects.remove(className);
     }
+
+    /**
+     * <p>
+     * Invoked if the application is about to close. Application close is being defined as the
+     * transition of the last running Activity of the current application to the Android home screen
+     * using the BACK button. You can leverage this method to perform cleanup logic such as freeing
+     * resourced whenever your user "exits" your app using the back button.
+     * </p>
+     * <p>
+     * Note that you must not rely on this callback as a general purpose "exit" handler, since
+     * Android does not give any guarantees as to when exactly the process hosting an application is
+     * being terminated. In other words, your application can be terminated at any point in time, in
+     * which case this method will NOT be invoked.
+     * </p>
+     */
+    public void onClose() {
+        // NO-OP by default
+    }
 }

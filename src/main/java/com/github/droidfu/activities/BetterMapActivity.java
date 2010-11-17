@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.DialogInterface.OnClickListener;
 import android.os.Bundle;
 import android.view.GestureDetector;
+import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
@@ -215,4 +216,9 @@ public class BetterMapActivity extends MapActivity implements BetterActivity {
         mapView.setOnTouchListener(tapListener);
     }
 
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        BetterActivityHelper.handleApplicationClosing(this, keyCode);
+        return super.onKeyDown(keyCode, event);
+    }
 }
