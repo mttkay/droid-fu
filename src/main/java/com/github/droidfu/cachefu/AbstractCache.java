@@ -315,6 +315,9 @@ public abstract class AbstractCache<KeyT, ValT> implements Map<KeyT, ValT> {
 
         if (isDiskCacheEnabled) {
             File[] cachedFiles = new File(diskCacheDirectory).listFiles();
+            if (cachedFiles == null) {
+                return;
+            }
             for (File f : cachedFiles) {
                 f.delete();
             }
