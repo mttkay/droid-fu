@@ -125,6 +125,10 @@ public class BetterHttp {
         BetterHttp.httpClient = httpClient;
     }
 
+    public static AbstractHttpClient getHttpClient() {
+        return httpClient;
+    }
+
     public static void updateProxySettings() {
         if (appContext == null) {
             return;
