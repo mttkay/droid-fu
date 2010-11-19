@@ -25,11 +25,14 @@ import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Proxy;
+import android.util.Log;
 
 import com.github.droidfu.cachefu.AbstractCache;
 import com.github.droidfu.cachefu.HttpResponseCache;
 
 public class BetterHttp {
+
+    static final String LOG_TAG = "BetterHttp";
 
     public static final int DEFAULT_MAX_CONNECTIONS = 4;
     public static final int DEFAULT_CONNECTION_TIMEOUT = 10 * 1000;
@@ -140,6 +143,7 @@ public class BetterHttp {
         if (nwInfo == null) {
             return;
         }
+        Log.i(LOG_TAG, nwInfo.toString());
         if (nwInfo.getType() == ConnectivityManager.TYPE_MOBILE) {
             String proxyHost = Proxy.getHost(appContext);
             if (proxyHost == null) {

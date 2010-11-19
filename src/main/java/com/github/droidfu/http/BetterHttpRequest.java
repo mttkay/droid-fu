@@ -17,9 +17,6 @@ package com.github.droidfu.http;
 
 import java.net.ConnectException;
 
-import oauth.signpost.OAuthConsumer;
-import oauth.signpost.exception.OAuthException;
-
 import org.apache.http.client.methods.HttpUriRequest;
 
 public interface BetterHttpRequest {
@@ -30,9 +27,7 @@ public interface BetterHttpRequest {
 
     public BetterHttpRequest expecting(Integer... statusCodes);
 
-    public BetterHttpRequest signed(OAuthConsumer oauthConsumer) throws OAuthException;
-
-    public BetterHttpRequest retry(int retries);
+    public BetterHttpRequest retries(int retries);
 
     public BetterHttpResponse send() throws ConnectException;
 }

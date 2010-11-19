@@ -23,7 +23,7 @@ public class CachedHttpRequest implements BetterHttpRequest {
         return this;
     }
 
-    public BetterHttpRequest retry(int retries) {
+    public BetterHttpRequest retries(int retries) {
         return this;
     }
 
