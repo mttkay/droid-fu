@@ -34,12 +34,14 @@ public class BetterHttpRequestRetryHandler implements HttpRequestRetryHandler {
         exceptionWhitelist.add(SocketException.class);
 
         // never retry timeouts
+        // TODO: this doesn't actually capture all timeouts; I've seen timeouts being thrown as a
+        // plain SocketExceptiion
         exceptionBlacklist.add(InterruptedIOException.class);
         // never retry SSL handshake failures
         exceptionBlacklist.add(SSLHandshakeException.class);
     }
 
-    private int maxRetries;
+    private int maxRetries, timesRetried;
 
     public BetterHttpRequestRetryHandler(int maxRetries) {
         this.maxRetries = maxRetries;
@@ -47,6 +49,8 @@ public class BetterHttpRequestRetryHandler implements HttpRequestRetryHandler {
 
     public boolean retryRequest(IOException exception, int executionCount, HttpContext context) {
         boolean retry;
+
+        this.timesRetried = executionCount;
 
         Boolean b = (Boolean) context.getAttribute(ExecutionContext.HTTP_REQ_SENT);
         boolean sent = (b != null && b.booleanValue());
@@ -71,7 +75,8 @@ public class BetterHttpRequestRetryHandler implements HttpRequestRetryHandler {
 
         if (retry) {
             Log.e(BetterHttp.LOG_TAG, "request failed (" + exception.getClass().getCanonicalName()
-                    + "), will retry in " + RETRY_SLEEP_TIME_MILLIS / 1000 + " seconds");
+                    + ": " + exception.getMessage() + " / attempt " + executionCount
+                    + "), will retry in " + RETRY_SLEEP_TIME_MILLIS / 1000.0 + " seconds");
             SystemClock.sleep(RETRY_SLEEP_TIME_MILLIS);
         } else {
             Log.e(BetterHttp.LOG_TAG, "request failed after " + executionCount + " attempts");
@@ -79,5 +84,9 @@ public class BetterHttpRequestRetryHandler implements HttpRequestRetryHandler {
         }
 
         return retry;
+    }
+
+    public int getTimesRetried() {
+        return timesRetried;
     }
 }

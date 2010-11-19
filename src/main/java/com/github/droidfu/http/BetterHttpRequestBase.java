@@ -29,6 +29,8 @@ import org.apache.http.impl.client.AbstractHttpClient;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HttpContext;
 
+import android.util.Log;
+
 import com.github.droidfu.cachefu.HttpResponseCache;
 import com.github.droidfu.http.CachedHttpResponse.ResponseData;
 
@@ -77,17 +79,38 @@ public abstract class BetterHttpRequestBase implements BetterHttpRequest,
 
     public BetterHttpResponse send() throws ConnectException {
 
-        httpClient.setHttpRequestRetryHandler(new BetterHttpRequestRetryHandler(maxRetries));
+        BetterHttpRequestRetryHandler retryHandler = new BetterHttpRequestRetryHandler(maxRetries);
+
+        // tell HttpClient to user our own retry handler
+        httpClient.setHttpRequestRetryHandler(retryHandler);
 
         HttpContext context = new BasicHttpContext();
 
-        try {
-            return httpClient.execute(request, this, context);
-        } catch (IOException cause) {
-            ConnectException ex = new ConnectException();
-            ex.initCause(cause);
-            throw ex;
+        // Grab a coffee now and lean back, I'm not good at explaining stuff. This code realizes
+        // a second retry layer on top of HttpClient. Rationale: HttpClient.execute sometimes craps
+        // out even *before* the HttpRequestRetryHandler set above is called, e.g. on a
+        // "Network unreachable" SocketException, which can happen when failing over from Wi-Fi to
+        // 3G or vice versa. Hence, we catch these exceptions, feed it through the same retry
+        // decision method *again*, and align the execution count along the way.
+        boolean retry = true;
+        int executionCount = 0;
+        IOException cause = null;
+        while (retry) {
+            try {
+                return httpClient.execute(request, this, context);
+            } catch (IOException e) {
+                Log.e(BetterHttp.LOG_TAG,
+                        "Intercepting exception that wasn't handled by HttpClient");
+                cause = e;
+                executionCount = Math.max(executionCount, retryHandler.getTimesRetried());
+                retry = retryHandler.retryRequest(cause, ++executionCount, context);
+            }
         }
+
+        // no retries left, crap out with exception
+        ConnectException ex = new ConnectException();
+        ex.initCause(cause);
+        throw ex;
     }
 
     public BetterHttpResponse handleResponse(HttpResponse response) throws IOException {
