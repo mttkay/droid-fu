@@ -22,7 +22,6 @@ import android.os.Bundle;
 import android.os.Message;
 import android.util.AttributeSet;
 import android.view.Gravity;
-import android.view.animation.AlphaAnimation;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.ViewSwitcher;
@@ -112,9 +111,9 @@ public class WebImageView extends ViewSwitcher {
         // 125.0f, preferredItemHeight / 2.0f);
         // anim.setDuration(500L);
 
-        AlphaAnimation anim = new AlphaAnimation(0.0f, 1.0f);
-        anim.setDuration(500L);
-        setInAnimation(anim);
+        // AlphaAnimation anim = new AlphaAnimation(0.0f, 1.0f);
+        // anim.setDuration(500L);
+        // setInAnimation(anim);
 
         addLoadingSpinnerView(context);
         addImageView(context);
