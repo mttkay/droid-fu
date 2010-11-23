@@ -17,13 +17,13 @@ package com.github.droidfu.support;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.Locale;
 
 import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.content.res.Configuration;
 import android.os.Build;
 import android.provider.Settings;
 import android.provider.Settings.SettingNotFoundException;
@@ -56,13 +56,8 @@ public class DiagnosticSupport {
     public static String createDiagnosis(Activity context, Exception error) {
         StringBuilder sb = new StringBuilder();
 
-        // collect device information
-        ContentResolver resolver = context.getContentResolver();
-        Configuration sysConfig = new Configuration();
-        Settings.System.getConfiguration(resolver, sysConfig);
-
         sb.append("Application version: " + getApplicationVersionString(context) + "\n");
-        sb.append("Device locale: " + sysConfig.locale.toString() + "\n\n");
+        sb.append("Device locale: " + Locale.getDefault().toString() + "\n\n");
 
         // phone information
         sb.append("PHONE SPECS\n");
@@ -81,6 +76,7 @@ public class DiagnosticSupport {
         // settings
         sb.append("SYSTEM SETTINGS\n");
         String networkMode = null;
+        ContentResolver resolver = context.getContentResolver();
         try {
             if (Settings.Secure.getInt(resolver, Settings.Secure.WIFI_ON) == 0) {
                 networkMode = "DATA";
