@@ -171,10 +171,6 @@ public class WebImageView extends ViewSwitcher {
         this.imageUrl = imageUrl;
     }
 
-    public void setProgressDrawable(Drawable progressDrawable) {
-        this.progressDrawable = progressDrawable;
-    }
-
     /**
      * Often you have resources which usually have an image, but some don't. For
      * these cases, use this method to supply a placeholder drawable which will
