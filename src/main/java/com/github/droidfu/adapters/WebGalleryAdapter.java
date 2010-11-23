@@ -116,8 +116,7 @@ public class WebGalleryAdapter extends BaseAdapter {
             container.setLayoutParams(new Gallery.LayoutParams(LayoutParams.FILL_PARENT,
                     LayoutParams.FILL_PARENT));
 
-            item = new WebImageView(context, null, false);
-            item.setProgressDrawable(progressDrawable);
+            item = new WebImageView(context, null, progressDrawable, false);
             FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(LayoutParams.WRAP_CONTENT,
                     LayoutParams.WRAP_CONTENT);
             lp.gravity = Gravity.CENTER;
