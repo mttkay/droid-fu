@@ -30,8 +30,8 @@ import android.widget.Gallery.LayoutParams;
 import com.github.droidfu.widgets.WebImageView;
 
 /**
- * Can be used as an adapter for an Android {@link Gallery} view. This adapter
- * loads the images to be shown from the web.
+ * Can be used as an adapter for an Android {@link Gallery} view. This adapter loads the images to
+ * be shown from the web.
  * 
  * @author Matthias Kaeppler
  */
@@ -49,9 +49,9 @@ public class WebGalleryAdapter extends BaseAdapter {
 
     /**
      * @param context
-     *        the current context
+     *            the current context
      * @param imageUrls
-     *        the set of image URLs which are to be loaded and displayed
+     *            the set of image URLs which are to be loaded and displayed
      */
     public WebGalleryAdapter(Context context, List<String> imageUrls) {
         initialize(context, imageUrls, null);
@@ -59,12 +59,11 @@ public class WebGalleryAdapter extends BaseAdapter {
 
     /**
      * @param context
-     *        the current context
+     *            the current context
      * @param imageUrls
-     *        the set of image URLs which are to be loaded and displayed
+     *            the set of image URLs which are to be loaded and displayed
      * @param progressDrawableResId
-     *        the resource ID of the drawable that will be used for rendering
-     *        progress
+     *            the resource ID of the drawable that will be used for rendering progress
      */
     public WebGalleryAdapter(Context context, List<String> imageUrls, int progressDrawableResId) {
         initialize(context, imageUrls, context.getResources().getDrawable(progressDrawableResId));
@@ -104,42 +103,56 @@ public class WebGalleryAdapter extends BaseAdapter {
         return progressDrawable;
     }
 
+    // TODO: both convertView and ViewHolder are pointless at the moment, since there's a framework
+    // bug which causes views to not be cached in a Gallery widget:
+    // http://code.google.com/p/android/issues/detail?id=3376
     public View getView(int position, View convertView, ViewGroup parent) {
 
         String imageUrl = (String) getItem(position);
 
-        FrameLayout container;
-        WebImageView item;
+        ViewHolder viewHolder = null;
+        WebImageView webImageView = null;
 
         if (convertView == null) {
-            container = new FrameLayout(context);
-            container.setLayoutParams(new Gallery.LayoutParams(LayoutParams.FILL_PARENT,
-                    LayoutParams.FILL_PARENT));
-
-            item = new WebImageView(context, null, progressDrawable, false);
+            // create the image view
+            webImageView = new WebImageView(context, null, progressDrawable, false);
             FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(LayoutParams.WRAP_CONTENT,
                     LayoutParams.WRAP_CONTENT);
             lp.gravity = Gravity.CENTER;
-            item.setLayoutParams(lp);
+            webImageView.setLayoutParams(lp);
 
-            container.addView(item, 0);
+            // create the container layout for the image view
+            FrameLayout container = new FrameLayout(context);
+            container.setLayoutParams(new Gallery.LayoutParams(LayoutParams.FILL_PARENT,
+                    LayoutParams.FILL_PARENT));
+            container.addView(webImageView, 0);
+
+            convertView = container;
+
+            viewHolder = new ViewHolder();
+            viewHolder.webImageView = webImageView;
+            convertView.setTag(viewHolder);
         } else {
-            container = (FrameLayout) convertView;
-            item = (WebImageView) container.getChildAt(0);
+            viewHolder = (ViewHolder) convertView.getTag();
+            webImageView = viewHolder.webImageView;
         }
 
         // calling reset is important to prevent old images from displaying in a recycled view.
-        item.reset();
+        webImageView.reset();
 
-        item.setImageUrl(imageUrl);
-        item.loadImage();
+        webImageView.setImageUrl(imageUrl);
+        webImageView.loadImage();
 
         onGetView(position, convertView, parent);
 
-        return container;
+        return convertView;
     }
 
     protected void onGetView(int position, View convertView, ViewGroup parent) {
         // for extension
+    }
+
+    private static final class ViewHolder {
+        private WebImageView webImageView;
     }
 }
