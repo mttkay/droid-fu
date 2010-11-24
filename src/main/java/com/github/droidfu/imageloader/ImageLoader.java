@@ -46,27 +46,23 @@ import com.github.droidfu.widgets.WebImageView;
  */
 public class ImageLoader implements Runnable {
 
-    private static final String LOG_TAG = "Droid-Fu/ImageLoader";
-
-    private static ThreadPoolExecutor executor;
-
-    private static ImageCache imageCache;
-
-    private static final int DEFAULT_POOL_SIZE = 3;
-
-    // expire images after a day
-    // TODO: this currently only affects the in-memory cache, so it's quite pointless
-    private static final int DEFAULT_TTL_MINUTES = 24 * 60;
-
     public static final int HANDLER_MESSAGE_ID = 0;
-
     public static final String BITMAP_EXTRA = "droidfu:extra_bitmap";
     public static final String IMAGE_URL_EXTRA = "droidfu:extra_image_url";
 
+    private static final String LOG_TAG = "Droid-Fu/ImageLoader";
+    // the default thread pool size
+    private static final int DEFAULT_POOL_SIZE = 3;
+    // expire images after a day
+    // TODO: this currently only affects the in-memory cache, so it's quite pointless
+    private static final int DEFAULT_TTL_MINUTES = 24 * 60;
+    private static final int DEFAULT_RETRY_HANDLER_SLEEP_TIME = 1000;
+    private static final int DEFAULT_NUM_RETRIES = 3;
     private static final int NO_POSITION = -1;
 
-    private static int numAttempts = 3;
-    private static final int RETRY_HANDLER_SLEEP_TIME = 1000;
+    private static ThreadPoolExecutor executor;
+    private static ImageCache imageCache;
+    private static int numRetries = DEFAULT_NUM_RETRIES;
 
     /**
      * @param numThreads
@@ -82,7 +78,7 @@ public class ImageLoader implements Runnable {
      *            fails
      */
     public static void setMaxDownloadAttempts(int numAttempts) {
-        ImageLoader.numAttempts = numAttempts;
+        ImageLoader.numRetries = numAttempts;
     }
 
     /**
@@ -182,27 +178,6 @@ public class ImageLoader implements Runnable {
         executor.execute(loader);
     }
 
-    // /**
-    // * Loads the target image either from the cache or by downloading it.
-    // *
-    // * @param loader
-    // * loader instance that will be used if a download is required.
-    // */
-    // private static void doLoadImage(ImageLoader loader) {
-    // String imageUrl = loader.imageUrl;
-    //
-    // synchronized (imageCache) {
-    // // TODO: move the call to getBitmap to the worker thread (just probe the cache here)
-    // Bitmap image = imageCache.getBitmap(imageUrl);
-    // if (image == null) {
-    // // fetch the image in the background
-    // executor.execute(loader);
-    // } else {
-    // loader.notifyImageLoaded(imageUrl, image);
-    // }
-    // }
-    // }
-
     /**
      * Clears the 1st-level cache (in-memory cache). A good candidate for calling in
      * {@link android.app.Application#onLowMemory()}.
@@ -220,7 +195,13 @@ public class ImageLoader implements Runnable {
         return imageCache;
     }
 
+    /**
+     * The job method run on a worker thread. It will first query the image cache, and on a miss,
+     * download the image from the Web.
+     */
     public void run() {
+        // TODO: if we had a way to check for in-memory hits, we could improve performance by
+        // fetching an image from the in-memory cache on the main thread
         Bitmap bitmap = imageCache.getBitmap(imageUrl);
 
         if (bitmap == null) {
@@ -232,10 +213,12 @@ public class ImageLoader implements Runnable {
         } // TODO: notify about failure otherwise?
     }
 
+    // TODO: we could probably improve performance by re-using connections instead of closing them
+    // after each and every download
     private Bitmap downloadImage() {
         int timesTried = 1;
 
-        while (timesTried <= numAttempts) {
+        while (timesTried <= numRetries) {
             try {
                 byte[] imageData = retrieveImageData();
 
@@ -246,7 +229,7 @@ public class ImageLoader implements Runnable {
             } catch (Throwable e) {
                 Log.w(LOG_TAG, "download for " + imageUrl + " failed (attempt " + timesTried + ")");
                 e.printStackTrace();
-                SystemClock.sleep(RETRY_HANDLER_SLEEP_TIME);
+                SystemClock.sleep(DEFAULT_RETRY_HANDLER_SLEEP_TIME);
                 timesTried++;
             }
         }

@@ -24,6 +24,13 @@ import java.io.IOException;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
+/**
+ * Implements a cache capable of caching image files. It exposes helper methods to immediately
+ * access binary image data as {@link Bitmap} objects.
+ * 
+ * @author Matthias Kaeppler
+ * 
+ */
 public class ImageCache extends AbstractCache<String, byte[]> {
 
     public ImageCache(int initialCapacity, long expirationInMinutes, int maxConcurrentThreads) {
