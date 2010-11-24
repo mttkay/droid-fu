@@ -15,89 +15,54 @@
 
 package com.github.droidfu.cachefu;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Bitmap.CompressFormat;
 
-/**
- * <p>
- * A simple 2-level cache for bitmap images consisting of a small and fast
- * in-memory cache (1st level cache) and a slower but bigger disk cache (2nd
- * level cache). For second level caching, the application's cache directory
- * will be used. Please note that Android may at any point decide to wipe that
- * directory.
- * </p>
- * <p>
- * When pulling from the cache, it will first attempt to load the image from
- * memory. If that fails, it will try to load it from disk. If that succeeds,
- * the image will be put in the 1st level cache and returned. Otherwise it's a
- * cache miss, and the caller is responsible for loading the image from
- * elsewhere (probably the Internet).
- * </p>
- * <p>
- * Pushes to the cache are always write-through (i.e., the image will be stored
- * both on disk and in memory).
- * </p>
- * 
- * @author Matthias Kaeppler
- */
-public class ImageCache extends AbstractCache<String, Bitmap> {
-
-    private int cachedImageQuality = 75;
-
-    private CompressFormat compressedImageFormat = CompressFormat.PNG;
+public class ImageCache extends AbstractCache<String, byte[]> {
 
     public ImageCache(int initialCapacity, long expirationInMinutes, int maxConcurrentThreads) {
         super("ImageCache", initialCapacity, expirationInMinutes, maxConcurrentThreads);
     }
 
-    /**
-     * The image format that should be used when caching images on disk. The
-     * default value is {@link CompressFormat#PNG}. Note that when switching to
-     * a format like JPEG, you will lose any transparency that was part of the
-     * image.
-     * 
-     * @param compressedImageFormat
-     *        the {@link CompressFormat}
-     */
-    public void setCompressedImageFormat(CompressFormat compressedImageFormat) {
-        this.compressedImageFormat = compressedImageFormat;
-    }
-
-    public CompressFormat getCompressedImageFormat() {
-        return compressedImageFormat;
-    }
-
-    /**
-     * @param cachedImageQuality
-     *        the quality of images being compressed and written to disk (2nd
-     *        level cache) as a number in [0..100]
-     */
-    public void setCachedImageQuality(int cachedImageQuality) {
-        this.cachedImageQuality = cachedImageQuality;
-    }
-
-    public int getCachedImageQuality() {
-        return cachedImageQuality;
-    }
-
     @Override
     public String getFileNameForKey(String imageUrl) {
-        // TODO: is hashCode appropriate to avoid collisions?
-        // the key is the image URL
-        return Integer.toHexString(imageUrl.hashCode()) + "." + compressedImageFormat.name();
+        return CacheHelper.getFileNameFromUrl(imageUrl);
     }
 
     @Override
-    protected Bitmap readValueFromDisk(File file) {
-        return BitmapFactory.decodeFile(file.getAbsolutePath());
+    protected byte[] readValueFromDisk(File file) throws IOException {
+        BufferedInputStream istream = new BufferedInputStream(new FileInputStream(file));
+        long fileSize = file.length();
+        if (fileSize > Integer.MAX_VALUE) {
+            throw new IOException("Cannot read files larger than " + Integer.MAX_VALUE + " bytes");
+        }
+
+        int imageDataLength = (int) fileSize;
+
+        byte[] imageData = new byte[imageDataLength];
+        istream.read(imageData, 0, imageDataLength);
+        istream.close();
+
+        return imageData;
+    }
+
+    public synchronized Bitmap getBitmap(Object elementKey) {
+        byte[] imageData = super.get(elementKey);
+        if (imageData == null) {
+            return null;
+        }
+        return BitmapFactory.decodeByteArray(imageData, 0, imageData.length);
     }
 
     @Override
-    protected void writeValueToDisk(BufferedOutputStream ostream, Bitmap value) {
-        value.compress(compressedImageFormat, cachedImageQuality, ostream);
+    protected void writeValueToDisk(BufferedOutputStream ostream, byte[] imageData)
+            throws IOException {
+        ostream.write(imageData);
     }
 }

@@ -35,8 +35,7 @@ public class HttpResponseCache extends AbstractCache<String, ResponseData> {
 
     @Override
     public String getFileNameForKey(String url) {
-        // replace all special URI characters with a single + symbol
-        return url.replaceAll("[.:/,%?&=]", "+").replaceAll("[+]+", "+");
+        return CacheHelper.getFileNameFromUrl(url);
     }
 
     @Override

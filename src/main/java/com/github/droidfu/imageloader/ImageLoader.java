@@ -15,6 +15,9 @@
 
 package com.github.droidfu.imageloader;
 
+import java.io.BufferedInputStream;
+import java.io.IOException;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -33,15 +36,16 @@ import com.github.droidfu.cachefu.ImageCache;
 import com.github.droidfu.widgets.WebImageView;
 
 /**
- * Realizes an background image loader backed by a two-level FIFO cache. If the
- * image to be loaded is present in the cache, it is set immediately on the
- * given view. Otherwise, a thread from a thread pool will be used to download
- * the image in the background and set the image on the view as soon as it
- * completes.
+ * Realizes an background image loader backed by a two-level FIFO cache. If the image to be loaded
+ * is present in the cache, it is set immediately on the given view. Otherwise, a thread from a
+ * thread pool will be used to download the image in the background and set the image on the view as
+ * soon as it completes.
  * 
  * @author Matthias Kaeppler
  */
 public class ImageLoader implements Runnable {
+
+    private static final String LOG_TAG = "Droid-Fu/ImageLoader";
 
     private static ThreadPoolExecutor executor;
 
@@ -63,8 +67,7 @@ public class ImageLoader implements Runnable {
 
     /**
      * @param numThreads
-     *        the maximum number of threads that will be started to download
-     *        images in parallel
+     *            the maximum number of threads that will be started to download images in parallel
      */
     public static void setThreadPoolSize(int numThreads) {
         executor.setMaximumPoolSize(numThreads);
@@ -72,23 +75,21 @@ public class ImageLoader implements Runnable {
 
     /**
      * @param numAttempts
-     *        how often the image loader should retry the image download if
-     *        network connection fails
+     *            how often the image loader should retry the image download if network connection
+     *            fails
      */
     public static void setMaxDownloadAttempts(int numAttempts) {
         ImageLoader.numAttempts = numAttempts;
     }
 
     /**
-     * This method must be called before any other method is invoked on this
-     * class. Please note that when using ImageLoader as part of
-     * {@link WebImageView} or {@link WebGalleryAdapter}, then there is no need
-     * to call this method, since those classes will already do that for you.
-     * This method is idempotent. You may call it multiple times without any
-     * side effects.
+     * This method must be called before any other method is invoked on this class. Please note that
+     * when using ImageLoader as part of {@link WebImageView} or {@link WebGalleryAdapter}, then
+     * there is no need to call this method, since those classes will already do that for you. This
+     * method is idempotent. You may call it multiple times without any side effects.
      * 
      * @param context
-     *        the current context
+     *            the current context
      */
     public static synchronized void initialize(Context context) {
         if (executor == null) {
@@ -120,40 +121,36 @@ public class ImageLoader implements Runnable {
     }
 
     /**
-     * Triggers the image loader for the given image and view. The image loading
-     * will be performed concurrently to the UI main thread, using a fixed size
-     * thread pool. The loaded image will be posted back to the given ImageView
-     * upon completion.
+     * Triggers the image loader for the given image and view. The image loading will be performed
+     * concurrently to the UI main thread, using a fixed size thread pool. The loaded image will be
+     * posted back to the given ImageView upon completion.
      * 
      * @param imageUrl
-     *        the URL of the image to download
+     *            the URL of the image to download
      * @param imageView
-     *        the ImageView which should be updated with the new image
+     *            the ImageView which should be updated with the new image
      */
     public static void start(String imageUrl, ImageView imageView) {
         start(imageUrl, imageView, NO_POSITION);
     }
 
     /**
-     * Triggers the image loader for the given image and view. The image loading
-     * will be performed concurrently to the UI main thread, using a fixed size
-     * thread pool. The loaded image will be posted back to the given ImageView
-     * upon completion. This method is intended to be used in a ListAdapter (for
-     * a ListView) after setting the list item's position to the ImageView using
-     * <code>setTag(position)</code>. Since ListViews re-use views for
-     * performance optimization, it is not guaranteed that when the image has
-     * finished downloading, the target ImageView will still be used to render
-     * the requested image. ImageLoaderHandler checks that the index originally
-     * intended for a given image is the same as the last index set using
-     * setTag(), and can prevent a flicker effect after many images are loaded
-     * for the same ImageView.
+     * Triggers the image loader for the given image and view. The image loading will be performed
+     * concurrently to the UI main thread, using a fixed size thread pool. The loaded image will be
+     * posted back to the given ImageView upon completion. This method is intended to be used in a
+     * ListAdapter (for a ListView) after setting the list item's position to the ImageView using
+     * <code>setTag(position)</code>. Since ListViews re-use views for performance optimization, it
+     * is not guaranteed that when the image has finished downloading, the target ImageView will
+     * still be used to render the requested image. ImageLoaderHandler checks that the index
+     * originally intended for a given image is the same as the last index set using setTag(), and
+     * can prevent a flicker effect after many images are loaded for the same ImageView.
      * 
      * @param imageUrl
-     *        the URL of the image to download
+     *            the URL of the image to download
      * @param imageView
-     *        the ImageView which should be updated with the new image
+     *            the ImageView which should be updated with the new image
      * @param position
-     *        the position of the item within the adapter's data set.
+     *            the position of the item within the adapter's data set.
      */
     public static void start(String imageUrl, ImageView imageView, int position) {
         ImageLoader loader;
@@ -166,17 +163,16 @@ public class ImageLoader implements Runnable {
     }
 
     /**
-     * Triggers the image loader for the given image and handler. The image
-     * loading will be performed concurrently to the UI main thread, using a
-     * fixed size thread pool. The loaded image will not be automatically posted
-     * to an ImageView; instead, you can pass a custom
-     * {@link ImageLoaderHandler} and handle the loaded image yourself (e.g.
-     * cache it for later use).
+     * Triggers the image loader for the given image and handler. The image loading will be
+     * performed concurrently to the UI main thread, using a fixed size thread pool. The loaded
+     * image will not be automatically posted to an ImageView; instead, you can pass a custom
+     * {@link ImageLoaderHandler} and handle the loaded image yourself (e.g. cache it for later
+     * use).
      * 
      * @param imageUrl
-     *        the URL of the image to download
+     *            the URL of the image to download
      * @param handler
-     *        the handler which is used to handle the downloaded image
+     *            the handler which is used to handle the downloaded image
      */
     public static void start(String imageUrl, ImageLoaderHandler handler) {
         ImageLoader loader = new ImageLoader(imageUrl, handler);
@@ -187,13 +183,14 @@ public class ImageLoader implements Runnable {
      * Loads the target image either from the cache or by downloading it.
      * 
      * @param loader
-     *        loader instance that will be used if a download is required.
+     *            loader instance that will be used if a download is required.
      */
     private static void doLoadImage(ImageLoader loader) {
         String imageUrl = loader.imageUrl;
 
         synchronized (imageCache) {
-            Bitmap image = imageCache.get(imageUrl);
+            // TODO: move the call to getBitmap to the worker thread (just probe the cache here)
+            Bitmap image = imageCache.getBitmap(imageUrl);
             if (image == null) {
                 // fetch the image in the background
                 executor.execute(loader);
@@ -204,8 +201,8 @@ public class ImageLoader implements Runnable {
     }
 
     /**
-     * Clears the 1st-level cache (in-memory cache). A good candidate for
-     * calling in {@link android.app.Application#onLowMemory()}.
+     * Clears the 1st-level cache (in-memory cache). A good candidate for calling in
+     * {@link android.app.Application#onLowMemory()}.
      */
     public static void clearCache() {
         synchronized (imageCache) {
@@ -228,15 +225,18 @@ public class ImageLoader implements Runnable {
 
         while (timesTried <= numAttempts) {
             try {
-                URL url = new URL(imageUrl);
-                bitmap = BitmapFactory.decodeStream(url.openStream());
+                byte[] imageData = downloadImage();
+
                 synchronized (imageCache) {
-                    imageCache.put(imageUrl, bitmap);
+                    imageCache.put(imageUrl, imageData);
                 }
+
+                bitmap = BitmapFactory.decodeByteArray(imageData, 0, imageData.length);
+
                 break;
             } catch (Throwable e) {
-                Log.w(ImageLoader.class.getSimpleName(), "download for " + imageUrl
-                        + " failed (attempt " + timesTried + ")");
+                Log.w(LOG_TAG, "download for " + imageUrl + " failed (attempt " + timesTried + ")");
+                e.printStackTrace();
                 try {
                     Thread.sleep(2000);
                 } catch (InterruptedException e1) {
@@ -249,6 +249,31 @@ public class ImageLoader implements Runnable {
         if (bitmap != null) {
             notifyImageLoaded(imageUrl, bitmap);
         }
+    }
+
+    private byte[] downloadImage() throws IOException {
+        URL url = new URL(imageUrl);
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+
+        // determine the image size and allocate a buffer
+        int fileSize = connection.getContentLength();
+        byte[] imageData = new byte[fileSize];
+
+        // download the file
+        Log.d(LOG_TAG, "fetching image " + imageUrl + " (" + fileSize + ")");
+        BufferedInputStream istream = new BufferedInputStream(connection.getInputStream());
+        int bytesRead = 0;
+        int offset = 0;
+        while (bytesRead != -1 && offset < fileSize) {
+            bytesRead = istream.read(imageData, offset, fileSize - offset);
+            offset += bytesRead;
+        }
+
+        // clean up
+        istream.close();
+        connection.disconnect();
+
+        return imageData;
     }
 
     public void notifyImageLoaded(String url, Bitmap bitmap) {
