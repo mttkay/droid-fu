@@ -28,6 +28,7 @@ import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.os.SystemClock;
 import android.util.Log;
 import android.widget.ImageView;
 
@@ -51,9 +52,10 @@ public class ImageLoader implements Runnable {
 
     private static ImageCache imageCache;
 
-    private static final int DEFAULT_POOL_SIZE = 2;
+    private static final int DEFAULT_POOL_SIZE = 3;
 
     // expire images after a day
+    // TODO: this currently only affects the in-memory cache, so it's quite pointless
     private static final int DEFAULT_TTL_MINUTES = 24 * 60;
 
     public static final int HANDLER_MESSAGE_ID = 0;
@@ -64,6 +66,7 @@ public class ImageLoader implements Runnable {
     private static final int NO_POSITION = -1;
 
     private static int numAttempts = 3;
+    private static final int RETRY_HANDLER_SLEEP_TIME = 1000;
 
     /**
      * @param numThreads
@@ -159,7 +162,7 @@ public class ImageLoader implements Runnable {
         } else {
             loader = new ImageLoader(imageUrl, imageView, position);
         }
-        doLoadImage(loader);
+        executor.execute(loader);
     }
 
     /**
@@ -176,38 +179,36 @@ public class ImageLoader implements Runnable {
      */
     public static void start(String imageUrl, ImageLoaderHandler handler) {
         ImageLoader loader = new ImageLoader(imageUrl, handler);
-        doLoadImage(loader);
+        executor.execute(loader);
     }
 
-    /**
-     * Loads the target image either from the cache or by downloading it.
-     * 
-     * @param loader
-     *            loader instance that will be used if a download is required.
-     */
-    private static void doLoadImage(ImageLoader loader) {
-        String imageUrl = loader.imageUrl;
-
-        synchronized (imageCache) {
-            // TODO: move the call to getBitmap to the worker thread (just probe the cache here)
-            Bitmap image = imageCache.getBitmap(imageUrl);
-            if (image == null) {
-                // fetch the image in the background
-                executor.execute(loader);
-            } else {
-                loader.notifyImageLoaded(imageUrl, image);
-            }
-        }
-    }
+    // /**
+    // * Loads the target image either from the cache or by downloading it.
+    // *
+    // * @param loader
+    // * loader instance that will be used if a download is required.
+    // */
+    // private static void doLoadImage(ImageLoader loader) {
+    // String imageUrl = loader.imageUrl;
+    //
+    // synchronized (imageCache) {
+    // // TODO: move the call to getBitmap to the worker thread (just probe the cache here)
+    // Bitmap image = imageCache.getBitmap(imageUrl);
+    // if (image == null) {
+    // // fetch the image in the background
+    // executor.execute(loader);
+    // } else {
+    // loader.notifyImageLoaded(imageUrl, image);
+    // }
+    // }
+    // }
 
     /**
      * Clears the 1st-level cache (in-memory cache). A good candidate for calling in
      * {@link android.app.Application#onLowMemory()}.
      */
     public static void clearCache() {
-        synchronized (imageCache) {
-            imageCache.clear();
-        }
+        imageCache.clear();
     }
 
     /**
@@ -220,38 +221,40 @@ public class ImageLoader implements Runnable {
     }
 
     public void run() {
-        Bitmap bitmap = null;
-        int timesTried = 1;
+        Bitmap bitmap = imageCache.getBitmap(imageUrl);
 
-        while (timesTried <= numAttempts) {
-            try {
-                byte[] imageData = downloadImage();
-
-                synchronized (imageCache) {
-                    imageCache.put(imageUrl, imageData);
-                }
-
-                bitmap = BitmapFactory.decodeByteArray(imageData, 0, imageData.length);
-
-                break;
-            } catch (Throwable e) {
-                Log.w(LOG_TAG, "download for " + imageUrl + " failed (attempt " + timesTried + ")");
-                e.printStackTrace();
-                try {
-                    Thread.sleep(2000);
-                } catch (InterruptedException e1) {
-                }
-
-                timesTried++;
-            }
+        if (bitmap == null) {
+            bitmap = downloadImage();
         }
 
         if (bitmap != null) {
             notifyImageLoaded(imageUrl, bitmap);
-        }
+        } // TODO: notify about failure otherwise?
     }
 
-    private byte[] downloadImage() throws IOException {
+    private Bitmap downloadImage() {
+        int timesTried = 1;
+
+        while (timesTried <= numAttempts) {
+            try {
+                byte[] imageData = retrieveImageData();
+
+                imageCache.put(imageUrl, imageData);
+
+                return BitmapFactory.decodeByteArray(imageData, 0, imageData.length);
+
+            } catch (Throwable e) {
+                Log.w(LOG_TAG, "download for " + imageUrl + " failed (attempt " + timesTried + ")");
+                e.printStackTrace();
+                SystemClock.sleep(RETRY_HANDLER_SLEEP_TIME);
+                timesTried++;
+            }
+        }
+
+        return null;
+    }
+
+    private byte[] retrieveImageData() throws IOException {
         URL url = new URL(imageUrl);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 
