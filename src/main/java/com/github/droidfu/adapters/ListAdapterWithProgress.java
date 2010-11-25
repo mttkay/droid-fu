@@ -150,9 +150,11 @@ public abstract class ListAdapterWithProgress<T> extends BaseAdapter {
         if (isPositionOfProgressElement(position)) {
             return progressView;
         }
-
-        if (convertView == progressView) {
-            // make sure the progress view is never used as a convert view
+        
+        if (convertView == progressView || convertView != null && convertView.getId() == progressView.getId()) {
+            // make sure the progress view is never used as a convert view, 
+            // also if this adapter is used in an ExpandableListAdapter.
+            // NB: if you are using this adapter in an ExpandableListAdapter make sure you give your progressView an id.
             convertView = null;
         }
 
