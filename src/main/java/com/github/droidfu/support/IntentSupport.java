@@ -32,17 +32,17 @@ public class IntentSupport {
     public static final String MIME_TYPE_TEXT = "text/*";
 
     /**
-     * Checks whether there are applications installed which are able to handle
-     * the given action/data.
+     * Checks whether there are applications installed which are able to handle the given
+     * action/data.
      * 
      * @param context
-     *        the current context
+     *            the current context
      * @param action
-     *        the action to check
+     *            the action to check
      * @param uri
-     *        that data URI to check (may be null)
+     *            that data URI to check (may be null)
      * @param mimeType
-     *        the MIME type of the content (may be null)
+     *            the MIME type of the content (may be null)
      * @return true if there are apps which will respond to this action/data
      */
     public static boolean isIntentAvailable(Context context, String action, Uri uri, String mimeType) {
@@ -51,20 +51,20 @@ public class IntentSupport {
             intent.setType(mimeType);
         }
         List<ResolveInfo> list = context.getPackageManager().queryIntentActivities(intent,
-            PackageManager.MATCH_DEFAULT_ONLY);
+                PackageManager.MATCH_DEFAULT_ONLY);
         return !list.isEmpty();
     }
 
     /**
-     * Checks whether there are applications installed which are able to handle
-     * the given action/type.
+     * Checks whether there are applications installed which are able to handle the given
+     * action/type.
      * 
      * @param context
-     *        the current context
+     *            the current context
      * @param action
-     *        the action to check
+     *            the action to check
      * @param mimeType
-     *        the MIME type of the content (may be null)
+     *            the MIME type of the content (may be null)
      * @return true if there are apps which will respond to this action/type
      */
     public static boolean isIntentAvailable(Context context, String action, String mimeType) {
@@ -73,23 +73,22 @@ public class IntentSupport {
             intent.setType(mimeType);
         }
         List<ResolveInfo> list = context.getPackageManager().queryIntentActivities(intent,
-            PackageManager.MATCH_DEFAULT_ONLY);
+                PackageManager.MATCH_DEFAULT_ONLY);
         return !list.isEmpty();
     }
 
     /**
-     * Checks whether there are applications installed which are able to handle
-     * the given intent.
+     * Checks whether there are applications installed which are able to handle the given intent.
      * 
      * @param context
-     *        the current context
+     *            the current context
      * @param intent
-     *        the intent to check
+     *            the intent to check
      * @return true if there are apps which will respond to this intent
      */
     public static boolean isIntentAvailable(Context context, Intent intent) {
         List<ResolveInfo> list = context.getPackageManager().queryIntentActivities(intent,
-            PackageManager.MATCH_DEFAULT_ONLY);
+                PackageManager.MATCH_DEFAULT_ONLY);
         return !list.isEmpty();
     }
 
@@ -128,12 +127,11 @@ public class IntentSupport {
     }
 
     /**
-     * Creates an intent which when fired, will launch the camera to take a
-     * picture that's saved to a temporary file so you can use it directly
-     * without going through the gallery.
+     * Creates an intent which when fired, will launch the camera to take a picture that's saved to
+     * a temporary file so you can use it directly without going through the gallery.
      * 
      * @param tempFile
-     *        the file that should be used to temporarily store the picture
+     *            the file that should be used to temporarily store the picture
      * @return the intent
      */
     public static Intent newTakePictureIntent(File tempFile) {
@@ -143,8 +141,8 @@ public class IntentSupport {
     }
 
     /**
-     * Creates an intent which when fired, will launch the phone's picture
-     * gallery to select a picture from it.
+     * Creates an intent which when fired, will launch the phone's picture gallery to select a
+     * picture from it.
      * 
      * @return the intent
      */
@@ -152,6 +150,32 @@ public class IntentSupport {
         Intent intent = new Intent(Intent.ACTION_PICK);
         intent.setType("image/*");
         return intent;
+    }
+
+    /**
+     * Creates an intent that will open the phone app and enter the given number. Unlike
+     * {@link #newCallNumberIntent(String)}, this does not actually dispatch the call, so it gives
+     * the user a chance to review and edit the number.
+     * 
+     * @param phoneNumber
+     *            the number to dial
+     * @return the intent
+     */
+    public static Intent newDialNumberIntent(String phoneNumber) {
+        return new Intent(Intent.ACTION_DIAL, Uri.parse("tel:" + phoneNumber.replace(" ", "")));
+    }
+
+    /**
+     * Creates an intent that will immediately dispatch a call to the given number. NOTE that unlike
+     * {@link #newDialNumberIntent(String)}, this intent requires the
+     * {@link android.Manifest.permission#CALL_PHONE} permission to be set.
+     * 
+     * @param phoneNumber
+     *            the number to call
+     * @return the intent
+     */
+    public static Intent newCallNumberIntent(String phoneNumber) {
+        return new Intent(Intent.ACTION_CALL, Uri.parse("tel:" + phoneNumber.replace(" ", "")));
     }
 
 }
