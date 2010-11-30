@@ -276,6 +276,20 @@ public abstract class AbstractCache<KeyT, ValT> implements Map<KeyT, ValT> {
         return cache.containsKey(key) || (isDiskCacheEnabled && getFileForKey((KeyT) key).exists());
     }
 
+    /**
+     * Checks if a value is present in the in-memory cache. This method ignores the disk cache.
+     * 
+     * @param key
+     *            the cache key
+     * @return true if the value is currently hold in memory, false otherwise
+     */
+    public synchronized boolean containsKeyInMemory(Object key) {
+        return cache.containsKey(key);
+    }
+
+    /**
+     * Checks if the given value is currently hold in memory.
+     */
     public synchronized boolean containsValue(Object value) {
         return cache.containsValue(value);
     }
