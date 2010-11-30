@@ -199,6 +199,10 @@ public class BetterHttp {
         defaultHeaders.put(header, value);
     }
 
+    public static HashMap<String, String> getDefaultHeaders() {
+        return defaultHeaders;
+    }
+
     public static void setContext(Context context) {
         if (appContext != null) {
             return;
