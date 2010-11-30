@@ -116,6 +116,7 @@ public class ImageLoader implements Runnable {
 
     public ImageLoader(String imageUrl, ImageView imageView, int position) {
         this.imageUrl = imageUrl;
+        imageView.setTag(position);
         this.handler = new ImageLoaderHandler(imageView, position);
     }
 
