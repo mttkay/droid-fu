@@ -26,7 +26,6 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.Message;
 import android.os.SystemClock;
 import android.util.Log;
@@ -102,7 +101,7 @@ public class ImageLoader implements Runnable {
 
     private String imageUrl;
 
-    private Handler handler;
+    private ImageLoaderHandler handler;
 
     private ImageLoader(String imageUrl, ImageView imageView) {
         this.imageUrl = imageUrl;
@@ -159,7 +158,7 @@ public class ImageLoader implements Runnable {
         } else {
             loader = new ImageLoader(imageUrl, imageView, position);
         }
-        executor.execute(loader);
+        setOrLoadImage(loader);
     }
 
     /**
@@ -176,7 +175,17 @@ public class ImageLoader implements Runnable {
      */
     public static void start(String imageUrl, ImageLoaderHandler handler) {
         ImageLoader loader = new ImageLoader(imageUrl, handler);
-        executor.execute(loader);
+        setOrLoadImage(loader);
+    }
+
+    private static void setOrLoadImage(ImageLoader imageLoader) {
+        String imageUrl = imageLoader.imageUrl;
+        if (imageCache.containsKeyInMemory(imageUrl)) {
+            // do not go through message passing, handle directly instead
+            imageLoader.handler.handleImageLoaded(imageCache.getBitmap(imageUrl), null);
+        } else {
+            executor.execute(imageLoader);
+        }
     }
 
     /**

@@ -29,20 +29,35 @@ public class ImageLoaderHandler extends Handler {
     public ImageLoaderHandler(ImageView imageView) {
         this.imageView = imageView;
     }
-    
+
     public ImageLoaderHandler(ImageView imageView, int position) {
         this.imageView = imageView;
         this.position = position;
     }
 
     @Override
-    public void handleMessage(Message msg) {
+    public final void handleMessage(Message msg) {
         if (msg.what == ImageLoader.HANDLER_MESSAGE_ID) {
             handleImageLoadedMessage(msg);
         }
     }
 
-    protected void handleImageLoadedMessage(Message msg) {
+    protected final void handleImageLoadedMessage(Message msg) {
+        Bundle data = msg.getData();
+        Bitmap bitmap = data.getParcelable(ImageLoader.BITMAP_EXTRA);
+        handleImageLoaded(bitmap, msg);
+    }
+
+    /**
+     * Override this method if you need custom handler logic. Note that this method can actually be
+     * called directly for performance reasons, in which case the message will be null
+     * 
+     * @param bitmap
+     *            the bitmap returned from the image loader
+     * @param msg
+     *            the handler message; can be null
+     */
+    protected void handleImageLoaded(Bitmap bitmap, Message msg) {
         // If this handler is used for loading images in a ListAdapter,
         // the thread will set the image only if it's the right position,
         // otherwise it won't do anything.
@@ -52,8 +67,6 @@ public class ImageLoaderHandler extends Handler {
                 return;
             }
         }
-        Bundle data = msg.getData();
-        Bitmap bitmap = data.getParcelable(ImageLoader.BITMAP_EXTRA);
         imageView.setImageBitmap(bitmap);
     }
 

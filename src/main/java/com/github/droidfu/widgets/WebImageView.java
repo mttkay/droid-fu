@@ -16,6 +16,7 @@
 package com.github.droidfu.widgets;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.drawable.AnimationDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -32,8 +33,8 @@ import com.github.droidfu.imageloader.ImageLoader;
 import com.github.droidfu.imageloader.ImageLoaderHandler;
 
 /**
- * An image view that fetches its image off the web using the supplied URL.
- * While the image is being downloaded, a progress indicator will be shown.
+ * An image view that fetches its image off the web using the supplied URL. While the image is being
+ * downloaded, a progress indicator will be shown.
  * 
  * @author Matthias Kaeppler
  */
@@ -53,13 +54,12 @@ public class WebImageView extends ViewSwitcher {
 
     /**
      * @param context
-     *        the view's current context
+     *            the view's current context
      * @param imageUrl
-     *        the URL of the image to download and show
+     *            the URL of the image to download and show
      * @param autoLoad
-     *        Whether the download should start immediately after creating the
-     *        view. If set to false, use {@link #loadImage()} to manually
-     *        trigger the image download.
+     *            Whether the download should start immediately after creating the view. If set to
+     *            false, use {@link #loadImage()} to manually trigger the image download.
      */
     public WebImageView(Context context, String imageUrl, boolean autoLoad) {
         super(context);
@@ -68,16 +68,15 @@ public class WebImageView extends ViewSwitcher {
 
     /**
      * @param context
-     *        the view's current context
+     *            the view's current context
      * @param imageUrl
-     *        the URL of the image to download and show
+     *            the URL of the image to download and show
      * @param progressDrawable
-     *        the drawable to be used for the {@link ProgressBar} which is
-     *        displayed while the image is loading
+     *            the drawable to be used for the {@link ProgressBar} which is displayed while the
+     *            image is loading
      * @param autoLoad
-     *        Whether the download should start immediately after creating the
-     *        view. If set to false, use {@link #loadImage()} to manually
-     *        trigger the image download.
+     *            Whether the download should start immediately after creating the view. If set to
+     *            false, use {@link #loadImage()} to manually trigger the image download.
      */
     public WebImageView(Context context, String imageUrl, Drawable progressDrawable,
             boolean autoLoad) {
@@ -90,13 +89,14 @@ public class WebImageView extends ViewSwitcher {
         // TypedArray styles = context.obtainStyledAttributes(attributes,
         // R.styleable.GalleryItem);
         int progressDrawableId = attributes.getAttributeResourceValue(DroidFu.XMLNS,
-            "progressDrawable", 0);
+                "progressDrawable", 0);
         Drawable progressDrawable = null;
         if (progressDrawableId > 0) {
             progressDrawable = context.getResources().getDrawable(progressDrawableId);
         }
         initialize(context, attributes.getAttributeValue(DroidFu.XMLNS, "imageUrl"),
-            progressDrawable, attributes.getAttributeBooleanValue(DroidFu.XMLNS, "autoLoad", true));
+                progressDrawable, attributes.getAttributeBooleanValue(DroidFu.XMLNS, "autoLoad",
+                        true));
         // styles.recycle();
     }
 
@@ -135,8 +135,8 @@ public class WebImageView extends ViewSwitcher {
             }
         }
 
-        LayoutParams lp = new LayoutParams(progressDrawable.getIntrinsicWidth(),
-                progressDrawable.getIntrinsicHeight());
+        LayoutParams lp = new LayoutParams(progressDrawable.getIntrinsicWidth(), progressDrawable
+                .getIntrinsicHeight());
         lp.gravity = Gravity.CENTER;
 
         addView(loadingSpinner, 0, lp);
@@ -151,8 +151,7 @@ public class WebImageView extends ViewSwitcher {
     }
 
     /**
-     * Use this method to trigger the image download if you had previously set
-     * autoLoad to false.
+     * Use this method to trigger the image download if you had previously set autoLoad to false.
      */
     public void loadImage() {
         if (imageUrl == null) {
@@ -171,12 +170,11 @@ public class WebImageView extends ViewSwitcher {
     }
 
     /**
-     * Often you have resources which usually have an image, but some don't. For
-     * these cases, use this method to supply a placeholder drawable which will
-     * be loaded instead of a web image.
+     * Often you have resources which usually have an image, but some don't. For these cases, use
+     * this method to supply a placeholder drawable which will be loaded instead of a web image.
      * 
      * @param imageResourceId
-     *        the resource of the placeholder image drawable
+     *            the resource of the placeholder image drawable
      */
     public void setNoImageDrawable(int imageResourceId) {
         imageView.setImageDrawable(getContext().getResources().getDrawable(imageResourceId));
@@ -197,21 +195,21 @@ public class WebImageView extends ViewSwitcher {
         }
 
         @Override
-        protected void handleImageLoadedMessage(Message msg) {
+        protected void handleImageLoaded(Bitmap bitmap, Message msg) {
+            if (msg != null) {
+                Bundle data = msg.getData();
+                String loadedUrl = data.getString(ImageLoader.IMAGE_URL_EXTRA);
 
-            Bundle data = msg.getData();
-            String loadedUrl = data.getString(ImageLoader.IMAGE_URL_EXTRA);
-
-            // if an image url is specified, make sure this is the one we are expecting now
-            if (loadedUrl != null && !loadedUrl.equals(imageUrl)) {
-                // this happens when multiple download requests are made concurrently.
-                // we always want to show the last requested image, so we discard when mismatched
-                return;
+                // if an image url is specified, make sure this is the one we are expecting now
+                if (loadedUrl != null && !loadedUrl.equals(imageUrl)) {
+                    // this happens when multiple download requests are made concurrently.
+                    // we always want to show the last requested image, so we discard when
+                    // mismatched
+                    return;
+                }
             }
 
-
-            super.handleImageLoadedMessage(msg);
-
+            imageView.setImageBitmap(bitmap);
             isLoaded = true;
             setDisplayedChild(1);
         }
