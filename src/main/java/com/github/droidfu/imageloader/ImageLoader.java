@@ -138,12 +138,14 @@ public class ImageLoader implements Runnable {
     }
 
     private static void start(String imageUrl, ImageView imageView, ImageLoaderHandler handler) {
-        String oldImageUrl = (String) imageView.getTag();
-        if (imageUrl.equals(oldImageUrl)) {
-            // nothing to do
-            return;
-        } else {
-            imageView.setTag(imageUrl);
+        if (imageView != null) {
+            String oldImageUrl = (String) imageView.getTag();
+            if (imageUrl.equals(oldImageUrl)) {
+                // nothing to do
+                return;
+            } else {
+                imageView.setTag(imageUrl);
+            }
         }
 
         if (imageCache.containsKeyInMemory(imageUrl)) {
