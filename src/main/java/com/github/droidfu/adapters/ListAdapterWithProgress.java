@@ -147,15 +147,10 @@ public abstract class ListAdapterWithProgress<T> extends BaseAdapter {
     }
 
     public final View getView(int position, View convertView, ViewGroup parent) {
+        System.out.println("adapter Android convertView for pos " + position + " null = "
+                + (convertView == null));
         if (isPositionOfProgressElement(position)) {
             return progressView;
-        }
-        
-        if (convertView == progressView || convertView != null && convertView.getId() == progressView.getId()) {
-            // make sure the progress view is never used as a convert view, 
-            // also if this adapter is used in an ExpandableListAdapter.
-            // NB: if you are using this adapter in an ExpandableListAdapter make sure you give your progressView an id.
-            convertView = null;
         }
 
         return doGetView(position, convertView, parent);
@@ -165,6 +160,19 @@ public abstract class ListAdapterWithProgress<T> extends BaseAdapter {
 
     private boolean isPositionOfProgressElement(int position) {
         return isLoadingData && position == data.size();
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        if (isPositionOfProgressElement(position)) {
+            return IGNORE_ITEM_VIEW_TYPE;
+        }
+        return 0;
+    }
+
+    @Override
+    public int getViewTypeCount() {
+        return 2;
     }
 
     public ArrayList<T> getData() {
