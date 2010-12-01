@@ -57,7 +57,6 @@ public class ImageLoader implements Runnable {
     private static final int DEFAULT_TTL_MINUTES = 24 * 60;
     private static final int DEFAULT_RETRY_HANDLER_SLEEP_TIME = 1000;
     private static final int DEFAULT_NUM_RETRIES = 3;
-    private static final int NO_POSITION = -1;
 
     private static ThreadPoolExecutor executor;
     private static ImageCache imageCache;
@@ -103,20 +102,9 @@ public class ImageLoader implements Runnable {
 
     private ImageLoaderHandler handler;
 
-    private ImageLoader(String imageUrl, ImageView imageView) {
-        this.imageUrl = imageUrl;
-        this.handler = new ImageLoaderHandler(imageView);
-    }
-
     private ImageLoader(String imageUrl, ImageLoaderHandler handler) {
         this.imageUrl = imageUrl;
         this.handler = handler;
-    }
-
-    public ImageLoader(String imageUrl, ImageView imageView, int position) {
-        this.imageUrl = imageUrl;
-        imageView.setTag(position);
-        this.handler = new ImageLoaderHandler(imageView, position);
     }
 
     /**
@@ -130,35 +118,7 @@ public class ImageLoader implements Runnable {
      *            the ImageView which should be updated with the new image
      */
     public static void start(String imageUrl, ImageView imageView) {
-        start(imageUrl, imageView, NO_POSITION);
-    }
-
-    /**
-     * Triggers the image loader for the given image and view. The image loading will be performed
-     * concurrently to the UI main thread, using a fixed size thread pool. The loaded image will be
-     * posted back to the given ImageView upon completion. This method is intended to be used in a
-     * ListAdapter (for a ListView) after setting the list item's position to the ImageView using
-     * <code>setTag(position)</code>. Since ListViews re-use views for performance optimization, it
-     * is not guaranteed that when the image has finished downloading, the target ImageView will
-     * still be used to render the requested image. ImageLoaderHandler checks that the index
-     * originally intended for a given image is the same as the last index set using setTag(), and
-     * can prevent a flicker effect after many images are loaded for the same ImageView.
-     * 
-     * @param imageUrl
-     *            the URL of the image to download
-     * @param imageView
-     *            the ImageView which should be updated with the new image
-     * @param position
-     *            the position of the item within the adapter's data set.
-     */
-    public static void start(String imageUrl, ImageView imageView, int position) {
-        ImageLoader loader;
-        if (position == NO_POSITION) {
-            loader = new ImageLoader(imageUrl, imageView);
-        } else {
-            loader = new ImageLoader(imageUrl, imageView, position);
-        }
-        setOrLoadImage(loader);
+        start(imageUrl, imageView, new ImageLoaderHandler(imageView, imageUrl));
     }
 
     /**
@@ -174,17 +134,23 @@ public class ImageLoader implements Runnable {
      *            the handler which is used to handle the downloaded image
      */
     public static void start(String imageUrl, ImageLoaderHandler handler) {
-        ImageLoader loader = new ImageLoader(imageUrl, handler);
-        setOrLoadImage(loader);
+        start(imageUrl, handler.getImageView(), handler);
     }
 
-    private static void setOrLoadImage(ImageLoader imageLoader) {
-        String imageUrl = imageLoader.imageUrl;
+    private static void start(String imageUrl, ImageView imageView, ImageLoaderHandler handler) {
+        String oldImageUrl = (String) imageView.getTag();
+        if (imageUrl.equals(oldImageUrl)) {
+            // nothing to do
+            return;
+        } else {
+            imageView.setTag(imageUrl);
+        }
+
         if (imageCache.containsKeyInMemory(imageUrl)) {
             // do not go through message passing, handle directly instead
-            imageLoader.handler.handleImageLoaded(imageCache.getBitmap(imageUrl), null);
+            handler.handleImageLoaded(imageCache.getBitmap(imageUrl), null);
         } else {
-            executor.execute(imageLoader);
+            executor.execute(new ImageLoader(imageUrl, handler));
         }
     }
 

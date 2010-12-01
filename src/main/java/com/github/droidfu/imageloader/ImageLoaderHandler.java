@@ -1,4 +1,4 @@
-/* Copyright (c) 2009 Matthias Käppler
+/* Copyright (c) 2009 Matthias Kaeppler
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,15 +24,11 @@ import android.widget.ImageView;
 public class ImageLoaderHandler extends Handler {
 
     private ImageView imageView;
-    private Integer position;
+    private String imageUrl;
 
-    public ImageLoaderHandler(ImageView imageView) {
+    public ImageLoaderHandler(ImageView imageView, String imageUrl) {
         this.imageView = imageView;
-    }
-
-    public ImageLoaderHandler(ImageView imageView, int position) {
-        this.imageView = imageView;
-        this.position = position;
+        this.imageUrl = imageUrl;
     }
 
     @Override
@@ -56,18 +52,27 @@ public class ImageLoaderHandler extends Handler {
      *            the bitmap returned from the image loader
      * @param msg
      *            the handler message; can be null
+     * @return true if the view was updated with the new image, false if it was discarded
      */
-    protected void handleImageLoaded(Bitmap bitmap, Message msg) {
+    protected boolean handleImageLoaded(Bitmap bitmap, Message msg) {
         // If this handler is used for loading images in a ListAdapter,
         // the thread will set the image only if it's the right position,
         // otherwise it won't do anything.
-        if (position != null) {
-            int forPosition = (Integer) imageView.getTag();
-            if (forPosition != this.position) {
-                return;
-            }
+        String forUrl = (String) imageView.getTag();
+        if (imageUrl.equals(forUrl)) {
+            imageView.setImageBitmap(bitmap);
+            return true;
         }
-        imageView.setImageBitmap(bitmap);
+
+        return false;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
     }
 
     public ImageView getImageView() {

@@ -1,4 +1,4 @@
-/* Copyright (c) 2009 Matthias Käppler
+/* Copyright (c) 2009 Matthias Kaeppler
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,6 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.drawable.AnimationDrawable;
 import android.graphics.drawable.Drawable;
-import android.os.Bundle;
 import android.os.Message;
 import android.util.AttributeSet;
 import android.view.Gravity;
@@ -191,27 +190,17 @@ public class WebImageView extends ViewSwitcher {
     private class DefaultImageLoaderHandler extends ImageLoaderHandler {
 
         public DefaultImageLoaderHandler() {
-            super(imageView);
+            super(imageView, imageUrl);
         }
 
         @Override
-        protected void handleImageLoaded(Bitmap bitmap, Message msg) {
-            if (msg != null) {
-                Bundle data = msg.getData();
-                String loadedUrl = data.getString(ImageLoader.IMAGE_URL_EXTRA);
-
-                // if an image url is specified, make sure this is the one we are expecting now
-                if (loadedUrl != null && !loadedUrl.equals(imageUrl)) {
-                    // this happens when multiple download requests are made concurrently.
-                    // we always want to show the last requested image, so we discard when
-                    // mismatched
-                    return;
-                }
+        protected boolean handleImageLoaded(Bitmap bitmap, Message msg) {
+            boolean wasUpdated = super.handleImageLoaded(bitmap, msg);
+            if (wasUpdated) {
+                isLoaded = true;
+                setDisplayedChild(1);
             }
-
-            imageView.setImageBitmap(bitmap);
-            isLoaded = true;
-            setDisplayedChild(1);
+            return wasUpdated;
         }
     }
 }
