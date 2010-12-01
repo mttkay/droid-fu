@@ -1,4 +1,4 @@
-/* Copyright (c) 2009 Matthias Käppler
+/* Copyright (c) 2009 Matthias Kaeppler
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -147,8 +147,6 @@ public abstract class ListAdapterWithProgress<T> extends BaseAdapter {
     }
 
     public final View getView(int position, View convertView, ViewGroup parent) {
-        System.out.println("adapter Android convertView for pos " + position + " null = "
-                + (convertView == null));
         if (isPositionOfProgressElement(position)) {
             return progressView;
         }
