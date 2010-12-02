@@ -26,6 +26,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.provider.Settings;
+import android.provider.Settings.Secure;
 import android.provider.Settings.SettingNotFoundException;
 
 public class DiagnosticSupport {
@@ -40,6 +41,30 @@ public class DiagnosticSupport {
             apiLevel = Integer.parseInt(Build.VERSION.SDK);
         }
         ANDROID_API_LEVEL = apiLevel;
+    }
+
+    /**
+     * Returns the ANDROID_ID unique device ID for the current device. Unlike the platform
+     * functions, this method is reliable: since reading that ID has changed between platform
+     * versions, it takes care of attempting to read it in different ways, if one failed. Also, it
+     * guarantees to never return null.
+     * 
+     * @param context
+     *            the context
+     * @return the device's ANDROID_ID, or "UNKNOWN_DEVICE"
+     * @see Secure#ANDROID_ID
+     */
+    public static String getAndroidId(Context context) {
+        String androidId = Secure.getString(context.getContentResolver(), Secure.ANDROID_ID);
+        if (androidId == null) {
+            // this happens on 1.6 and older
+            androidId = android.provider.Settings.System.getString(context.getContentResolver(),
+                    android.provider.Settings.System.ANDROID_ID);
+        }
+        if (androidId == null) {
+            androidId = "UNKNOWN_DEVICE";
+        }
+        return androidId;
     }
 
     public static String getApplicationVersionString(Context context) {
