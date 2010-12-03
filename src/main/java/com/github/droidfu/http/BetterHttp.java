@@ -29,6 +29,8 @@ import android.util.Log;
 
 import com.github.droidfu.cachefu.AbstractCache;
 import com.github.droidfu.cachefu.HttpResponseCache;
+import com.github.droidfu.http.ssl.EasySSLSocketFactory;
+import com.github.droidfu.support.DiagnosticSupport;
 
 public class BetterHttp {
 
@@ -65,7 +67,14 @@ public class BetterHttp {
 
         SchemeRegistry schemeRegistry = new SchemeRegistry();
         schemeRegistry.register(new Scheme("http", PlainSocketFactory.getSocketFactory(), 80));
-        schemeRegistry.register(new Scheme("https", SSLSocketFactory.getSocketFactory(), 443));
+        if (DiagnosticSupport.ANDROID_API_LEVEL >= 7) {
+            schemeRegistry.register(new Scheme("https", SSLSocketFactory.getSocketFactory(), 443));
+        } else {
+            // used to work around a bug in Android 1.6:
+            // http://code.google.com/p/android/issues/detail?id=1946
+            // TODO: is there a less rigorous workaround for this?
+            schemeRegistry.register(new Scheme("https", new EasySSLSocketFactory(), 443));
+        }
 
         ThreadSafeClientConnManager cm = new ThreadSafeClientConnManager(httpParams, schemeRegistry);
         httpClient = new DefaultHttpClient(cm, httpParams);
