@@ -39,4 +39,7 @@ public class CachedHttpRequest implements BetterHttpRequest {
         return null;
     }
 
+    public BetterHttpRequest withTimeout(int timeout) {
+        return this;
+    }
 }

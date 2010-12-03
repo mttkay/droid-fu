@@ -26,6 +26,7 @@ import org.apache.http.client.HttpResponseException;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.impl.client.AbstractHttpClient;
+import org.apache.http.params.CoreConnectionPNames;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HttpContext;
 
@@ -48,6 +49,8 @@ public abstract class BetterHttpRequestBase implements BetterHttpRequest,
     protected HttpUriRequest request;
 
     protected int maxRetries = MAX_RETRIES;
+
+    private int oldTimeout; // used to cache the global timeout when changing it for one request
 
     BetterHttpRequestBase(AbstractHttpClient httpClient) {
         this.httpClient = httpClient;
@@ -74,6 +77,13 @@ public abstract class BetterHttpRequestBase implements BetterHttpRequest,
         } else {
             this.maxRetries = retries;
         }
+        return this;
+    }
+
+    public BetterHttpRequest withTimeout(int timeout) {
+        oldTimeout = httpClient.getParams().getIntParameter(CoreConnectionPNames.SO_TIMEOUT,
+                BetterHttp.DEFAULT_SOCKET_TIMEOUT);
+        BetterHttp.setSocketTimeout(timeout);
         return this;
     }
 
@@ -104,6 +114,11 @@ public abstract class BetterHttpRequestBase implements BetterHttpRequest,
                 cause = e;
                 executionCount = Math.max(executionCount, retryHandler.getTimesRetried());
                 retry = retryHandler.retryRequest(cause, ++executionCount, context);
+            } finally {
+                // if timeout was changed with this request using withTimeout(), reset it
+                if (oldTimeout != BetterHttp.getSocketTimeout()) {
+                    BetterHttp.setSocketTimeout(oldTimeout);
+                }
             }
         }
 

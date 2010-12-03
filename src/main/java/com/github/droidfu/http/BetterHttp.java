@@ -37,11 +37,11 @@ public class BetterHttp {
     static final String LOG_TAG = "BetterHttp";
 
     public static final int DEFAULT_MAX_CONNECTIONS = 4;
-    public static final int DEFAULT_CONNECTION_TIMEOUT = 10 * 1000;
+    public static final int DEFAULT_SOCKET_TIMEOUT = 10 * 1000;
     public static final String DEFAULT_HTTP_USER_AGENT = "Android/DroidFu";
 
     private static int maxConnections = DEFAULT_MAX_CONNECTIONS;
-    private static int connectionTimeout = DEFAULT_CONNECTION_TIMEOUT;
+    private static int socketTimeout = DEFAULT_SOCKET_TIMEOUT;
 
     private static HashMap<String, String> defaultHeaders = new HashMap<String, String>();
     private static AbstractHttpClient httpClient;
@@ -56,11 +56,11 @@ public class BetterHttp {
     protected static void setupHttpClient() {
         BasicHttpParams httpParams = new BasicHttpParams();
 
-        ConnManagerParams.setTimeout(httpParams, connectionTimeout);
+        ConnManagerParams.setTimeout(httpParams, socketTimeout);
         ConnManagerParams.setMaxConnectionsPerRoute(httpParams,
                 new ConnPerRouteBean(maxConnections));
         ConnManagerParams.setMaxTotalConnections(httpParams, DEFAULT_MAX_CONNECTIONS);
-        HttpConnectionParams.setSoTimeout(httpParams, connectionTimeout);
+        HttpConnectionParams.setSoTimeout(httpParams, socketTimeout);
         HttpConnectionParams.setTcpNoDelay(httpParams, true);
         HttpProtocolParams.setVersion(httpParams, HttpVersion.HTTP_1_1);
         HttpProtocolParams.setUserAgent(httpParams, DEFAULT_HTTP_USER_AGENT);
@@ -200,8 +200,20 @@ public class BetterHttp {
         BetterHttp.maxConnections = maxConnections;
     }
 
-    public static void setConnectionTimeout(int connectionTimeout) {
-        BetterHttp.connectionTimeout = connectionTimeout;
+    /**
+     * Adjust the socket timeout, i.e. the amount of time that may pass when waiting for a server
+     * response. Time unit is milliseconds.
+     * 
+     * @param socketTimeout
+     *            the timeout in milliseconds
+     */
+    public static void setSocketTimeout(int socketTimeout) {
+        BetterHttp.socketTimeout = socketTimeout;
+        HttpConnectionParams.setSoTimeout(httpClient.getParams(), socketTimeout);
+    }
+
+    public static int getSocketTimeout() {
+        return socketTimeout;
     }
 
     public static void setDefaultHeader(String header, String value) {

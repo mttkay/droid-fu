@@ -58,6 +58,15 @@ public interface BetterHttpRequest {
     public BetterHttpRequest retries(int retries);
 
     /**
+     * Set the socket timeout for this specific request.
+     * 
+     * @param timeout
+     *            the timeout in milliseconds
+     * @return this request
+     */
+    public BetterHttpRequest withTimeout(int timeout);
+
+    /**
      * Sends the current request. This method uses a special retry-logic (on top of that employed by
      * HttpClient, which is better suited to handle network fail-overs when e.g. switching between
      * Wi-Fi and 3G).
