@@ -37,7 +37,7 @@ public class BetterHttp {
     static final String LOG_TAG = "BetterHttp";
 
     public static final int DEFAULT_MAX_CONNECTIONS = 4;
-    public static final int DEFAULT_SOCKET_TIMEOUT = 10 * 1000;
+    public static final int DEFAULT_SOCKET_TIMEOUT = 30 * 1000;
     public static final String DEFAULT_HTTP_USER_AGENT = "Android/DroidFu";
 
     private static int maxConnections = DEFAULT_MAX_CONNECTIONS;
