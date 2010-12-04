@@ -193,7 +193,7 @@ public class ImageLoader implements Runnable {
 
     // TODO: we could probably improve performance by re-using connections instead of closing them
     // after each and every download
-    private Bitmap downloadImage() {
+    protected Bitmap downloadImage() {
         int timesTried = 1;
 
         while (timesTried <= numRetries) {
@@ -215,7 +215,7 @@ public class ImageLoader implements Runnable {
         return null;
     }
 
-    private byte[] retrieveImageData() throws IOException {
+    protected byte[] retrieveImageData() throws IOException {
         URL url = new URL(imageUrl);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 
