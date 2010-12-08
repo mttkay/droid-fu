@@ -44,14 +44,13 @@ public class DiagnosticSupport {
     }
 
     /**
-     * Returns the ANDROID_ID unique device ID for the current device. Unlike the platform
-     * functions, this method is reliable: since reading that ID has changed between platform
-     * versions, it takes care of attempting to read it in different ways, if one failed. Also, it
-     * guarantees to never return null.
+     * Returns the ANDROID_ID unique device ID for the current device. Reading that ID has changed
+     * between platform versions, so this method takes care of attempting to read it in different
+     * ways, if one failed.
      * 
      * @param context
      *            the context
-     * @return the device's ANDROID_ID, or "UNKNOWN_DEVICE"
+     * @return the device's ANDROID_ID, or null if it could not be determined
      * @see Secure#ANDROID_ID
      */
     public static String getAndroidId(Context context) {
@@ -61,8 +60,23 @@ public class DiagnosticSupport {
             androidId = android.provider.Settings.System.getString(context.getContentResolver(),
                     android.provider.Settings.System.ANDROID_ID);
         }
+        return androidId;
+    }
+
+    /**
+     * Same as {@link #getAndroidId(Context)}, but never returns null.
+     * 
+     * @param context
+     *            the context
+     * @param fallbackValue
+     *            the fallback value
+     * @return the device's ANDROID_ID, or the fallback value if it could not be determined
+     * @see Secure#ANDROID_ID
+     */
+    public static String getAndroidId(Context context, String fallbackValue) {
+        String androidId = getAndroidId(context);
         if (androidId == null) {
-            androidId = "UNKNOWN_DEVICE";
+            androidId = fallbackValue;
         }
         return androidId;
     }
@@ -83,6 +97,7 @@ public class DiagnosticSupport {
 
         sb.append("Application version: " + getApplicationVersionString(context) + "\n");
         sb.append("Device locale: " + Locale.getDefault().toString() + "\n\n");
+        sb.append("Android ID: " + getAndroidId(context, "n/a"));
 
         // phone information
         sb.append("PHONE SPECS\n");
