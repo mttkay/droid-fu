@@ -191,9 +191,9 @@ public class BetterMapActivity extends MapActivity implements BetterActivity {
         return mapView;
     }
     
-    public void setMyLocationOverlay() {
+    public void setMyLocationOverlay(MyLocationOverlay myLocationOverlay) {
         // Create the overlay and add it to the map.
-        this.myLocationOverlay = new MyLocationOverlay(this, getMapView());
+        this.myLocationOverlay = myLocationOverlay;
         mapView.getOverlays().add(this.myLocationOverlay);
     }
     
