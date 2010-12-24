@@ -145,12 +145,6 @@
       <scope>provided</scope>
     </dependency>
   
-    <dependency>
-        <groupId>oauth.signpost</groupId>
-        <artifactId>signpost-core</artifactId>
-        <version>1.2</version>
-        <scope>compile</scope>        
-    </dependency>
      
     <dependency>
       <groupId>org.powermock.modules</groupId>
@@ -171,21 +165,6 @@
   <!-- external repositories -->
   <repositories>
     <repository>
-      <id>signpost-releases</id>
-      <url>http://oss.sonatype.org/content/repositories/signpost-releases</url>
-      <layout>default</layout>
-      <releases>
-        <enabled>true</enabled>
-        <updatePolicy>daily</updatePolicy>
-        <checksumPolicy>warn</checksumPolicy>
-      </releases>
-      <snapshots>
-        <enabled>false</enabled>
-        <updatePolicy>daily</updatePolicy>
-        <checksumPolicy>warn</checksumPolicy>
-      </snapshots>
-    </repository>
-    <repository>
       <id>powermock-repo</id>
       <url>http://powermock.googlecode.com/svn/repo/</url>
     </repository>
@@ -194,25 +173,6 @@
   <distributionManagement>
     <downloadUrl>http://github.com/kaeppler/droid-fu/downloads</downloadUrl>
   </distributionManagement>
-
-  <!-- 
-  <distributionManagement>
-    <repository>
-      <id>signpost-releases</id>
-      <name>Signpost Release Repository</name>
-      <url>
-        http://oss.sonatype.org/content/repositories/signpost-releases/
-      </url>
-    </repository>
-    <snapshotRepository>
-      <id>signpost-snapshots</id>
-      <name>Signpost Snapshot Repository</name>
-      <url>
-        http://oss.sonatype.org/content/repositories/signpost-snapshots/
-      </url>
-    </snapshotRepository>
-  </distributionManagement>
-  -->
    
   <profiles>
     <profile>
