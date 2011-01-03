@@ -52,6 +52,8 @@ public abstract class BetterHttpRequestBase implements BetterHttpRequest,
 
     private int oldTimeout; // used to cache the global timeout when changing it for one request
 
+    private int executionCount;
+
     BetterHttpRequestBase(AbstractHttpClient httpClient) {
         this.httpClient = httpClient;
     }
@@ -103,17 +105,19 @@ public abstract class BetterHttpRequestBase implements BetterHttpRequest,
         // 3G or vice versa. Hence, we catch these exceptions, feed it through the same retry
         // decision method *again*, and align the execution count along the way.
         boolean retry = true;
-        int executionCount = 0;
         IOException cause = null;
         while (retry) {
             try {
                 return httpClient.execute(request, this, context);
             } catch (IOException e) {
-                Log.e(BetterHttp.LOG_TAG,
-                        "Intercepting exception that wasn't handled by HttpClient");
                 cause = e;
-                executionCount = Math.max(executionCount, retryHandler.getTimesRetried());
-                retry = retryHandler.retryRequest(cause, ++executionCount, context);
+                retry = retryRequest(retryHandler, cause, context);
+            } catch (NullPointerException e) {
+                // there's a bug in HttpClient 4.0.x that on some occasions causes
+                // DefaultRequestExecutor to throw an NPE, see
+                // http://code.google.com/p/android/issues/detail?id=5255
+                cause = new IOException("NPE in HttpClient" + e.getMessage());
+                retry = retryRequest(retryHandler, cause, context);
             } finally {
                 // if timeout was changed with this request using withTimeout(), reset it
                 if (oldTimeout != BetterHttp.getSocketTimeout()) {
@@ -126,6 +130,13 @@ public abstract class BetterHttpRequestBase implements BetterHttpRequest,
         ConnectException ex = new ConnectException();
         ex.initCause(cause);
         throw ex;
+    }
+
+    private boolean retryRequest(BetterHttpRequestRetryHandler retryHandler, IOException cause,
+            HttpContext context) {
+        Log.e(BetterHttp.LOG_TAG, "Intercepting exception that wasn't handled by HttpClient");
+        executionCount = Math.max(executionCount, retryHandler.getTimesRetried());
+        return retryHandler.retryRequest(cause, ++executionCount, context);
     }
 
     public BetterHttpResponse handleResponse(HttpResponse response) throws IOException {
