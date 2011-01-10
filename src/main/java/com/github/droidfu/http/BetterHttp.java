@@ -50,11 +50,12 @@ public class BetterHttp {
     public static final int DEFAULT_MAX_CONNECTIONS = 4;
     public static final int DEFAULT_SOCKET_TIMEOUT = 30 * 1000;
     public static final String DEFAULT_HTTP_USER_AGENT = "Android/DroidFu";
+    private static final String HEADER_ACCEPT_ENCODING = "Accept-Encoding";
+    private static final String ENCODING_GZIP = "gzip";
 
     private static int maxConnections = DEFAULT_MAX_CONNECTIONS;
     private static int socketTimeout = DEFAULT_SOCKET_TIMEOUT;
-    private static final String HEADER_ACCEPT_ENCODING = "Accept-Encoding";
-    private static final String ENCODING_GZIP = "gzip";
+    private static String httpUserAgent = DEFAULT_HTTP_USER_AGENT;
 
     private static HashMap<String, String> defaultHeaders = new HashMap<String, String>();
     private static AbstractHttpClient httpClient;
@@ -76,7 +77,7 @@ public class BetterHttp {
         HttpConnectionParams.setSoTimeout(httpParams, socketTimeout);
         HttpConnectionParams.setTcpNoDelay(httpParams, true);
         HttpProtocolParams.setVersion(httpParams, HttpVersion.HTTP_1_1);
-        HttpProtocolParams.setUserAgent(httpParams, DEFAULT_HTTP_USER_AGENT);
+        HttpProtocolParams.setUserAgent(httpParams, httpUserAgent);
 
         SchemeRegistry schemeRegistry = new SchemeRegistry();
         schemeRegistry.register(new Scheme("http", PlainSocketFactory.getSocketFactory(), 80));
@@ -280,6 +281,11 @@ public class BetterHttp {
     public static void setPortForScheme(String scheme, int port) {
         Scheme _scheme = new Scheme(scheme, PlainSocketFactory.getSocketFactory(), port);
         httpClient.getConnectionManager().getSchemeRegistry().register(_scheme);
+    }
+
+    public static void setUserAgent(String userAgent) {
+        BetterHttp.httpUserAgent = userAgent;
+        HttpProtocolParams.setUserAgent(httpClient.getParams(), userAgent);
     }
 
     /**
