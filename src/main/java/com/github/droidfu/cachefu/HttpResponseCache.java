@@ -41,9 +41,8 @@ public class HttpResponseCache extends AbstractCache<String, ResponseData> {
     private void removeExpiredCache(final String urlPrefix) {
         final File cacheDir = new File(diskCacheDirectory);
         
-        if (cacheDir.exists() && cacheDir.listFiles() != null) {
-            FilenameFilter filenameFilter = new FilenameFilter() {
-                
+        if (cacheDir.exists()) {
+            File[] list = cacheDir.listFiles(new FilenameFilter() {
                 @Override
                 public boolean accept(File dir, String filename) {
                     if (dir.equals(cacheDir) && filename.startsWith(getFileNameForKey(urlPrefix))) {
@@ -51,12 +50,12 @@ public class HttpResponseCache extends AbstractCache<String, ResponseData> {
                     }
                     return false;
                 }
-            };
-            File[] list = cacheDir.listFiles(filenameFilter);
+            });
 
             if (list == null || list.length == 0) {
                 return;
             }
+            
             for (File file : list) {
                 file.delete();
             }

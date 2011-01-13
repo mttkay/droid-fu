@@ -48,21 +48,19 @@ public class HttpResponseCacheTest extends BetterHttpTestBase {
     
     @Mock
     private File fileMock;
-
+    
     @SuppressWarnings("unchecked")
     @Before
     public void setupHttpClient() throws Exception {
-
         super.setupHttpClient();
         
         mockStatic(StringSupport.class);
         when(StringSupport.underscore(Matchers.anyString())).thenReturn("http_resp/");
         
-        mockFile();
+        mockIOObjects();
         
         BetterHttp.enableResponseCache(10, 60, 1);
         cache = BetterHttp.getResponseCache();
-        cache.setDiskCacheEnabled(true, "root_dir");
 
         when(
                 httpClientMock.execute(any(HttpUriRequest.class), any(ResponseHandler.class),
@@ -78,9 +76,10 @@ public class HttpResponseCacheTest extends BetterHttpTestBase {
     @SuppressWarnings("unchecked")
     @Test
     public void testBasicCachingFlow() throws Exception {
+        when(fileMock.exists()).thenReturn(false);
+        
         // first time invocation should do an actual request
         BetterHttpResponse resp = BetterHttp.get(url, true).send();
-        verify(fileMock, times(2)).exists();
         verify(httpClientMock, times(1)).execute(any(HttpUriRequest.class),
                 any(ResponseHandler.class), any(HttpContext.class));
         assertSame(mockResponse, resp);
@@ -98,42 +97,47 @@ public class HttpResponseCacheTest extends BetterHttpTestBase {
     }
 
     @Test
-    public void removingByPrefixShouldWork() {
+    public void removingByPrefixShouldWork() throws IOException {
+        cache.setDiskCacheEnabled("cache_root_dir");
+        
         cache.put("http://example.com/places", new ResponseData(200, responseBody.getBytes()));
         cache.put("http://example.com/places/photos",
                 new ResponseData(200, responseBody.getBytes()));
+        
+        verify(fileMock, times(2)).createNewFile();
+        assertEquals(2, cache.size());
+        
+        cache.removeAllWithPrefix("http://example.com/places");
+        verify(fileMock, times(2)).delete();
+        assertTrue(cache.isEmpty());
+    }
+    
+    @Test
+    public void removeByPrefixShouldRemoveExpiredCachedFiles() throws IOException {
+        cache.setDiskCacheEnabled("cache_root_dir");
+        File[] cachedFiles = { new File("http://example.com/users/photos"), new File("http://example.com/users") };
+        when(fileMock.listFiles(Matchers.any(FilenameFilter.class))).thenReturn(cachedFiles);
+        
         cache.put("http://example.com/users", new ResponseData(200, responseBody.getBytes()));
         cache.put("http://example.com/users/photos",
                 new ResponseData(200, responseBody.getBytes()));
 
-        assertEquals(4, cache.size());        
-        
-        cache.removeAllWithPrefix("http://example.com/places");
+        verify(fileMock, times(2)).createNewFile();
+        assertEquals(2, cache.size()); 
+
+        // Cache expires
         cache.removeKey("http://example.com/users");
+        cache.removeKey("http://example.com/users/photos");
+        
         cache.removeAllWithPrefix("http://example.com/users");
-        verify(fileMock, times(4)).delete();
-        assertTrue(cache.isEmpty());
+        verify(fileMock, times(2)).delete();
     }
     
-    private void mockFile() throws Exception, IOException {
+    private void mockIOObjects() throws Exception {
         PowerMockito.whenNew(File.class).withArguments(Matchers.anyString()).thenReturn(fileMock);
         when(fileMock.exists()).thenReturn(true);
         when(fileMock.createNewFile()).thenReturn(true);
-        when(fileMock.length()).thenReturn(11L);
-        File[] array = { new File("http://example.com/users") };
-        when(fileMock.listFiles(Matchers.any(FilenameFilter.class))).thenReturn(array);
-
-//        mockStatic(FilenameFilter.class);
-//        FilenameFilter fnf = Mockito.mock(FilenameFilter.class);
-//        when(fnf.accept(any(File.class), Matchers.anyString())).thenAnswer(new Answer<Boolean>() {
-//            @Override
-//            public Boolean answer(InvocationOnMock invocation) throws Throwable {
-//                if (((String)invocation.getArguments()[0]).equals("http://example.com/users")) {
-//                    return true;
-//                }
-//                return false;
-//            }
-//        });
+        when(fileMock.length()).thenReturn(11111L);
         
         mockStatic(FileInputStream.class);
         FileInputStream fis = Mockito.mock(FileInputStream.class);

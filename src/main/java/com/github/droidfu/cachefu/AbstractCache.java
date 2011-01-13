@@ -312,6 +312,7 @@ public abstract class AbstractCache<KeyT, ValT> implements Map<KeyT, ValT> {
         return value;
     }
     
+    // Forced key expiration
     public ValT removeKey(Object key) {
         return cache.remove(key);
     }
@@ -336,9 +337,17 @@ public abstract class AbstractCache<KeyT, ValT> implements Map<KeyT, ValT> {
         return isDiskCacheEnabled;
     }
     
-    public void setDiskCacheEnabled(boolean isDiskCacheEnabled, String rootDir) {
-        this.isDiskCacheEnabled = isDiskCacheEnabled;
-        setRootDir(rootDir);
+    /**
+     * 
+     * @param rootDir a folder name to enable caching or null to disable it.
+     */
+    public void setDiskCacheEnabled(String rootDir) {
+        if (rootDir != null && rootDir.length() > 0) {
+            setRootDir(rootDir);
+            this.isDiskCacheEnabled = true;
+        } else {
+            this.isDiskCacheEnabled = false;
+        }
     }
 
     public synchronized void clear() {
