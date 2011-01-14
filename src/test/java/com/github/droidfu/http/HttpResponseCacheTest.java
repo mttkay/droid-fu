@@ -5,11 +5,12 @@ import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.powermock.api.mockito.PowerMockito.mock;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
+import static org.powermock.api.mockito.PowerMockito.whenNew;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -27,10 +28,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Matchers;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
-import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
@@ -134,35 +133,29 @@ public class HttpResponseCacheTest extends BetterHttpTestBase {
     }
     
     private void mockIOObjects() throws Exception {
-        PowerMockito.whenNew(File.class).withArguments(Matchers.anyString()).thenReturn(fileMock);
+        whenNew(File.class).withArguments(Matchers.anyString()).thenReturn(fileMock);
         when(fileMock.exists()).thenReturn(true);
         when(fileMock.createNewFile()).thenReturn(true);
         when(fileMock.length()).thenReturn(11111L);
         
         mockStatic(FileInputStream.class);
-        FileInputStream fis = Mockito.mock(FileInputStream.class);
-        PowerMockito.whenNew(FileInputStream.class).withArguments(File.class).
+        FileInputStream fis = mock(FileInputStream.class);
+        whenNew(FileInputStream.class).withArguments(File.class).
         thenReturn(fis);
         
         mockStatic(BufferedInputStream.class);
-        BufferedInputStream bis = Mockito.mock(BufferedInputStream.class);
-        PowerMockito.whenNew(BufferedInputStream.class).withArguments(FileInputStream.class).
+        BufferedInputStream bis = mock(BufferedInputStream.class);
+        whenNew(BufferedInputStream.class).withArguments(FileInputStream.class).
         thenReturn(bis);
-        when(bis.read()).thenReturn(200);
-        when(bis.read(Matchers.any(byte[].class))).thenReturn(200);
-        doNothing().when(bis).close();
         
         mockStatic(FileOutputStream.class);
-        FileOutputStream fos = Mockito.mock(FileOutputStream.class);
-        PowerMockito.whenNew(FileOutputStream.class).withArguments(File.class).
+        FileOutputStream fos = mock(FileOutputStream.class);
+        whenNew(FileOutputStream.class).withArguments(File.class).
         thenReturn(fos);
         
         mockStatic(BufferedOutputStream.class);
-        BufferedOutputStream bos = Mockito.mock(BufferedOutputStream.class);
-        PowerMockito.whenNew(BufferedOutputStream.class).withArguments(FileOutputStream.class).thenReturn(bos);
-        doNothing().when(bos).write(Matchers.anyInt());
-        doNothing().when(bos).write(Matchers.any(byte[].class));
-        doNothing().when(bos).close();
+        BufferedOutputStream bos = mock(BufferedOutputStream.class);
+        whenNew(BufferedOutputStream.class).withArguments(FileOutputStream.class).thenReturn(bos);
     }
     
 }
