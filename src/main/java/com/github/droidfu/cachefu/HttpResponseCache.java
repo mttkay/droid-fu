@@ -4,6 +4,7 @@ import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.Set;
 
@@ -30,6 +31,33 @@ public class HttpResponseCache extends AbstractCache<String, ResponseData> {
             if (key.startsWith(urlPrefix)) {
                 remove(key);
             }
+        }
+        
+        if (isDiskCacheEnabled()) {
+            removeExpiredCache(urlPrefix);
+        }
+    }
+
+    private void removeExpiredCache(final String urlPrefix) {
+        final File cacheDir = new File(diskCacheDirectory);
+        
+        if (!cacheDir.exists()) {
+            return;
+        }
+        
+        File[] list = cacheDir.listFiles(new FilenameFilter() {
+            @Override
+            public boolean accept(File dir, String filename) {
+                return dir.equals(cacheDir) && filename.startsWith(getFileNameForKey(urlPrefix));
+            }
+        });
+
+        if (list == null || list.length == 0) {
+            return;
+        }
+        
+        for (File file : list) {
+            file.delete();
         }
     }
 

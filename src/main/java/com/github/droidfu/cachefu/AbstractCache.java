@@ -63,7 +63,7 @@ public abstract class AbstractCache<KeyT, ValT> implements Map<KeyT, ValT> {
 
     private boolean isDiskCacheEnabled;
 
-    private String diskCacheDirectory;
+    protected String diskCacheDirectory;
 
     private ConcurrentMap<KeyT, ValT> cache;
 
@@ -121,9 +121,9 @@ public abstract class AbstractCache<KeyT, ValT> implements Map<KeyT, ValT> {
         } else {
             rootDir = appContext.getCacheDir().getAbsolutePath();
         }
+        
+        setRootDir(rootDir);
 
-        this.diskCacheDirectory = rootDir + "/cachefu/"
-                + StringSupport.underscore(name.replaceAll("\\s", ""));
         File outFile = new File(diskCacheDirectory);
         outFile.mkdirs();
 
@@ -136,6 +136,10 @@ public abstract class AbstractCache<KeyT, ValT> implements Map<KeyT, ValT> {
         }
 
         return isDiskCacheEnabled;
+    }
+
+    private void setRootDir(String rootDir) {
+        this.diskCacheDirectory = rootDir + "/cachefu/" + StringSupport.underscore(name.replaceAll("\\s", ""));
     }
 
     /**
@@ -296,7 +300,7 @@ public abstract class AbstractCache<KeyT, ValT> implements Map<KeyT, ValT> {
 
     @SuppressWarnings("unchecked")
     public synchronized ValT remove(Object key) {
-        ValT value = cache.remove(key);
+        ValT value = removeKey(key);
 
         if (isDiskCacheEnabled) {
             File cachedValue = getFileForKey((KeyT) key);
@@ -306,6 +310,11 @@ public abstract class AbstractCache<KeyT, ValT> implements Map<KeyT, ValT> {
         }
 
         return value;
+    }
+    
+    // Forced key expiration
+    public ValT removeKey(Object key) {
+        return cache.remove(key);
     }
 
     public Set<KeyT> keySet() {
@@ -322,6 +331,23 @@ public abstract class AbstractCache<KeyT, ValT> implements Map<KeyT, ValT> {
 
     public synchronized boolean isEmpty() {
         return cache.isEmpty();
+    }
+    
+    public boolean isDiskCacheEnabled() {
+        return isDiskCacheEnabled;
+    }
+    
+    /**
+     * 
+     * @param rootDir a folder name to enable caching or null to disable it.
+     */
+    public void setDiskCacheEnabled(String rootDir) {
+        if (rootDir != null && rootDir.length() > 0) {
+            setRootDir(rootDir);
+            this.isDiskCacheEnabled = true;
+        } else {
+            this.isDiskCacheEnabled = false;
+        }
     }
 
     public synchronized void clear() {
