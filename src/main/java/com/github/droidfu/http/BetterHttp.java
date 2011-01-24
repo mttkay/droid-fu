@@ -49,11 +49,7 @@ public class BetterHttp {
 
     private static HttpResponseCache responseCache;
 
-    static {
-        setupHttpClient();
-    }
-
-    protected static void setupHttpClient() {
+    public static void setupHttpClient() {
         BasicHttpParams httpParams = new BasicHttpParams();
 
         ConnManagerParams.setTimeout(httpParams, socketTimeout);
