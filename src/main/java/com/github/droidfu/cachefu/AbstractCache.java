@@ -116,8 +116,8 @@ public abstract class AbstractCache<KeyT, ValT> implements Map<KeyT, ValT> {
         if (storageDevice == DISK_CACHE_SDCARD
                 && Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())) {
             // SD-card available
-            rootDir = Environment.getExternalStorageDirectory().getAbsolutePath() + "/"
-                    + appContext.getPackageName();
+            rootDir = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Android/data/"
+                    + appContext.getPackageName() + "/cache";
         } else {
             rootDir = appContext.getCacheDir().getAbsolutePath();
         }
@@ -125,7 +125,14 @@ public abstract class AbstractCache<KeyT, ValT> implements Map<KeyT, ValT> {
         setRootDir(rootDir);
 
         File outFile = new File(diskCacheDirectory);
-        outFile.mkdirs();
+        if (outFile.mkdirs()) {
+            File nomedia = new File(diskCacheDirectory, ".nomedia");
+            try {
+                nomedia.createNewFile();
+            } catch (IOException e) {
+                Log.e(LOG_TAG, "Failed creating .nomedia file");
+            }
+        }
 
         isDiskCacheEnabled = outFile.exists();
 
