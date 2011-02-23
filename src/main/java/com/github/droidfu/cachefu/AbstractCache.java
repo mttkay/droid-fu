@@ -15,10 +15,8 @@
 
 package com.github.droidfu.cachefu;
 
-import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Map;
@@ -121,7 +119,7 @@ public abstract class AbstractCache<KeyT, ValT> implements Map<KeyT, ValT> {
         } else {
             rootDir = appContext.getCacheDir().getAbsolutePath();
         }
-        
+
         setRootDir(rootDir);
 
         File outFile = new File(diskCacheDirectory);
@@ -146,7 +144,8 @@ public abstract class AbstractCache<KeyT, ValT> implements Map<KeyT, ValT> {
     }
 
     private void setRootDir(String rootDir) {
-        this.diskCacheDirectory = rootDir + "/cachefu/" + StringSupport.underscore(name.replaceAll("\\s", ""));
+        this.diskCacheDirectory = rootDir + "/cachefu/"
+                + StringSupport.underscore(name.replaceAll("\\s", ""));
     }
 
     /**
@@ -191,8 +190,7 @@ public abstract class AbstractCache<KeyT, ValT> implements Map<KeyT, ValT> {
      *            the cache value to persist
      * @throws IOException
      */
-    protected abstract void writeValueToDisk(BufferedOutputStream ostream, ValT value)
-            throws IOException;
+    protected abstract void writeValueToDisk(File file, ValT value) throws IOException;
 
     private void cacheToDisk(KeyT key, ValT value) {
         File file = new File(diskCacheDirectory + "/" + getFileNameForKey(key));
@@ -200,11 +198,7 @@ public abstract class AbstractCache<KeyT, ValT> implements Map<KeyT, ValT> {
             file.createNewFile();
             file.deleteOnExit();
 
-            BufferedOutputStream ostream = new BufferedOutputStream(new FileOutputStream(file));
-
-            writeValueToDisk(ostream, value);
-
-            ostream.close();
+            writeValueToDisk(file, value);
 
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -318,7 +312,7 @@ public abstract class AbstractCache<KeyT, ValT> implements Map<KeyT, ValT> {
 
         return value;
     }
-    
+
     // Forced key expiration
     public ValT removeKey(Object key) {
         return cache.remove(key);
@@ -339,14 +333,15 @@ public abstract class AbstractCache<KeyT, ValT> implements Map<KeyT, ValT> {
     public synchronized boolean isEmpty() {
         return cache.isEmpty();
     }
-    
+
     public boolean isDiskCacheEnabled() {
         return isDiskCacheEnabled;
     }
-    
+
     /**
      * 
-     * @param rootDir a folder name to enable caching or null to disable it.
+     * @param rootDir
+     *            a folder name to enable caching or null to disable it.
      */
     public void setDiskCacheEnabled(String rootDir) {
         if (rootDir != null && rootDir.length() > 0) {
