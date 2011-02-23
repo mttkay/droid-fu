@@ -119,7 +119,12 @@ public abstract class AbstractCache<KeyT, ValT> implements Map<KeyT, ValT> {
             rootDir = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Android/data/"
                     + appContext.getPackageName() + "/cache";
         } else {
-            rootDir = appContext.getCacheDir().getAbsolutePath();
+            File internalCacheDir = appContext.getCacheDir();
+            // apparently on some configurations this can come back as null
+            if (internalCacheDir == null) {
+                return (isDiskCacheEnabled = false);
+            }
+            rootDir = internalCacheDir.getAbsolutePath();
         }
         
         setRootDir(rootDir);
