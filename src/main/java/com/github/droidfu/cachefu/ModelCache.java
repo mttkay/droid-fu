@@ -20,10 +20,18 @@ import android.os.Parcelable;
  * @author Michael England
  * 
  */
-public class ModelCache extends AbstractCache<String, CachedObject> {
+public class ModelCache extends AbstractCache<String, CachedModel> {
 
     public ModelCache(int initialCapacity, long expirationInMinutes, int maxConcurrentThreads) {
         super("ModelCache", initialCapacity, expirationInMinutes, maxConcurrentThreads);
+    }
+
+    private long transactionCount = Long.MIN_VALUE + 1;
+
+    @Override
+    public synchronized CachedModel put(String key, CachedModel value) {
+        value.setTransactionId(transactionCount++);
+        return super.put(key, value);
     }
 
     public synchronized void removeAllWithPrefix(String keyPrefix) {
@@ -69,7 +77,7 @@ public class ModelCache extends AbstractCache<String, CachedObject> {
     }
 
     @Override
-    protected CachedObject readValueFromDisk(File file) throws IOException {
+    protected CachedModel readValueFromDisk(File file) throws IOException {
         FileInputStream istream = new FileInputStream(file);
 
         byte[] dataWritten = new byte[(int) file.length()];
@@ -80,19 +88,19 @@ public class ModelCache extends AbstractCache<String, CachedObject> {
         Parcel parcelIn = Parcel.obtain();
         parcelIn.unmarshall(dataWritten, 0, dataWritten.length);
         parcelIn.setDataPosition(0);
-        DescribedCachedObject result = new DescribedCachedObject();
+        DescribedCachedModel result = new DescribedCachedModel();
         result.readFromParcel(parcelIn);
 
-        return result.getCachedObject();
+        return result.getCachedModel();
     }
 
     @Override
-    protected void writeValueToDisk(File file, CachedObject data) throws IOException {
-        DescribedCachedObject describedCachedObject = new DescribedCachedObject();
-        describedCachedObject.setCachedObject(data);
+    protected void writeValueToDisk(File file, CachedModel data) throws IOException {
+        DescribedCachedModel describedCachedModel = new DescribedCachedModel();
+        describedCachedModel.setCachedModel(data);
 
         Parcel parcelOut = Parcel.obtain();
-        describedCachedObject.writeToParcel(parcelOut, 0);
+        describedCachedModel.writeToParcel(parcelOut, 0);
         byte[] dataWritten = parcelOut.marshall();
 
         FileOutputStream ostream = new FileOutputStream(file);
@@ -100,16 +108,16 @@ public class ModelCache extends AbstractCache<String, CachedObject> {
         bistream.write(dataWritten);
     }
 
-    static class DescribedCachedObject implements Parcelable {
+    static class DescribedCachedModel implements Parcelable {
 
-        private CachedObject cachedObject;
+        private CachedModel cachedModel;
 
-        public void setCachedObject(CachedObject cachedObject) {
-            this.cachedObject = cachedObject;
+        public void setCachedModel(CachedModel cachedModel) {
+            this.cachedModel = cachedModel;
         }
 
-        public CachedObject getCachedObject() {
-            return cachedObject;
+        public CachedModel getCachedModel() {
+            return cachedModel;
         }
 
         @Override
@@ -119,9 +127,9 @@ public class ModelCache extends AbstractCache<String, CachedObject> {
 
         @Override
         public void writeToParcel(Parcel dest, int flags) {
-            dest.writeString(cachedObject.getClass().getCanonicalName());
-            dest.writeParcelable(cachedObject, flags);
-            cachedObject.writeToParcel(dest, flags);
+            dest.writeString(cachedModel.getClass().getCanonicalName());
+            dest.writeParcelable(cachedModel, flags);
+            cachedModel.writeToParcel(dest, flags);
         }
 
         public void readFromParcel(Parcel source) throws IOException {
@@ -129,7 +137,7 @@ public class ModelCache extends AbstractCache<String, CachedObject> {
             Class<?> clazz;
             try {
                 clazz = Class.forName(className);
-                cachedObject = source.readParcelable(clazz.getClassLoader());
+                cachedModel = source.readParcelable(clazz.getClassLoader());
             } catch (ClassNotFoundException e) {
                 throw new IOException(e.getMessage());
             }

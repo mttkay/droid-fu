@@ -1,20 +1,23 @@
 package com.github.droidfu.cachefu;
 
+import java.io.IOException;
+
 import android.os.Parcel;
 import android.os.Parcelable;
 
-public abstract class CachedObject implements Parcelable {
+public abstract class CachedModel implements Parcelable {
 
     private String id;
+    private long transactionId = Long.MIN_VALUE;
 
-    public CachedObject() {
+    public CachedModel() {
     }
 
-    public CachedObject(Parcel source) {
+    public CachedModel(Parcel source) throws IOException {
         readFromParcel(source);
     }
 
-    public CachedObject(String id) {
+    public CachedModel(String id) {
         this.id = id;
     }
 
@@ -26,6 +29,10 @@ public abstract class CachedObject implements Parcelable {
         this.id = id;
     }
 
+    void setTransactionId(long transactionId) {
+        this.transactionId = transactionId;
+    }
+
     public String getKey() {
         if (id == null) {
             return null;
@@ -34,9 +41,9 @@ public abstract class CachedObject implements Parcelable {
         }
     }
 
-    public static CachedObject find(ModelCache modelCache, String id,
-            Class<? extends CachedObject> clazz) {
-        CachedObject testObject;
+    public static CachedModel find(ModelCache modelCache, String id,
+            Class<? extends CachedModel> clazz) {
+        CachedModel testObject;
         try {
             testObject = clazz.newInstance();
         } catch (Exception e) {
@@ -66,9 +73,9 @@ public abstract class CachedObject implements Parcelable {
     public boolean reload(ModelCache modelCache) {
         String key = getKey();
         if ((modelCache != null) && (key != null)) {
-            CachedObject cachedObject = modelCache.get(key);
-            if (cachedObject != null) {
-                reloadFromCachedObject(modelCache, cachedObject);
+            CachedModel cachedModel = modelCache.get(key);
+            if ((cachedModel != null) && (cachedModel.transactionId > this.transactionId)) {
+                reloadFromCachedModel(modelCache, cachedModel);
                 return true;
             } else {
                 return false;
@@ -80,7 +87,7 @@ public abstract class CachedObject implements Parcelable {
 
     public abstract String createKey(String id);
 
-    public abstract void reloadFromCachedObject(ModelCache modelCache, CachedObject cachedObject);
+    public abstract boolean reloadFromCachedModel(ModelCache modelCache, CachedModel cachedModel);
 
     @Override
     public int describeContents() {
@@ -92,7 +99,8 @@ public abstract class CachedObject implements Parcelable {
         dest.writeString(id);
     }
 
-    public void readFromParcel(Parcel source) {
+    @SuppressWarnings("unused")
+    public void readFromParcel(Parcel source) throws IOException {
         id = source.readString();
     }
 

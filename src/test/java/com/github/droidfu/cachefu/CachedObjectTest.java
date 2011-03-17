@@ -4,11 +4,14 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.io.IOException;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
+import android.os.Parcel;
 import android.util.Log;
 
 import com.github.droidfu.TestBase;
@@ -17,9 +20,7 @@ import com.github.droidfu.TestBase;
 @PrepareForTest({ Log.class })
 public class CachedObjectTest extends TestBase {
 
-    class TestObject extends CachedObject {
-
-        private static final long serialVersionUID = -1914654469838892120L;
+    class TestObject extends CachedModel {
 
         private String testString;
 
@@ -40,9 +41,22 @@ public class CachedObjectTest extends TestBase {
         }
 
         @Override
-        public void reloadFromCachedObject(ModelCache modelCache, CachedObject cachedObject) {
-            TestObject cachedTestObject = (TestObject) cachedObject;
+        public boolean reloadFromCachedModel(ModelCache modelCache, CachedModel cachedModel) {
+            TestObject cachedTestObject = (TestObject) cachedModel;
             testString = cachedTestObject.testString;
+            return false;
+        }
+
+        @Override
+        public void readFromParcel(Parcel source) throws IOException {
+            super.readFromParcel(source);
+            testString = source.readString();
+        }
+
+        @Override
+        public void writeToParcel(Parcel dest, int flags) {
+            super.writeToParcel(dest, flags);
+            dest.writeString(testString);
         }
 
         @Override

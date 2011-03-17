@@ -2,11 +2,14 @@ package com.github.droidfu.cachefu;
 
 import static org.junit.Assert.assertEquals;
 
+import java.io.IOException;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
+import android.os.Parcel;
 import android.util.Log;
 
 import com.github.droidfu.TestBase;
@@ -15,9 +18,7 @@ import com.github.droidfu.TestBase;
 @PrepareForTest({ Log.class })
 public class NestedCachedObjectTest extends TestBase {
 
-    class TestObject extends CachedObject {
-
-        private static final long serialVersionUID = -4264329112200722511L;
+    class TestObject extends CachedModel {
 
         private String testString;
 
@@ -38,9 +39,22 @@ public class NestedCachedObjectTest extends TestBase {
         }
 
         @Override
-        public void reloadFromCachedObject(ModelCache modelCache, CachedObject cachedObject) {
-            TestObject cachedTestObject = (TestObject) cachedObject;
+        public boolean reloadFromCachedModel(ModelCache modelCache, CachedModel cachedModel) {
+            TestObject cachedTestObject = (TestObject) cachedModel;
             testString = cachedTestObject.testString;
+            return false;
+        }
+
+        @Override
+        public void readFromParcel(Parcel source) throws IOException {
+            super.readFromParcel(source);
+            testString = source.readString();
+        }
+
+        @Override
+        public void writeToParcel(Parcel dest, int flags) {
+            super.writeToParcel(dest, flags);
+            dest.writeString(testString);
         }
 
         @Override
@@ -50,7 +64,7 @@ public class NestedCachedObjectTest extends TestBase {
 
     }
 
-    public class OuterTestObject extends CachedObject {
+    public class OuterTestObject extends CachedModel {
 
         private static final long serialVersionUID = -4127153536940947286L;
 
@@ -73,13 +87,15 @@ public class NestedCachedObjectTest extends TestBase {
         }
 
         @Override
-        public void reloadFromCachedObject(ModelCache modelCache, CachedObject cachedObject) {
-            OuterTestObject cachedOuterObject = (OuterTestObject) cachedObject;
+        public boolean reloadFromCachedModel(ModelCache modelCache, CachedModel cachedModel) {
+            OuterTestObject cachedOuterObject = (OuterTestObject) cachedModel;
             internalObject = cachedOuterObject.internalObject;
             // HAVE TO DO THIS IN ORDER TO RELOAD NESTED OBJECT FROM CACHE
+            boolean internalObjectReloaded = false;
             if (internalObject == null) {
-                internalObject.reload(modelCache);
+                internalObjectReloaded = internalObject.reload(modelCache);
             }
+            return internalObjectReloaded;
         }
 
         @Override
