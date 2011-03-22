@@ -97,11 +97,13 @@ public abstract class CachedModel implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(id);
+        dest.writeLong(transactionId);
     }
 
     @SuppressWarnings("unused")
     public void readFromParcel(Parcel source) throws IOException {
         id = source.readString();
+        transactionId = source.readLong();
     }
 
 }

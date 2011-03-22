@@ -26,10 +26,8 @@ public class CachedList<CO extends CachedModel> extends CachedModel {
         list = new ArrayList<CO>(initialLength);
     }
 
-    public CachedList(Class<? extends CachedModel> clazz, Parcel source) throws IOException {
+    public CachedList(Parcel source) throws IOException {
         super(source);
-        initList(clazz);
-        list = new ArrayList<CO>();
     }
 
     public CachedList(Class<? extends CachedModel> clazz, String id) {
@@ -72,17 +70,11 @@ public class CachedList<CO extends CachedModel> extends CachedModel {
 
     public static final Creator<CachedList<CachedModel>> CREATOR = new Parcelable.Creator<CachedList<CachedModel>>() {
 
-        @SuppressWarnings("unchecked")
+        @SuppressWarnings({ "rawtypes", "unchecked" })
         @Override
         public CachedList<CachedModel> createFromParcel(Parcel source) {
-            String className = source.readString();
-            Class<? extends CachedModel> clazz;
             try {
-                clazz = (Class<? extends CachedModel>) Class.forName(className);
-                return new CachedList<CachedModel>(clazz, source);
-            } catch (ClassNotFoundException e) {
-                e.printStackTrace();
-                return null;
+                return new CachedList(source);
             } catch (IOException e) {
                 e.printStackTrace();
                 return null;
@@ -97,11 +89,17 @@ public class CachedList<CO extends CachedModel> extends CachedModel {
 
     };
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     @Override
     public void readFromParcel(Parcel source) throws IOException {
         super.readFromParcel(source);
-        list = source.readArrayList(clazz.getClassLoader());
+        String className = source.readString();
+        try {
+            clazz = (Class<? extends CachedModel>) Class.forName(className);
+            list = source.createTypedArrayList((Creator) clazz.getField("CREATOR").get(this));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
