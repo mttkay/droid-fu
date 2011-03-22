@@ -200,7 +200,11 @@ public class ImageLoader implements Runnable {
             try {
                 byte[] imageData = retrieveImageData();
 
-                imageCache.put(imageUrl, imageData);
+                if (imageData != null) {
+                    imageCache.put(imageUrl, imageData);
+                } else {
+                    break;
+                }
 
                 return BitmapFactory.decodeByteArray(imageData, 0, imageData.length);
 
@@ -221,6 +225,9 @@ public class ImageLoader implements Runnable {
 
         // determine the image size and allocate a buffer
         int fileSize = connection.getContentLength();
+        if (fileSize < 0) {
+            return null;
+        }
         byte[] imageData = new byte[fileSize];
 
         // download the file
