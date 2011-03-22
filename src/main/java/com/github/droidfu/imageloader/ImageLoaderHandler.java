@@ -16,6 +16,8 @@
 package com.github.droidfu.imageloader;
 
 import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -25,10 +27,17 @@ public class ImageLoaderHandler extends Handler {
 
     private ImageView imageView;
     private String imageUrl;
+    private Drawable errorDrawable;
 
     public ImageLoaderHandler(ImageView imageView, String imageUrl) {
         this.imageView = imageView;
         this.imageUrl = imageUrl;
+    }
+
+    public ImageLoaderHandler(ImageView imageView, String imageUrl,
+ Drawable errorDrawable) {
+        this(imageView, imageUrl);
+        this.errorDrawable = errorDrawable;
     }
 
     @Override
@@ -60,7 +69,12 @@ public class ImageLoaderHandler extends Handler {
         // otherwise it won't do anything.
         String forUrl = (String) imageView.getTag();
         if (imageUrl.equals(forUrl)) {
-            imageView.setImageBitmap(bitmap);
+            Bitmap image = bitmap != null || errorDrawable == null ? bitmap
+                    : ((BitmapDrawable) errorDrawable).getBitmap();
+            if (image != null) {
+                imageView.setImageBitmap(image);
+            }
+
             return true;
         }
 
