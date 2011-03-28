@@ -45,6 +45,16 @@ public class CachedList<CO extends CachedModel> extends CachedModel {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof CachedList)) {
+            return false;
+        }
+        @SuppressWarnings("rawtypes")
+        CachedList that = (CachedList) o;
+        return clazz.equals(that.clazz) && list.equals(that.list);
+    }
+
+    @Override
     public String createKey(String id) {
         return "list_" + id;
     }
