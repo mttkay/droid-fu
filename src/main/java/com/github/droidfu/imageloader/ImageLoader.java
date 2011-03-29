@@ -197,9 +197,7 @@ public class ImageLoader implements Runnable {
                 return;
             } else {
                 // Set the dummy image while waiting for the actual image to be downloaded.
-                if (imageView.getDrawable() == null) {
-                    imageView.setImageDrawable(dummyDrawable);
-                }
+                imageView.setImageDrawable(dummyDrawable);
                 imageView.setTag(imageUrl);
             }
         }
