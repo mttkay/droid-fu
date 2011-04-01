@@ -2,7 +2,6 @@ package com.github.droidfu.cachefu;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
 
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -10,7 +9,7 @@ import android.os.Parcelable;
 public class CachedList<CO extends CachedModel> extends CachedModel {
 
     protected Class<? extends CachedModel> clazz;
-    protected List<CO> list;
+    protected ArrayList<CO> list;
 
     public CachedList() {
         list = new ArrayList<CO>();
@@ -40,7 +39,7 @@ public class CachedList<CO extends CachedModel> extends CachedModel {
         this.clazz = clazz;
     }
 
-    public List<CO> getList() {
+    public ArrayList<CO> getList() {
         return list;
     }
 
