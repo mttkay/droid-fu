@@ -129,7 +129,6 @@ public class ModelCache extends AbstractCache<String, CachedModel> {
         public void writeToParcel(Parcel dest, int flags) {
             dest.writeString(cachedModel.getClass().getCanonicalName());
             dest.writeParcelable(cachedModel, flags);
-            cachedModel.writeToParcel(dest, flags);
         }
 
         public void readFromParcel(Parcel source) throws IOException {
