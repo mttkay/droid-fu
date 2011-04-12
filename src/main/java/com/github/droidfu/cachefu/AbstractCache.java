@@ -369,6 +369,8 @@ public abstract class AbstractCache<KeyT, ValT> implements Map<KeyT, ValT> {
                 f.delete();
             }
         }
+
+        Log.d(LOG_TAG, "Cache cleared");
     }
 
     public Collection<ValT> values() {
