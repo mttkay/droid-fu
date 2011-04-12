@@ -133,6 +133,10 @@ public class ModelCache extends AbstractCache<String, CachedModel> {
 
         public void readFromParcel(Parcel source) throws IOException {
             String className = source.readString();
+            // TODO: Why the hell this is null sometimes!?!?!?
+            if (className == null) {
+                return;
+            }
             Class<?> clazz;
             try {
                 clazz = Class.forName(className);
