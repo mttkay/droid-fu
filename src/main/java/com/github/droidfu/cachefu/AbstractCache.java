@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Date;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentMap;
@@ -66,6 +67,8 @@ public abstract class AbstractCache<KeyT, ValT> implements Map<KeyT, ValT> {
     private ConcurrentMap<KeyT, ValT> cache;
 
     private String name;
+    
+    private long expirationInMinutes;
 
     /**
      * Creates a new cache instance.
@@ -77,9 +80,7 @@ public abstract class AbstractCache<KeyT, ValT> implements Map<KeyT, ValT> {
      * @param initialCapacity
      *            the initial element size of the cache
      * @param expirationInMinutes
-     *            time in minutes after which elements will be purged from the cache (NOTE: this
-     *            only affects the memory cache, the disk cache does currently NOT handle element
-     *            TTLs!)
+     *            time in minutes after which elements will be purged from the cache
      * @param maxConcurrentThreads
      *            how many threads you think may at once access the cache; this need not be an exact
      *            number, but it helps in fragmenting the cache properly
@@ -88,7 +89,8 @@ public abstract class AbstractCache<KeyT, ValT> implements Map<KeyT, ValT> {
             int maxConcurrentThreads) {
 
         this.name = name;
-
+        this.expirationInMinutes = expirationInMinutes;
+                
         MapMaker mapMaker = new MapMaker();
         mapMaker.initialCapacity(initialCapacity);
         mapMaker.expiration(expirationInMinutes * 60, TimeUnit.SECONDS);
@@ -98,6 +100,27 @@ public abstract class AbstractCache<KeyT, ValT> implements Map<KeyT, ValT> {
     }
 
     /**
+     * Sanitize disk cache. Remove files which are older than expirationInMinutes.
+     */
+    private void sanitizeDiskCache() {
+        File[] cachedFiles = new File(diskCacheDirectory).listFiles();
+        if (cachedFiles == null) {
+            return;
+        }
+        for (File f : cachedFiles) {
+        	// if file older than expirationInMinutes, remove it
+        	long lastModified = f.lastModified();
+        	Date now = new Date();
+        	long ageInMinutes = ((now.getTime() - lastModified) / (1000*60));
+        	
+        	if (ageInMinutes >= expirationInMinutes) {
+        		Log.d(name, "DISK cache expiration for file " + f.toString());
+        		f.delete();
+        	}
+        }
+	}
+
+	/**
      * Enable caching to the phone's internal storage or SD card.
      * 
      * @param context
@@ -143,6 +166,10 @@ public abstract class AbstractCache<KeyT, ValT> implements Map<KeyT, ValT> {
             Log.w(LOG_TAG, "Failed creating disk cache directory " + diskCacheDirectory);
         } else {
             Log.d(name, "enabled write through to " + diskCacheDirectory);
+
+            // sanitize disk cache
+            Log.d(name, "sanitize DISK cache");
+            sanitizeDiskCache();
         }
 
         return isDiskCacheEnabled;
@@ -237,7 +264,18 @@ public abstract class AbstractCache<KeyT, ValT> implements Map<KeyT, ValT> {
         // memory miss, try reading from disk
         File file = getFileForKey(key);
         if (file.exists()) {
-            // disk hit
+        	// if file older than expirationInMinutes, remove it
+        	long lastModified = file.lastModified();
+        	Date now = new Date();
+        	long ageInMinutes = ((now.getTime() - lastModified) / (1000*60));
+        	
+        	if (ageInMinutes >= expirationInMinutes) {
+        		Log.d(name, "DISK cache expiration for file " + file.toString());
+        		file.delete();
+        		return null;
+        	}
+        	
+        	// disk hit
             Log.d(name, "DISK cache hit for " + key.toString());
             try {
                 value = readValueFromDisk(file);
