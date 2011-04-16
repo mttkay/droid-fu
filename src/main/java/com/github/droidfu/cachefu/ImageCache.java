@@ -19,6 +19,7 @@ import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 
 import android.graphics.Bitmap;
@@ -68,8 +69,11 @@ public class ImageCache extends AbstractCache<String, byte[]> {
     }
 
     @Override
-    protected void writeValueToDisk(BufferedOutputStream ostream, byte[] imageData)
-            throws IOException {
+    protected void writeValueToDisk(File file, byte[] imageData) throws IOException {
+        BufferedOutputStream ostream = new BufferedOutputStream(new FileOutputStream(file));
+
         ostream.write(imageData);
+
+        ostream.close();
     }
 }

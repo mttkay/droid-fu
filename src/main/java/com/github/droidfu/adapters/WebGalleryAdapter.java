@@ -37,14 +37,16 @@ import com.github.droidfu.widgets.WebImageView;
  */
 public class WebGalleryAdapter extends BaseAdapter {
 
+    public static final int NO_DRAWABLE = -1;
+
     private List<String> imageUrls;
 
     private Context context;
 
-    private Drawable progressDrawable;
+    private Drawable progressDrawable, errorDrawable;
 
     public WebGalleryAdapter(Context context) {
-        initialize(context, null, null);
+        initialize(context, null, null, null);
     }
 
     /**
@@ -54,7 +56,7 @@ public class WebGalleryAdapter extends BaseAdapter {
      *            the set of image URLs which are to be loaded and displayed
      */
     public WebGalleryAdapter(Context context, List<String> imageUrls) {
-        initialize(context, imageUrls, null);
+        initialize(context, imageUrls, null, null);
     }
 
     /**
@@ -66,13 +68,34 @@ public class WebGalleryAdapter extends BaseAdapter {
      *            the resource ID of the drawable that will be used for rendering progress
      */
     public WebGalleryAdapter(Context context, List<String> imageUrls, int progressDrawableResId) {
-        initialize(context, imageUrls, context.getResources().getDrawable(progressDrawableResId));
+        initialize(context, imageUrls, context.getResources().getDrawable(progressDrawableResId),
+                null);
     }
 
-    private void initialize(Context context, List<String> imageUrls, Drawable progressDrawable) {
+    /**
+     * @param context
+     *            the current context
+     * @param imageUrls
+     *            the set of image URLs which are to be loaded and displayed
+     * @param progressDrawableResId
+     *            the resource ID of the drawable that will be used for rendering progress
+     * @param errorDrawableId
+     *            the resource ID of the drawable that will be used if a download error occurs
+     */
+    public WebGalleryAdapter(Context context, List<String> imageUrls, int progressDrawableResId,
+            int errorDrawableId) {
+        initialize(context, imageUrls, progressDrawableResId == NO_DRAWABLE ? null : context
+                .getResources().getDrawable(progressDrawableResId),
+                errorDrawableId == NO_DRAWABLE ? null : context.getResources().getDrawable(
+                        errorDrawableId));
+    }
+
+    private void initialize(Context context, List<String> imageUrls, Drawable progressDrawable,
+            Drawable errorDrawable) {
         this.imageUrls = imageUrls;
         this.context = context;
         this.progressDrawable = progressDrawable;
+        this.errorDrawable = errorDrawable;
     }
 
     public int getCount() {
@@ -115,7 +138,8 @@ public class WebGalleryAdapter extends BaseAdapter {
 
         if (convertView == null) {
             // create the image view
-            webImageView = new WebImageView(context, null, progressDrawable, false);
+            webImageView = new WebImageView(context, null, progressDrawable,
+                    errorDrawable, false);
             FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(LayoutParams.WRAP_CONTENT,
                     LayoutParams.WRAP_CONTENT);
             lp.gravity = Gravity.CENTER;

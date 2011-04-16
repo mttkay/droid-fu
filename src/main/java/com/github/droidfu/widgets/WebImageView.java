@@ -49,7 +49,7 @@ public class WebImageView extends ViewSwitcher {
 
     private ScaleType scaleType = ScaleType.CENTER_CROP;
 
-    private Drawable progressDrawable;
+    private Drawable progressDrawable, errorDrawable;
 
     /**
      * @param context
@@ -62,7 +62,7 @@ public class WebImageView extends ViewSwitcher {
      */
     public WebImageView(Context context, String imageUrl, boolean autoLoad) {
         super(context);
-        initialize(context, imageUrl, null, autoLoad);
+        initialize(context, imageUrl, null, null, autoLoad);
     }
 
     /**
@@ -80,7 +80,27 @@ public class WebImageView extends ViewSwitcher {
     public WebImageView(Context context, String imageUrl, Drawable progressDrawable,
             boolean autoLoad) {
         super(context);
-        initialize(context, imageUrl, progressDrawable, autoLoad);
+        initialize(context, imageUrl, progressDrawable, null, autoLoad);
+    }
+
+    /**
+     * @param context
+     *            the view's current context
+     * @param imageUrl
+     *            the URL of the image to download and show
+     * @param progressDrawable
+     *            the drawable to be used for the {@link ProgressBar} which is displayed while the
+     *            image is loading
+     * @param errorDrawable
+     *            the drawable to be used if a download error occurs
+     * @param autoLoad
+     *            Whether the download should start immediately after creating the view. If set to
+     *            false, use {@link #loadImage()} to manually trigger the image download.
+     */
+    public WebImageView(Context context, String imageUrl, Drawable progressDrawable,
+            Drawable errorDrawable, boolean autoLoad) {
+        super(context);
+        initialize(context, imageUrl, progressDrawable, errorDrawable, autoLoad);
     }
 
     public WebImageView(Context context, AttributeSet attributes) {
@@ -89,20 +109,29 @@ public class WebImageView extends ViewSwitcher {
         // R.styleable.GalleryItem);
         int progressDrawableId = attributes.getAttributeResourceValue(DroidFu.XMLNS,
                 "progressDrawable", 0);
+        int errorDrawableId = attributes.getAttributeResourceValue(DroidFu.XMLNS, "errorDrawable",
+                0);
         Drawable progressDrawable = null;
         if (progressDrawableId > 0) {
             progressDrawable = context.getResources().getDrawable(progressDrawableId);
         }
+        Drawable errorDrawable = null;
+        if (errorDrawableId > 0) {
+            errorDrawable = context.getResources().getDrawable(errorDrawableId);
+        }
         initialize(context, attributes.getAttributeValue(DroidFu.XMLNS, "imageUrl"),
-                progressDrawable, attributes.getAttributeBooleanValue(DroidFu.XMLNS, "autoLoad",
+                progressDrawable, errorDrawable, attributes.getAttributeBooleanValue(
+                        DroidFu.XMLNS, "autoLoad",
                         true));
         // styles.recycle();
     }
 
     private void initialize(Context context, String imageUrl, Drawable progressDrawable,
+            Drawable errorDrawable,
             boolean autoLoad) {
         this.imageUrl = imageUrl;
         this.progressDrawable = progressDrawable;
+        this.errorDrawable = errorDrawable;
 
         ImageLoader.initialize(context);
 
@@ -190,7 +219,7 @@ public class WebImageView extends ViewSwitcher {
     private class DefaultImageLoaderHandler extends ImageLoaderHandler {
 
         public DefaultImageLoaderHandler() {
-            super(imageView, imageUrl);
+            super(imageView, imageUrl, errorDrawable);
         }
 
         @Override

@@ -49,11 +49,7 @@ public class BetterHttp {
 
     private static HttpResponseCache responseCache;
 
-    static {
-        setupHttpClient();
-    }
-
-    protected static void setupHttpClient() {
+    public static void setupHttpClient() {
         BasicHttpParams httpParams = new BasicHttpParams();
 
         ConnManagerParams.setTimeout(httpParams, socketTimeout);
@@ -184,8 +180,16 @@ public class BetterHttp {
         return new HttpGet(httpClient, url, defaultHeaders);
     }
 
+    public static BetterHttpRequest post(String url) {
+        return new HttpPost(httpClient, url, defaultHeaders);
+    }
+
     public static BetterHttpRequest post(String url, HttpEntity payload) {
         return new HttpPost(httpClient, url, payload, defaultHeaders);
+    }
+
+    public static BetterHttpRequest put(String url) {
+        return new HttpPut(httpClient, url, defaultHeaders);
     }
 
     public static BetterHttpRequest put(String url, HttpEntity payload) {
