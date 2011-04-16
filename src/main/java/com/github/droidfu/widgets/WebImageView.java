@@ -203,4 +203,12 @@ public class WebImageView extends ViewSwitcher {
             return wasUpdated;
         }
     }
+
+    /**
+     * Returns the URL of the image to show
+     * @return
+     */
+	public String getImageUrl() {
+		return imageUrl;
+	}
 }
