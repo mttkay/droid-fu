@@ -23,6 +23,14 @@ import org.apache.http.impl.client.AbstractHttpClient;
 
 class HttpPost extends BetterHttpRequestBase {
 
+    HttpPost(AbstractHttpClient httpClient, String url, HashMap<String, String> defaultHeaders) {
+        super(httpClient);
+        this.request = new org.apache.http.client.methods.HttpPost(url);
+        for (String header : defaultHeaders.keySet()) {
+            request.setHeader(header, defaultHeaders.get(header));
+        }
+    }
+
     HttpPost(AbstractHttpClient httpClient, String url, HttpEntity payload,
             HashMap<String, String> defaultHeaders) {
         super(httpClient);

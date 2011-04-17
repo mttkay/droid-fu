@@ -25,6 +25,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Message;
 import android.os.SystemClock;
@@ -118,7 +119,29 @@ public class ImageLoader implements Runnable {
      *            the ImageView which should be updated with the new image
      */
     public static void start(String imageUrl, ImageView imageView) {
-        start(imageUrl, imageView, new ImageLoaderHandler(imageView, imageUrl));
+        start(imageUrl, imageView, new ImageLoaderHandler(imageView, imageUrl), null, null);
+    }
+
+    /**
+     * Triggers the image loader for the given image and view and sets a dummy image while waiting
+     * for the download to finish. The image loading will be performed concurrently to the UI main
+     * thread, using a fixed size thread pool. The loaded image will be posted back to the given
+     * ImageView upon completion.
+     * 
+     * @param imageUrl
+     *            the URL of the image to download
+     * @param imageView
+     *            the ImageView which should be updated with the new image
+     * @param dummyDrawable
+     *            the Drawable set to the ImageView while waiting for the image to be downloaded
+     * @param errorDrawable
+     *            the Drawable set to the ImageView if a download error occurs
+     */
+    public static void start(String imageUrl, ImageView imageView, Drawable dummyDrawable,
+            Drawable errorDrawable) {
+        start(imageUrl, imageView, new ImageLoaderHandler(imageView, imageUrl,
+ errorDrawable),
+                dummyDrawable, errorDrawable);
     }
 
     /**
@@ -134,16 +157,47 @@ public class ImageLoader implements Runnable {
      *            the handler which is used to handle the downloaded image
      */
     public static void start(String imageUrl, ImageLoaderHandler handler) {
-        start(imageUrl, handler.getImageView(), handler);
+        start(imageUrl, handler.getImageView(), handler, null, null);
     }
 
-    private static void start(String imageUrl, ImageView imageView, ImageLoaderHandler handler) {
+    /**
+     * Triggers the image loader for the given image and handler. The image loading will be
+     * performed concurrently to the UI main thread, using a fixed size thread pool. The loaded
+     * image will not be automatically posted to an ImageView; instead, you can pass a custom
+     * {@link ImageLoaderHandler} and handle the loaded image yourself (e.g. cache it for later
+     * use).
+     * 
+     * @param imageUrl
+     *            the URL of the image to download
+     * @param handler
+     *            the handler which is used to handle the downloaded image
+     * @param dummyDrawable
+     *            the Drawable set to the ImageView while waiting for the image to be downloaded
+     * @param errorDrawable
+     *            the Drawable set to the ImageView if a download error occurs
+     */
+    public static void start(String imageUrl, ImageLoaderHandler handler, Drawable dummyDrawable,
+            Drawable errorDrawable) {
+        start(imageUrl, handler.getImageView(), handler, dummyDrawable, errorDrawable);
+    }
+
+    private static void start(String imageUrl, ImageView imageView, ImageLoaderHandler handler,
+            Drawable dummyDrawable, Drawable errorDrawable) {
         if (imageView != null) {
+            if (imageUrl == null) {
+                // In a ListView views are reused, so we must be sure to remove the tag that could
+                // have been set to the ImageView to prevent that the wrong image is set.
+                imageView.setTag(null);
+                imageView.setImageDrawable(dummyDrawable);
+                return;
+            }
             String oldImageUrl = (String) imageView.getTag();
             if (imageUrl.equals(oldImageUrl)) {
                 // nothing to do
                 return;
             } else {
+                // Set the dummy image while waiting for the actual image to be downloaded.
+                imageView.setImageDrawable(dummyDrawable);
                 imageView.setTag(imageUrl);
             }
         }
@@ -186,9 +240,9 @@ public class ImageLoader implements Runnable {
             bitmap = downloadImage();
         }
 
-        if (bitmap != null) {
-            notifyImageLoaded(imageUrl, bitmap);
-        } // TODO: notify about failure otherwise?
+        // TODO: gracefully handle this case.
+        notifyImageLoaded(imageUrl, bitmap);
+
     }
 
     // TODO: we could probably improve performance by re-using connections instead of closing them
@@ -200,7 +254,11 @@ public class ImageLoader implements Runnable {
             try {
                 byte[] imageData = retrieveImageData();
 
-                imageCache.put(imageUrl, imageData);
+                if (imageData != null) {
+                    imageCache.put(imageUrl, imageData);
+                } else {
+                    break;
+                }
 
                 return BitmapFactory.decodeByteArray(imageData, 0, imageData.length);
 
@@ -221,6 +279,9 @@ public class ImageLoader implements Runnable {
 
         // determine the image size and allocate a buffer
         int fileSize = connection.getContentLength();
+        if (fileSize < 0) {
+            return null;
+        }
         byte[] imageData = new byte[fileSize];
 
         // download the file
@@ -245,7 +306,8 @@ public class ImageLoader implements Runnable {
         message.what = HANDLER_MESSAGE_ID;
         Bundle data = new Bundle();
         data.putString(IMAGE_URL_EXTRA, url);
-        data.putParcelable(BITMAP_EXTRA, bitmap);
+        Bitmap image = bitmap;
+        data.putParcelable(BITMAP_EXTRA, image);
         message.setData(data);
 
         handler.sendMessage(message);
