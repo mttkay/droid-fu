@@ -5,9 +5,7 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.FilenameFilter;
 import java.io.IOException;
-import java.util.Set;
 
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -34,41 +32,8 @@ public class ModelCache extends AbstractCache<String, CachedModel> {
         return super.put(key, value);
     }
 
-    public synchronized void removeAllWithPrefix(String keyPrefix) {
-        Set<String> keys = keySet();
-
-        for (String key : keys) {
-            if (key.startsWith(keyPrefix)) {
-                remove(key);
-            }
-        }
-
-        if (isDiskCacheEnabled()) {
-            removeExpiredCache(keyPrefix);
-        }
-    }
-
-    private void removeExpiredCache(final String keyPrefix) {
-        final File cacheDir = new File(diskCacheDirectory);
-
-        if (!cacheDir.exists()) {
-            return;
-        }
-
-        File[] list = cacheDir.listFiles(new FilenameFilter() {
-            @Override
-            public boolean accept(File dir, String filename) {
-                return dir.equals(cacheDir) && filename.startsWith(getFileNameForKey(keyPrefix));
-            }
-        });
-
-        if (list == null || list.length == 0) {
-            return;
-        }
-
-        for (File file : list) {
-            file.delete();
-        }
+    public synchronized void removeAllWithPrefix(String urlPrefix) {
+        CacheHelper.removeAllWithStringPrefix(this, urlPrefix);
     }
 
     @Override

@@ -38,6 +38,10 @@ public class ImageCache extends AbstractCache<String, byte[]> {
         super("ImageCache", initialCapacity, expirationInMinutes, maxConcurrentThreads);
     }
 
+    public synchronized void removeAllWithPrefix(String urlPrefix) {
+        CacheHelper.removeAllWithStringPrefix(this, urlPrefix);
+    }
+
     @Override
     public String getFileNameForKey(String imageUrl) {
         return CacheHelper.getFileNameFromUrl(imageUrl);
