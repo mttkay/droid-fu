@@ -113,7 +113,7 @@ public class CachedListTest extends TestBase {
     }
 
     @Test
-    public void testReloadAllUpdatesListObjects() {
+    public void testReloadUpdatesListObjects() {
         ModelCache modelCache = new ModelCache(2, 1, 1);
         String id = "123";
 
