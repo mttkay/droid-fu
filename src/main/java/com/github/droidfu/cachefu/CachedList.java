@@ -75,24 +75,23 @@ public class CachedList<CO extends CachedModel> extends CachedModel {
     }
 
     @Override
-    public synchronized boolean reload(ModelCache modelCache) {
-        boolean result = reload(modelCache);
+    public boolean reload(ModelCache modelCache) {
+        boolean result = super.reload(modelCache);
+        for (CachedModel listModel : list) {
+            if (listModel.reload(modelCache)) {
+                result = true;
+            }
+        }
         return result;
     }
 
     @Override
     public synchronized boolean reloadFromCachedModel(ModelCache modelCache, CachedModel cachedModel) {
-        boolean internalObjectReloaded = false;
         @SuppressWarnings("unchecked")
         CachedList<CO> cachedList = (CachedList<CO>) cachedModel;
         clazz = cachedList.clazz;
         list = cachedList.list;
-        for (CachedModel listModel : list) {
-            if (listModel.reload(modelCache)) {
-                internalObjectReloaded = true;
-            }
-        }
-        return internalObjectReloaded;
+        return false;
     }
 
     public static final Creator<CachedList<CachedModel>> CREATOR = new Parcelable.Creator<CachedList<CachedModel>>() {

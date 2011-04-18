@@ -74,10 +74,10 @@ public class CachedListTest extends TestBase {
         TestObject preObject;
         preObject = new TestObject();
         preObject.setTestString("this is a test");
-        preList.getList().add(preObject);
+        preList.add(preObject);
         preObject = new TestObject();
         preObject.setTestString("this is also a test");
-        preList.getList().add(preObject);
+        preList.add(preObject);
         assertTrue(preList.save(modelCache));
 
         @SuppressWarnings("unchecked")
@@ -95,16 +95,16 @@ public class CachedListTest extends TestBase {
         TestObject originalListObject;
         originalListObject = new TestObject();
         originalListObject.setTestString("original text");
-        originalList.getList().add(originalListObject);
+        originalList.add(originalListObject);
         originalListObject = new TestObject();
         originalListObject.setTestString("original other text");
-        originalList.getList().add(originalListObject);
+        originalList.add(originalListObject);
         originalList.save(modelCache);
 
         CachedList<CachedModel> overridingList = new CachedList<CachedModel>(TestObject.class, id);
         TestObject overridingListObject = new TestObject();
         overridingListObject.setTestString("new text");
-        overridingList.getList().add(overridingListObject);
+        overridingList.add(overridingListObject);
         overridingList.save(modelCache);
 
         assertTrue(originalList.reload(modelCache));
@@ -121,18 +121,18 @@ public class CachedListTest extends TestBase {
         TestObject originalListObject;
         originalListObject = new TestObject();
         originalListObject.setTestString("original text");
-        originalList.getList().add(originalListObject);
+        originalList.add(originalListObject);
         originalListObject = new TestObject(id);
         originalListObject.setTestString("original other text");
         originalListObject.save(modelCache);
-        originalList.getList().add(originalListObject);
+        originalList.add(originalListObject);
         originalList.save(modelCache);
 
         TestObject overridingListObject = new TestObject(id);
         overridingListObject.setTestString("new text");
         overridingListObject.save(modelCache);
 
-        assertTrue(originalList.reloadAll(modelCache));
+        assertTrue(originalList.reload(modelCache));
         assertEquals(2, originalList.getList().size());
         assertEquals("original text", ((TestObject) originalList.getList().get(0)).getTestString());
         assertEquals("new text", ((TestObject) originalList.getList().get(1)).getTestString());
