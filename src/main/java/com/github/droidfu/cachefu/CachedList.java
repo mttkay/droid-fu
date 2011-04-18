@@ -39,12 +39,28 @@ public class CachedList<CO extends CachedModel> extends CachedModel {
         this.clazz = clazz;
     }
 
-    public ArrayList<CO> getList() {
-        return list;
+    public synchronized ArrayList<CO> getList() {
+        return new ArrayList<CO>(list);
+    }
+
+    public synchronized void add(CO cachedObject) {
+        list.add(cachedObject);
+    }
+
+    public synchronized void set(int index, CO cachedObject) {
+        list.set(index, cachedObject);
+    }
+
+    public synchronized CO get(int index) {
+        return list.get(index);
+    }
+
+    public synchronized int size() {
+        return list.size();
     }
 
     @Override
-    public boolean equals(Object o) {
+    public synchronized boolean equals(Object o) {
         if (!(o instanceof CachedList)) {
             return false;
         }
@@ -54,27 +70,29 @@ public class CachedList<CO extends CachedModel> extends CachedModel {
     }
 
     @Override
-    public String createKey(String id) {
+    public synchronized String createKey(String id) {
         return "list_" + id;
     }
 
-    public boolean reloadAll(ModelCache modelCache) {
+    @Override
+    public synchronized boolean reload(ModelCache modelCache) {
         boolean result = reload(modelCache);
-        for (CachedModel cachedModel : list) {
-            if (cachedModel.reload(modelCache)) {
-                result = true;
-            }
-        }
         return result;
     }
 
     @Override
-    public boolean reloadFromCachedModel(ModelCache modelCache, CachedModel cachedModel) {
+    public synchronized boolean reloadFromCachedModel(ModelCache modelCache, CachedModel cachedModel) {
+        boolean internalObjectReloaded = false;
         @SuppressWarnings("unchecked")
         CachedList<CO> cachedList = (CachedList<CO>) cachedModel;
         clazz = cachedList.clazz;
         list = cachedList.list;
-        return false;
+        for (CachedModel listModel : list) {
+            if (listModel.reload(modelCache)) {
+                internalObjectReloaded = true;
+            }
+        }
+        return internalObjectReloaded;
     }
 
     public static final Creator<CachedList<CachedModel>> CREATOR = new Parcelable.Creator<CachedList<CachedModel>>() {
