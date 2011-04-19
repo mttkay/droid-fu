@@ -92,7 +92,7 @@ public class NestedCachedObjectTest extends TestBase {
             internalObject = cachedOuterObject.internalObject;
             // HAVE TO DO THIS IN ORDER TO RELOAD NESTED OBJECT FROM CACHE
             boolean internalObjectReloaded = false;
-            if (internalObject == null) {
+            if (internalObject != null) {
                 internalObjectReloaded = internalObject.reload(modelCache);
             }
             return internalObjectReloaded;

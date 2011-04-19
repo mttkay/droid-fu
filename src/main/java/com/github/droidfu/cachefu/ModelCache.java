@@ -8,7 +8,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 
 import android.os.Parcel;
-import android.os.Parcelable;
 
 /**
  * Allows caching Model objects using the features provided by {@link AbstractCache}. The key into
@@ -20,97 +19,94 @@ import android.os.Parcelable;
  */
 public class ModelCache extends AbstractCache<String, CachedModel> {
 
+    /**
+     * Creates an {@link AbstractCache} with params provided and name 'ModelCache'.
+     * 
+     * @see com.github.droidfu.cachefu.AbstractCache#AbstractCache(java.lang.String, int, long, int)
+     */
     public ModelCache(int initialCapacity, long expirationInMinutes, int maxConcurrentThreads) {
         super("ModelCache", initialCapacity, expirationInMinutes, maxConcurrentThreads);
     }
 
+    // Counter for all saves to cache. Used to determine if newer object in cache
     private long transactionCount = Long.MIN_VALUE + 1;
 
+    /**
+     * @see com.github.droidfu.cachefu.AbstractCache#put(java.lang.Object, java.lang.Object)
+     */
     @Override
     public synchronized CachedModel put(String key, CachedModel value) {
+        // Set transaction id for checking validity against other values with same key
         value.setTransactionId(transactionCount++);
         return super.put(key, value);
     }
 
-    public synchronized void removeAllWithPrefix(String urlPrefix) {
-        CacheHelper.removeAllWithStringPrefix(this, urlPrefix);
+    /**
+     * Removes all cached objects with key prefix.
+     * 
+     * @param prefix
+     *            Prefix of all cached object keys to be removed
+     */
+    public synchronized void removeAllWithPrefix(String prefix) {
+        CacheHelper.removeAllWithStringPrefix(this, prefix);
     }
 
+    /**
+     * @see com.github.droidfu.cachefu.AbstractCache#getFileNameForKey(java.lang.Object)
+     */
     @Override
     public String getFileNameForKey(String url) {
         return CacheHelper.getFileNameFromUrl(url);
     }
 
+    /**
+     * @see com.github.droidfu.cachefu.AbstractCache#readValueFromDisk(java.io.File)
+     */
     @Override
     protected CachedModel readValueFromDisk(File file) throws IOException {
         FileInputStream istream = new FileInputStream(file);
 
+        // Read file into byte array
         byte[] dataWritten = new byte[(int) file.length()];
         BufferedInputStream bistream = new BufferedInputStream(istream);
         bistream.read(dataWritten);
         bistream.close();
 
+        // Create parcel with cached data
         Parcel parcelIn = Parcel.obtain();
         parcelIn.unmarshall(dataWritten, 0, dataWritten.length);
         parcelIn.setDataPosition(0);
-        DescribedCachedModel result = new DescribedCachedModel();
-        result.readFromParcel(parcelIn);
 
-        return result.getCachedModel();
+        // Read class name from parcel and use the class loader to read parcel
+        String className = parcelIn.readString();
+        // In case this sometimes hits a null value
+        if (className == null) {
+            return null;
+        }
+        Class<?> clazz;
+        try {
+            clazz = Class.forName(className);
+            return parcelIn.readParcelable(clazz.getClassLoader());
+        } catch (ClassNotFoundException e) {
+            throw new IOException(e.getMessage());
+        }
     }
 
+    /**
+     * @see com.github.droidfu.cachefu.AbstractCache#writeValueToDisk(java.io.File,
+     *      java.lang.Object)
+     */
     @Override
     protected void writeValueToDisk(File file, CachedModel data) throws IOException {
-        DescribedCachedModel describedCachedModel = new DescribedCachedModel();
-        describedCachedModel.setCachedModel(data);
-
+        // Write object into parcel
         Parcel parcelOut = Parcel.obtain();
-        describedCachedModel.writeToParcel(parcelOut, 0);
-        byte[] dataWritten = parcelOut.marshall();
+        parcelOut.writeString(data.getClass().getCanonicalName());
+        parcelOut.writeParcelable(data, 0);
 
+        // Write byte data to file
         FileOutputStream ostream = new FileOutputStream(file);
         BufferedOutputStream bistream = new BufferedOutputStream(ostream);
-        bistream.write(dataWritten);
-    }
-
-    static class DescribedCachedModel implements Parcelable {
-
-        private CachedModel cachedModel;
-
-        public void setCachedModel(CachedModel cachedModel) {
-            this.cachedModel = cachedModel;
-        }
-
-        public CachedModel getCachedModel() {
-            return cachedModel;
-        }
-
-        @Override
-        public int describeContents() {
-            return 0;
-        }
-
-        @Override
-        public void writeToParcel(Parcel dest, int flags) {
-            dest.writeString(cachedModel.getClass().getCanonicalName());
-            dest.writeParcelable(cachedModel, flags);
-        }
-
-        public void readFromParcel(Parcel source) throws IOException {
-            String className = source.readString();
-            // TODO: Why the hell this is null sometimes!?!?!?
-            if (className == null) {
-                return;
-            }
-            Class<?> clazz;
-            try {
-                clazz = Class.forName(className);
-                cachedModel = source.readParcelable(clazz.getClassLoader());
-            } catch (ClassNotFoundException e) {
-                throw new IOException(e.getMessage());
-            }
-        }
-
+        bistream.write(parcelOut.marshall());
     }
 
 }

@@ -18,7 +18,7 @@ import com.github.droidfu.TestBase;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({ Log.class })
-public class CachedObjectTest extends TestBase {
+public class CachedModelTest extends TestBase {
 
     class TestObject extends CachedModel {
 
