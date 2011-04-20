@@ -35,29 +35,30 @@ import org.powermock.modules.junit4.PowerMockRunner;
 
 import android.util.Log;
 
+import com.github.droidfu.cachefu.CacheHelper;
 import com.github.droidfu.cachefu.HttpResponseCache;
 import com.github.droidfu.http.CachedHttpResponse.ResponseData;
 import com.github.droidfu.support.StringSupport;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest( { Log.class, HttpResponseCache.class, StringSupport.class })
+@PrepareForTest({ Log.class, HttpResponseCache.class, CacheHelper.class, StringSupport.class })
 public class HttpResponseCacheTest extends BetterHttpTestBase {
 
     private HttpResponseCache cache;
-    
+
     @Mock
     private File fileMock;
-    
+
     @SuppressWarnings("unchecked")
     @Before
     public void setupHttpClient() throws Exception {
         super.setupHttpClient();
-        
+
         mockStatic(StringSupport.class);
         when(StringSupport.underscore(Matchers.anyString())).thenReturn("http_resp/");
-        
+
         mockIOObjects();
-        
+
         BetterHttp.enableResponseCache(10, 60, 1);
         cache = BetterHttp.getResponseCache();
 
@@ -76,7 +77,7 @@ public class HttpResponseCacheTest extends BetterHttpTestBase {
     @Test
     public void testBasicCachingFlow() throws Exception {
         when(fileMock.exists()).thenReturn(false);
-        
+
         // first time invocation should do an actual request
         BetterHttpResponse resp = BetterHttp.get(url, true).send();
         verify(httpClientMock, times(1)).execute(any(HttpUriRequest.class),
@@ -91,71 +92,68 @@ public class HttpResponseCacheTest extends BetterHttpTestBase {
 
     @Test
     public void shouldGenerateCorrectFileNamesWhenCachingToDisk() {
-        assertEquals("http+api+qype+com+positions+1+1+places+x+y+a+2Bc", cache
-                .getFileNameForKey(url));
+        assertEquals("http+api+qype+com+positions+1+1+places+x+y+a+2Bc",
+                cache.getFileNameForKey(url));
     }
 
     @Test
     public void removingByPrefixShouldWork() throws IOException {
         cache.setDiskCacheEnabled("cache_root_dir");
-        
+
         cache.put("http://example.com/places", new ResponseData(200, responseBody.getBytes()));
         cache.put("http://example.com/places/photos",
                 new ResponseData(200, responseBody.getBytes()));
-        
+
         verify(fileMock, times(2)).createNewFile();
         assertEquals(2, cache.size());
-        
+
         cache.removeAllWithPrefix("http://example.com/places");
         verify(fileMock, times(2)).delete();
         assertTrue(cache.isEmpty());
     }
-    
+
     @Test
     public void removeByPrefixShouldRemoveExpiredCachedFiles() throws IOException {
         cache.setDiskCacheEnabled("cache_root_dir");
-        File[] cachedFiles = { new File("http://example.com/users/photos"), new File("http://example.com/users") };
+        File[] cachedFiles = { new File("http://example.com/users/photos"),
+                new File("http://example.com/users") };
         when(fileMock.listFiles(Matchers.any(FilenameFilter.class))).thenReturn(cachedFiles);
-        
+
         cache.put("http://example.com/users", new ResponseData(200, responseBody.getBytes()));
-        cache.put("http://example.com/users/photos",
-                new ResponseData(200, responseBody.getBytes()));
+        cache.put("http://example.com/users/photos", new ResponseData(200, responseBody.getBytes()));
 
         verify(fileMock, times(2)).createNewFile();
-        assertEquals(2, cache.size()); 
+        assertEquals(2, cache.size());
 
         // Cache expires
         cache.removeKey("http://example.com/users");
         cache.removeKey("http://example.com/users/photos");
-        
+
         cache.removeAllWithPrefix("http://example.com/users");
         verify(fileMock, times(2)).delete();
     }
-    
+
     private void mockIOObjects() throws Exception {
         whenNew(File.class).withArguments(Matchers.anyString()).thenReturn(fileMock);
         when(fileMock.exists()).thenReturn(true);
         when(fileMock.createNewFile()).thenReturn(true);
         when(fileMock.length()).thenReturn(11111L);
-        
+
         mockStatic(FileInputStream.class);
         FileInputStream fis = mock(FileInputStream.class);
-        whenNew(FileInputStream.class).withArguments(File.class).
-        thenReturn(fis);
-        
+        whenNew(FileInputStream.class).withArguments(File.class).thenReturn(fis);
+
         mockStatic(BufferedInputStream.class);
         BufferedInputStream bis = mock(BufferedInputStream.class);
-        whenNew(BufferedInputStream.class).withArguments(FileInputStream.class).
-        thenReturn(bis);
-        
+        whenNew(BufferedInputStream.class).withArguments(FileInputStream.class).thenReturn(bis);
+
         mockStatic(FileOutputStream.class);
         FileOutputStream fos = mock(FileOutputStream.class);
-        whenNew(FileOutputStream.class).withArguments(File.class).
-        thenReturn(fos);
-        
+        whenNew(FileOutputStream.class).withArguments(File.class).thenReturn(fos);
+
         mockStatic(BufferedOutputStream.class);
         BufferedOutputStream bos = mock(BufferedOutputStream.class);
         whenNew(BufferedOutputStream.class).withArguments(FileOutputStream.class).thenReturn(bos);
     }
-    
+
 }
