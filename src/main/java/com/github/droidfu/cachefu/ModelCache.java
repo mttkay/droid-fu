@@ -107,6 +107,7 @@ public class ModelCache extends AbstractCache<String, CachedModel> {
         FileOutputStream ostream = new FileOutputStream(file);
         BufferedOutputStream bistream = new BufferedOutputStream(ostream);
         bistream.write(parcelOut.marshall());
+        bistream.close();
     }
 
 }
