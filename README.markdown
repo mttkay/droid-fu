@@ -6,7 +6,9 @@ You can find them [here](http://kaeppler.github.com/droid-fu).
 
 # Droid-Fu - for your Android needs
 
-Droid-Fu is an open-source effort aiming to collect and bundle solutions to common concerns in the development of applications for the [Google Android platform](http://developer.android.com/index.html). Currently it mostly contains code which I pulled out of [Qype Radar](http://www.qype.co.uk/go-mobile), and which I believe may prove useful to other developers. This is _very_ much a work-in-progress, and both content and APIs are still in flux. There is not much documentation (yet), and I intend to change that. For now, you may want to read all related articles [on my weblog](http://en.wordpress.com/tag/droid-fu/). You can also find me on [Twitter](http://twitter.com/twoofour).
+Droid-Fu is an open-source effort aiming to collect and bundle solutions to common concerns in the development of applications for the [Google Android platform](http://developer.android.com/index.html). Currently it mostly contains code which I pulled out of [Qype's Android app](http://www.qype.co.uk/go-mobile), and which I believe may prove useful to other developers. This is _very_ much a work-in-progress, and both content and APIs are still in flux. There is not much documentation (yet), and I intend to change that. For now, you may want to read all related articles [on my weblog](http://en.wordpress.com/tag/droid-fu/). You can also find me on [Twitter](http://twitter.com/twoofour).
+
+There are no releases yet, we pretty much work directly with the sources. If you want to stay up-to-date, we suggest you check out the project sources, pull frequently, and compile your app against them.
 
 ## What does it offer?
 
@@ -18,60 +20,67 @@ The areas tackled by Droid-Fu include:
   * support classes for handling Intents and diagnostics
   * better support for background tasks
   * super-easy and robust HTTP messaging
-  * (remote) image handling and caching
+  * powerful caching of Objects, HTTP responses, and remote images
   * custom adapters and views
 
 I suggest you read [this introductory article](http://brainflush.wordpress.com/2009/11/16/introducing-droid-fu-for-android-betteractivity-betterservice-and-betterasynctask/), and anything that follows.
 
 ## How do I install it?
 
-Droid-Fu is deployed as a JAR. Just drop it in your app's lib folder and add it to the classpath.
+Droid-Fu is deployed as a JAR. Just drop it in your app's lib folder and add it to the classpath. Alternatively, you can of course simply compile against the sources.
 
 ### Getting the JAR
 
-You can get the Droid-Fu JAR in several ways.
+If you don't want to compile against the sources, then I'm afraid you'll have to roll the JAR yourself. It's a little elaborate, but don't run off scared.
+Droid-Fu employs a managed build process, driven by the wonderful [Maven build system](http://maven.apache.org) system.
+This means you have to install Git to get the sources, and Maven 3 to build them.
+Droid-Fu is built against the latest Android APIs (it's backwards compatible down to 1.5 though), so you must have the proper Android JARs installed as Maven artifacts, too.
 
-The easiest one is probably to download a pre-built version from [GitHub](http://github.com/kaeppler/droid-fu/downloads). Just know that these builds may not contain the most recent changes you see in the master branch.
+The following steps summarize how to do all that.
 
-If you want to stay on the bleeding edge, you must download the sources and roll the JAR yourself. It's a little elaborate, but don't run off scared. Just follow these steps and you'll be fine. Droid-Fu employs a managed build process, driven by the wonderful [Maven build system](http://maven.apache.org) system. This means you have to install both Maven (v2.2.1 or newer), and the [maven-android SDK deployer](http://github.com/mosabua/maven-android-sdk-deployer). Droid-Fu is currently built against the Android 1.5 R4 APIs, so you must have the proper Android JAR installed, too. Consult the Android SDK docs to learn about how to download and install different Android platform versions using the AVD/SDK Manager bundled with the ADT.
+#### Step 1: Make sure you have the latest Android library JARs
 
-#### Step 1: Getting the source codes
+You only need to perform this step when Google releases a new platform version of the Android library files, which means every now and then.
+Update your SDK files to the latest version like so:
 
-If you're using [git](http://www.git-scm.com), do a 
+    $ android update sdk --no-ui
+    
+It's important that you repeat this command until you see the message "There is nothing to install or update." That's because the tools update themselves,
+so it may take several iterations of this command until everything is fully updated.
 
-    git clone git://github.com/kaeppler/droid-fu.git
+#### Step 2: Install the Android JARs to your local Maven repository
 
-and
+Droid-Fu must be compiled against the android.jar and maps.jar library files. Since the build is driven by Maven, you must provide these JARs as artifacts to Maven during the compile stage, otherwise the build will fail.
+We can do this with the [maven-android SDK deployer](http://github.com/mosabua/maven-android-sdk-deployer).
 
-    git clone git://github.com/mosabua/maven-android-sdk-deployer.git
+    $ git clone https://github.com/mosabua/maven-android-sdk-deployer.git
+    $ cd maven-android-sdk-deployer
+    $ mvn install
 
-now.
+(requires `ANDROID_HOME` to point to your SDK home)
 
-Alternatively, you can simply download the archived source codes from the master branches, [here](http://github.com/kaeppler/droid-fu/archives/master) and [here](http://github.com/mosabua/maven-android-sdk-deployer/archives/master).
+This will install all JAR files from `$ANDROID_HOME/platforms` and `$ANDROID_HOME/add-ons` as Maven artifacts.
 
-#### Step 2: Install the Android JAR to your local Maven repository
+#### Step 3: Getting the source code
 
-Droid-Fu must be compiled against the Android 1.5 R4 JAR. Since the build is driven by Maven, we must provide the Android JAR to Maven during the compile stage, otherwise the build will fail. Change to the folder to which you downloaded the maven-android SDK deployer source code, and into the platforms/android-3 sub-directory, e.g.:
+This is simple:
 
-    $ cd ~/projects/maven-android-sdk-deployer/platforms/android-3
+    $ git clone git://github.com/kaeppler/droid-fu.git
 
-Then install the Android JAR:
+Alternatively, you can simply download the archived source code from the master branch [here](http://github.com/kaeppler/droid-fu/archives/master).
 
-    $ mvn install -Dandroid.sdk.path=/path/to/your/android/sdk/root
+#### Step 4: Build and install the Droid-Fu JAR
 
-If the build fails, you probably provided a wrong SDK root. An `ls` in the `android.sdk.path` should list (among other files) a `platforms` and `add-ons` folder.
+To build and install the Droid-Fu JAR as a Maven artifact, run this from the directory where your checked out the sources:
 
-#### Step 3: Build and install the Droid-Fu JAR
+    $ mvn install
 
-If you just want to build the JAR, and copy it around manually, change to the folder where you downloaded/cloned the Droid-Fu sources, and run:
-
-    $ mvn package
-
-This will build the JAR and place it under the `target` directory. To make your life easier, I included a switch which lets you deploy the JAR directly to your application's lib folder:
+This will build the JAR and place it under the `target` directory (and also install it as a Maven artifact).
+To make your life easier, I included a switch which lets you deploy the JAR directly to your application's lib folder:
 
     $ mvn install -DcopyTo=/path/to/your/apps/lib/folder
 
-This will build the JAR and copy it to the given folder.
+This will additionally copy it to the given folder.
 
 If you want a JavaDoc JAR to get inline docs in Eclipse, do this:
 
@@ -81,7 +90,7 @@ This will create a JavaDoc JAR under `target`.
 
 ## How do I use it?
 
-1.  Link the JAR to your application's classpath, as you would with any other JAR in any other Java or Android project.
+1.  If your Android app is Maven managed, declare a dependency to `com.github.droidfu:droid-fu:1.0-SNAPSHOT`. If not, just put the JAR in your libs/ folder and add it to your application's classpath.
 
 1.  If you haven't yet created an [Application](file:///home/matthias/devel/frameworks/android-sdk/docs/reference/android/app/Application.html) class for your app, create a new class and let it inherit from `com.github.droidfu.DroidFuApplication`. Otherwise, just alter your app class to include said inheritance relation.
 
