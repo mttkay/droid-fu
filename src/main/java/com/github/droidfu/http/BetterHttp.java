@@ -1,9 +1,18 @@
 package com.github.droidfu.http;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
+import java.util.zip.GZIPInputStream;
 
+import org.apache.http.Header;
+import org.apache.http.HeaderElement;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
+import org.apache.http.HttpRequest;
+import org.apache.http.HttpRequestInterceptor;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpResponseInterceptor;
 import org.apache.http.HttpVersion;
 import org.apache.http.conn.params.ConnManagerParams;
 import org.apache.http.conn.params.ConnPerRouteBean;
@@ -12,6 +21,7 @@ import org.apache.http.conn.scheme.PlainSocketFactory;
 import org.apache.http.conn.scheme.Scheme;
 import org.apache.http.conn.scheme.SchemeRegistry;
 import org.apache.http.conn.ssl.SSLSocketFactory;
+import org.apache.http.entity.HttpEntityWrapper;
 import org.apache.http.impl.client.AbstractHttpClient;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
@@ -19,6 +29,7 @@ import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
 import org.apache.http.params.HttpProtocolParams;
+import org.apache.http.protocol.HttpContext;
 
 import android.content.Context;
 import android.content.IntentFilter;
@@ -39,9 +50,12 @@ public class BetterHttp {
     public static final int DEFAULT_MAX_CONNECTIONS = 4;
     public static final int DEFAULT_SOCKET_TIMEOUT = 30 * 1000;
     public static final String DEFAULT_HTTP_USER_AGENT = "Android/DroidFu";
+    private static final String HEADER_ACCEPT_ENCODING = "Accept-Encoding";
+    private static final String ENCODING_GZIP = "gzip";
 
     private static int maxConnections = DEFAULT_MAX_CONNECTIONS;
     private static int socketTimeout = DEFAULT_SOCKET_TIMEOUT;
+    private static String httpUserAgent = DEFAULT_HTTP_USER_AGENT;
 
     private static HashMap<String, String> defaultHeaders = new HashMap<String, String>();
     private static AbstractHttpClient httpClient;
@@ -59,7 +73,7 @@ public class BetterHttp {
         HttpConnectionParams.setSoTimeout(httpParams, socketTimeout);
         HttpConnectionParams.setTcpNoDelay(httpParams, true);
         HttpProtocolParams.setVersion(httpParams, HttpVersion.HTTP_1_1);
-        HttpProtocolParams.setUserAgent(httpParams, DEFAULT_HTTP_USER_AGENT);
+        HttpProtocolParams.setUserAgent(httpParams, httpUserAgent);
 
         SchemeRegistry schemeRegistry = new SchemeRegistry();
         schemeRegistry.register(new Scheme("http", PlainSocketFactory.getSocketFactory(), 80));
@@ -74,6 +88,37 @@ public class BetterHttp {
 
         ThreadSafeClientConnManager cm = new ThreadSafeClientConnManager(httpParams, schemeRegistry);
         httpClient = new DefaultHttpClient(cm, httpParams);
+
+        /*
+         * Intercept requests to have them ask for GZip encoding and intercept responses to
+         * automatically wrap the response entity for reinflation. This code is based on code from
+         * SyncService in the Google I/O 2010 {@linkplain http://code.google.com/p/iosched/
+         * scheduling app}.
+         */
+        httpClient.addRequestInterceptor(new HttpRequestInterceptor() {
+            public void process(final HttpRequest request, final HttpContext context) {
+                // Add header to accept gzip content
+                if (!request.containsHeader(HEADER_ACCEPT_ENCODING)) {
+                    request.addHeader(HEADER_ACCEPT_ENCODING, ENCODING_GZIP);
+                }
+            }
+        });
+
+        httpClient.addResponseInterceptor(new HttpResponseInterceptor() {
+            public void process(final HttpResponse response, final HttpContext context) {
+                // Inflate any responses compressed with gzip
+                final HttpEntity entity = response.getEntity();
+                final Header encoding = entity.getContentEncoding();
+                if (encoding != null) {
+                    for (HeaderElement element : encoding.getElements()) {
+                        if (element.getName().equalsIgnoreCase(ENCODING_GZIP)) {
+                            response.setEntity(new InflatingEntity(response.getEntity()));
+                            break;
+                        }
+                    }
+                }
+            }
+        });
     }
 
     /**
@@ -242,4 +287,28 @@ public class BetterHttp {
         httpClient.getConnectionManager().getSchemeRegistry().register(_scheme);
     }
 
+    public static void setUserAgent(String userAgent) {
+        BetterHttp.httpUserAgent = userAgent;
+        HttpProtocolParams.setUserAgent(httpClient.getParams(), userAgent);
+    }
+
+    /**
+     * Simple {@link HttpEntityWrapper} that inflates the wrapped
+     * {@link HttpEntity} by passing it through {@link GZIPInputStream}.
+     */
+    private static class InflatingEntity extends HttpEntityWrapper {
+        public InflatingEntity(final HttpEntity wrapped) {
+            super(wrapped);
+        }
+
+        @Override
+        public InputStream getContent() throws IOException {
+            return new GZIPInputStream(wrappedEntity.getContent());
+        }
+
+        @Override
+        public long getContentLength() {
+            return -1;
+        }
+    }
 }
