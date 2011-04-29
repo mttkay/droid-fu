@@ -88,37 +88,6 @@ public class BetterHttp {
 
         ThreadSafeClientConnManager cm = new ThreadSafeClientConnManager(httpParams, schemeRegistry);
         httpClient = new DefaultHttpClient(cm, httpParams);
-
-        /*
-         * Intercept requests to have them ask for GZip encoding and intercept responses to
-         * automatically wrap the response entity for reinflation. This code is based on code from
-         * SyncService in the Google I/O 2010 {@linkplain http://code.google.com/p/iosched/
-         * scheduling app}.
-         */
-        httpClient.addRequestInterceptor(new HttpRequestInterceptor() {
-            public void process(final HttpRequest request, final HttpContext context) {
-                // Add header to accept gzip content
-                if (!request.containsHeader(HEADER_ACCEPT_ENCODING)) {
-                    request.addHeader(HEADER_ACCEPT_ENCODING, ENCODING_GZIP);
-                }
-            }
-        });
-
-        httpClient.addResponseInterceptor(new HttpResponseInterceptor() {
-            public void process(final HttpResponse response, final HttpContext context) {
-                // Inflate any responses compressed with gzip
-                final HttpEntity entity = response.getEntity();
-                final Header encoding = entity.getContentEncoding();
-                if (encoding != null) {
-                    for (HeaderElement element : encoding.getElements()) {
-                        if (element.getName().equalsIgnoreCase(ENCODING_GZIP)) {
-                            response.setEntity(new InflatingEntity(response.getEntity()));
-                            break;
-                        }
-                    }
-                }
-            }
-        });
     }
 
     /**
@@ -139,6 +108,17 @@ public class BetterHttp {
             int maxConcurrentThreads) {
         responseCache = new HttpResponseCache(initialCapacity, expirationInMinutes,
                 maxConcurrentThreads);
+    }
+
+    /**
+     * Intercept requests to have them ask for GZip encoding and intercept responses to
+     * automatically wrap the response entity for reinflation. This code is based on code from
+     * SyncService in the Google I/O 2010 {@linkplain http://code.google.com/p/iosched/ scheduling
+     * app}.
+     */
+    public static void enableGZIPEncoding() {
+        httpClient.addRequestInterceptor(new GZIPHttpRequestInterceptor());
+        httpClient.addResponseInterceptor(new GZIPHttpResponseInterceptor());
     }
 
     /**
@@ -293,11 +273,42 @@ public class BetterHttp {
     }
 
     /**
-     * Simple {@link HttpEntityWrapper} that inflates the wrapped
-     * {@link HttpEntity} by passing it through {@link GZIPInputStream}.
+     * Simple {@link HttpRequestInterceptor} that adds GZIP accept encoding header.
      */
-    private static class InflatingEntity extends HttpEntityWrapper {
-        public InflatingEntity(final HttpEntity wrapped) {
+    static class GZIPHttpRequestInterceptor implements HttpRequestInterceptor {
+        public void process(final HttpRequest request, final HttpContext context) {
+            // Add header to accept gzip content
+            if (!request.containsHeader(HEADER_ACCEPT_ENCODING)) {
+                request.addHeader(HEADER_ACCEPT_ENCODING, ENCODING_GZIP);
+            }
+        }
+    }
+
+    /**
+     * Simple {@link HttpResponseInterceptor} that inflates response if GZIP encoding header.
+     */
+    static class GZIPHttpResponseInterceptor implements HttpResponseInterceptor {
+        public void process(final HttpResponse response, final HttpContext context) {
+            // Inflate any responses compressed with gzip
+            final HttpEntity entity = response.getEntity();
+            final Header encoding = entity.getContentEncoding();
+            if (encoding != null) {
+                for (HeaderElement element : encoding.getElements()) {
+                    if (element.getName().equalsIgnoreCase(ENCODING_GZIP)) {
+                        response.setEntity(new GZIPInflatingEntity(response.getEntity()));
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Simple {@link HttpEntityWrapper} that inflates the wrapped {@link HttpEntity} by passing it
+     * through {@link GZIPInputStream}.
+     */
+    static class GZIPInflatingEntity extends HttpEntityWrapper {
+        public GZIPInflatingEntity(final HttpEntity wrapped) {
             super(wrapped);
         }
 
