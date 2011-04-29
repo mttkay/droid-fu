@@ -63,6 +63,8 @@ public class ImageLoader implements Runnable {
     private static ImageCache imageCache;
     private static int numRetries = DEFAULT_NUM_RETRIES;
 
+    private static long expirationInMinutes = DEFAULT_TTL_MINUTES;
+    
     /**
      * @param numThreads
      *            the maximum number of threads that will be started to download images in parallel
@@ -94,11 +96,17 @@ public class ImageLoader implements Runnable {
             executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(DEFAULT_POOL_SIZE);
         }
         if (imageCache == null) {
-            imageCache = new ImageCache(25, DEFAULT_TTL_MINUTES, DEFAULT_POOL_SIZE);
+            imageCache = new ImageCache(25, expirationInMinutes, DEFAULT_POOL_SIZE);
             imageCache.enableDiskCache(context, ImageCache.DISK_CACHE_SDCARD);
         }
     }
 
+    public static synchronized void initialize(Context context, long expirationInMinutes) {
+    	ImageLoader.expirationInMinutes = expirationInMinutes;
+    	initialize(context);
+    }
+
+    
     private String imageUrl;
 
     private ImageLoaderHandler handler;
