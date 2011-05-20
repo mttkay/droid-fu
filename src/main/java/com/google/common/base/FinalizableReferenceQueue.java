@@ -253,7 +253,7 @@ public class FinalizableReferenceQueue {
         ClassLoader finalizerLoader = newLoader(getBaseUrl());
         return finalizerLoader.loadClass(FINALIZER_CLASS_NAME);
       } catch (Exception e) {
-        logger.log(Level.WARNING, LOADING_ERROR, e);
+        //logger.log(Level.WARNING, LOADING_ERROR, e);
         return null;
       }
     }
