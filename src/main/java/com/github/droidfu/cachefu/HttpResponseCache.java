@@ -34,7 +34,7 @@ public class HttpResponseCache extends AbstractCache<String, ResponseData> {
 
     @Override
     protected ResponseData readValueFromDisk(File file) throws IOException {
-        BufferedInputStream istream = new BufferedInputStream(new FileInputStream(file));
+        BufferedInputStream istream = new BufferedInputStream(new FileInputStream(file),AbstractCache.DEFAULT_BUFFER_SIZE);
         long fileSize = file.length();
         if (fileSize > Integer.MAX_VALUE) {
             throw new IOException("Cannot read files larger than " + Integer.MAX_VALUE + " bytes");
@@ -55,7 +55,7 @@ public class HttpResponseCache extends AbstractCache<String, ResponseData> {
 
     @Override
     protected void writeValueToDisk(File file, ResponseData data) throws IOException {
-        BufferedOutputStream ostream = new BufferedOutputStream(new FileOutputStream(file));
+        BufferedOutputStream ostream = new BufferedOutputStream(new FileOutputStream(file),AbstractCache.DEFAULT_BUFFER_SIZE);
 
         ostream.write(data.getStatusCode());
         ostream.write(data.getResponseBody());

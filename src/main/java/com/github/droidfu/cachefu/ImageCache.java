@@ -33,6 +33,7 @@ import android.graphics.BitmapFactory;
  * 
  */
 public class ImageCache extends AbstractCache<String, byte[]> {
+    
 
     public ImageCache(int initialCapacity, long expirationInMinutes, int maxConcurrentThreads) {
         super("ImageCache", initialCapacity, expirationInMinutes, maxConcurrentThreads);
@@ -49,7 +50,7 @@ public class ImageCache extends AbstractCache<String, byte[]> {
 
     @Override
     protected byte[] readValueFromDisk(File file) throws IOException {
-        BufferedInputStream istream = new BufferedInputStream(new FileInputStream(file));
+        BufferedInputStream istream = new BufferedInputStream(new FileInputStream(file),AbstractCache.DEFAULT_BUFFER_SIZE);
         long fileSize = file.length();
         if (fileSize > Integer.MAX_VALUE) {
             throw new IOException("Cannot read files larger than " + Integer.MAX_VALUE + " bytes");
@@ -74,7 +75,7 @@ public class ImageCache extends AbstractCache<String, byte[]> {
 
     @Override
     protected void writeValueToDisk(File file, byte[] imageData) throws IOException {
-        BufferedOutputStream ostream = new BufferedOutputStream(new FileOutputStream(file));
+        BufferedOutputStream ostream = new BufferedOutputStream(new FileOutputStream(file),AbstractCache.DEFAULT_BUFFER_SIZE);
 
         ostream.write(imageData);
 

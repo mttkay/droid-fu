@@ -57,6 +57,7 @@ public abstract class AbstractCache<KeyT, ValT> implements Map<KeyT, ValT> {
 
     public static final int DISK_CACHE_INTERNAL = 0;
     public static final int DISK_CACHE_SDCARD = 1;
+    
 
     private static final String LOG_TAG = "Droid-Fu[CacheFu]";
 
@@ -69,6 +70,8 @@ public abstract class AbstractCache<KeyT, ValT> implements Map<KeyT, ValT> {
     private String name;
     
     private long expirationInMinutes;
+    
+    public static final int DEFAULT_BUFFER_SIZE = 8192;
 
     /**
      * Creates a new cache instance.
