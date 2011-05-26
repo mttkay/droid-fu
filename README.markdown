@@ -104,6 +104,10 @@ This will create a JavaDoc JAR under `target`.
             ...
         </manifest>
 
+1.  Add to your `AndroidManifest.xml` the following permission:
+
+        <uses-permission android:name="android.permission.GET_TASKS"/>
+
 ## How is it licensed?
 
 Droid-Fu is free and open source and may be used under the terms of the [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0).
