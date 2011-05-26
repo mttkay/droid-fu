@@ -55,7 +55,7 @@ public interface BetterActivity {
      * Activity of your own application, or by an Activity of an entirely
      * different application. This function only returns true, if your Activity
      * is being paused by an Activity of another app, thus hiding yours.
-     * 
+     *
      * @return true, if the Activity is being paused because an Activity of
      *         another application received focus.
      */
@@ -68,7 +68,7 @@ public interface BetterActivity {
      * returned. Otherwise the returned Intent is the intent returned by
      * getIntent (which is the Intent which was used to initially launch this
      * activity).
-     * 
+     *
      * @return the current {@link Intent}
      */
     public Intent getCurrentIntent();
@@ -80,6 +80,24 @@ public interface BetterActivity {
     public AlertDialog newYesNoDialog(int titleResourceId, int messageResourceId,
             OnClickListener listener);
 
+    /**
+     * Creates a new informative dialog. Example:
+     * <p><blockquote><pre>
+     *  protected void onResume() {
+     *      super.onResume();
+     *      if (isLaunching()) {
+     *          newInfoDialog(R.string.info, R.string.launching).show();
+     *      } else {
+     *          newInfoDialog(R.string.info, R.string.resuming).show();
+     *      }
+     *  }
+     * </pre></blockquote>
+     * @param titleResourceId
+     *        the string resource that should be used as the dialog title
+     * @param messageResourceId
+     *        the string resource that should be displayed as the dialog message
+     * @return the dialog, on which you need to call show().
+     */
     public AlertDialog newInfoDialog(int titleResourceId, int messageResourceId);
 
     public AlertDialog newAlertDialog(int titleResourceId, int messageResourceId);
@@ -104,7 +122,7 @@ public interface BetterActivity {
      * email</li>
      * </ul>
      * </p>
-     * 
+     *
      * @param titleResourceId
      *        the string resource that should be used as the dialog title
      * @param error
@@ -134,7 +152,7 @@ public interface BetterActivity {
      * email</li>
      * </ul>
      * </p>
-     * 
+     *
      * @param error
      *        the exception that should be displayed and/or reported
      * @return the dialog
@@ -144,7 +162,7 @@ public interface BetterActivity {
     /**
      * Creates a new list style dialog from a list of objects. The toString()
      * method of any such object will be used to generate the list item's label.
-     * 
+     *
      * @param <T>
      *        the type of the list items
      * @param dialogTitle
