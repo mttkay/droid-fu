@@ -26,22 +26,25 @@ import com.github.droidfu.activities.BetterActivity;
 
 /**
  * Works in a similar way to AsyncTask but provides extra functionality.
+ * <ol>
+ * <li>It keeps track of the active instance of each {@link Context}, ensuring
+ * that the correct instance is reported to. This is very useful if your
+ * Activity is forced into the background, or the user rotates his device.
  *
- * 1) It keeps track of the active instance of each Context, ensuring that the
- * correct instance is reported to. This is very useful if your Activity is
- * forced into the background, or the user rotates his device.
+ * <li>A progress dialog is automatically shown. See {@link
+ * #useCustomDialog(int)} and {@link #disableDialog()} for alternatives.
  *
- * 2) A progress dialog is automatically shown. See useCustomDialog()
- * disableDialog()
+ * <li>If an Exception is thrown from inside doInBackground(), this is now
+ * handled by the {@link #handleError(Context, Exception)} method which you
+ * must implement.
  *
- * 3) If an Exception is thrown from inside doInBackground, this is now handled
- * by the handleError method.
- *
- * 4) You should now longer override onPreExecute(), doInBackground() and
- * onPostExecute(), instead you should use before(), doCheckedInBackground() and
- * after() respectively.
- *
- * These features require that the Application extends DroidFuApplication.
+ * <li>You should no longer override {@link #onPreExecute()}, doInBackground
+ * and {@link onPostExecute(ReturnT)}, instead you should use {@link
+ * before(Context)}, {@link doCheckedInBackground(Context, ParameterT)} and
+ * {@link after(Context,ReturnT)} respectively.
+ * </ol>
+ * These features require that your Application extends
+ * {@link DroidFuApplication}.
  *
  * @param <ParameterT>
  * @param <ProgressT>

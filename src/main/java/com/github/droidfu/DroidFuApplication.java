@@ -21,6 +21,14 @@ import java.util.HashMap;
 import android.app.Application;
 import android.content.Context;
 
+/**
+ * For other classes like {@link concurrent.BetterAsyncTask} to work, you need
+ * to have a class inheriting from DroidFuApplication. The DroidFuApplication
+ * keeps a hash of WeakReferences mapping contexts (activites and services) to
+ * their active instances, and when a {@link concurrent.BetterAsyncTask}
+ * finishes, it will ask your application for the active instance. Hence the
+ * need for subclassing and implementing this in your program.
+ */
 public class DroidFuApplication extends Application {
 
     private HashMap<String, WeakReference<Context>> contextObjects = new HashMap<String, WeakReference<Context>>();
