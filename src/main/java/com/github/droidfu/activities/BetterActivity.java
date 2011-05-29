@@ -28,8 +28,18 @@ public interface BetterActivity {
 
     public int getWindowFeatures();
 
+	/** Sets the title of the default progress dialog.
+	 * The default progress dialog might be shown by other classes like {@link
+	 * BetterAsyncTask}. If you don't set the title, your application will
+	 * crash due to it not finding the string resource to show.
+	 */
     public void setProgressDialogTitleId(int progressDialogTitleId);
 
+	/** Sets the message of the default progress dialog.
+	 * The default progress dialog might be shown by other classes like {@link
+	 * BetterAsyncTask}. If you don't set the message, your application will
+	 * crash due to it not finding the string resource to show.
+	 */
     public void setProgressDialogMsgId(int progressDialogMsgId);
 
     /**

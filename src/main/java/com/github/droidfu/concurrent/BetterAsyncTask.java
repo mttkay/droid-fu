@@ -31,8 +31,12 @@ import com.github.droidfu.activities.BetterActivity;
  * that the correct instance is reported to. This is very useful if your
  * Activity is forced into the background, or the user rotates his device.
  *
- * <li>A progress dialog is automatically shown. See {@link
- * #useCustomDialog(int)} and {@link #disableDialog()} for alternatives.
+ * <li>A progress dialog is automatically shown using the string resources you
+ * have previously set through {@link
+ * BetterActivity#setProgressDialogMsgId(int)} and {@link
+ * BetterActivity#setProgressDialogTitleId(int)}. If you don't want to show the
+ * default progress dialog, see {@link #useCustomDialog(int)} and {@link
+ * #disableDialog()} for alternatives.
  *
  * <li>If an Exception is thrown from inside doInBackground(), this is now
  * handled by the {@link #handleError(Context, Exception)} method which you
