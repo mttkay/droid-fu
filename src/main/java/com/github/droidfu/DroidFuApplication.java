@@ -28,6 +28,27 @@ import android.content.Context;
  * their active instances, and when a {@link concurrent.BetterAsyncTask}
  * finishes, it will ask your application for the active instance. Hence the
  * need for subclassing and implementing this in your program.
+ *
+ * <h2>Resources</h2>
+ *
+ * Sometimes Droid-fu might want to show a dialog to the user. In these
+ * situations it will look for a specific set of default resource strings. If
+ * you don't define them, it will most likely crash trying to show them. The
+ * strings are:
+ * <ul>
+ * <li>droidfu_dialog_button_send_error_report: used by
+ * {@link activities.BetterActivity#newErrorHandlerDialog(Exception)}.
+ * <li>droidfu_error_dialog_title: used by
+ * {@link activities.BetterActivity#newErrorHandlerDialog(Exception)}.
+ * <li>droidfu_error_report_email_address: used by
+ * {@link activities.BetterActivity#newErrorHandlerDialog(Exception)}.
+ * <li>droidfu_error_report_email_subject: used by
+ * {@link activities.BetterActivity#newErrorHandlerDialog(Exception)}.
+ * <li>droidfu_progress_dialog_message: used by {@link
+ * concurrent.BetterAsyncTask}.
+ * <li>droidfu_progress_dialog_title used by
+ * {@link concurrent.BetterAsyncTask}.
+ * </ul>
  */
 public class DroidFuApplication extends Application {
 

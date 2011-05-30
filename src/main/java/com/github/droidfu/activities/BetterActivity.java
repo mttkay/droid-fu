@@ -31,14 +31,18 @@ public interface BetterActivity {
 	/** Sets the title of the default progress dialog.
 	 * The default progress dialog might be shown by other classes like {@link
 	 * BetterAsyncTask}. If you don't set the title, your application will
-	 * crash due to it not finding the string resource to show.
+	 * crash due to it not finding the string resource to show. Alternatively
+	 * you can create a string resource in your program named
+	 * droidfu_progress_dialog_title.
 	 */
     public void setProgressDialogTitleId(int progressDialogTitleId);
 
 	/** Sets the message of the default progress dialog.
 	 * The default progress dialog might be shown by other classes like {@link
 	 * BetterAsyncTask}. If you don't set the message, your application will
-	 * crash due to it not finding the string resource to show.
+	 * crash due to it not finding the string resource to show. Alternatively
+	 * you can create a string resource in your program named
+	 * droidfu_progress_dialog_message.
 	 */
     public void setProgressDialogMsgId(int progressDialogMsgId);
 

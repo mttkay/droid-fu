@@ -31,9 +31,9 @@ import com.github.droidfu.activities.BetterActivity;
  * that the correct instance is reported to. This is very useful if your
  * Activity is forced into the background, or the user rotates his device.
  *
- * <li>A progress dialog is automatically shown using the string resources you
- * have previously set through {@link
- * BetterActivity#setProgressDialogMsgId(int)} and {@link
+ * <li>A progress dialog is automatically shown using the default string
+ * resources of your application or the specific ones you might have previously
+ * set through {@link BetterActivity#setProgressDialogMsgId(int)} and {@link
  * BetterActivity#setProgressDialogTitleId(int)}. If you don't want to show the
  * default progress dialog, see {@link #useCustomDialog(int)} and {@link
  * #disableDialog()} for alternatives.
