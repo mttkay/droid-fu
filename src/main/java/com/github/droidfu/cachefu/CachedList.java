@@ -170,8 +170,11 @@ public class CachedList<CO extends CachedModel> extends CachedModel {
     public boolean reload(ModelCache modelCache) {
         // First reload list object
         boolean result = super.reload(modelCache);
-        // Then reload each item in list
-        for (CachedModel listModel : list) {
+        // Then reload each item in list. Sometimes a ConcurrentModificationException occurs.
+        // Changed implementation so that it doesn't use an Iterator any more.
+        // Uglier but hopefully that will solve the issue.
+        for (int i = 0; i < list.size(); i++) {
+            CachedModel listModel = list.get(i);
             if (listModel.reload(modelCache)) {
                 result = true;
             }
