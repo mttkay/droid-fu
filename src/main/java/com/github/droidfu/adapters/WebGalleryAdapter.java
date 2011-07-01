@@ -175,11 +175,11 @@ public class WebGalleryAdapter extends BaseAdapter {
     }
 
     /** Lets a potential subclass customize the returned view of the adapter.
-	 * If you want to customize the look of the views returned by the adapter
-	 * you need to subclass WebGalleryAdapter and implement this method, which
-	 * currently is a nop. In your implementation access the FrameLayout
-	 * containing the WebImageView as a first child to customize it (eg. set a
-	 * new padding). Example:
+     * If you want to customize the look of the views returned by the adapter
+     * you need to subclass WebGalleryAdapter and implement this method, which
+     * currently is a nop. In your implementation access the FrameLayout
+     * containing the WebImageView as a first child to customize it (eg. set a
+     * new padding). Example:
      * <p><blockquote><pre>
      *  FrameLayout layout = (FrameLayout)convertView;
      *  layout.setLayoutParams(new GridView.LayoutParams(width, height));
