@@ -29,6 +29,7 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Message;
 import android.os.SystemClock;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.widget.ImageView;
 
@@ -268,7 +269,9 @@ public class ImageLoader implements Runnable {
                     break;
                 }
 
-                return BitmapFactory.decodeByteArray(imageData, 0, imageData.length);
+                Bitmap ret = BitmapFactory.decodeByteArray(imageData, 0, imageData.length);
+                ret.setDensity(DisplayMetrics.DENSITY_DEFAULT);
+                return ret;
 
             } catch (Throwable e) {
                 Log.w(LOG_TAG, "download for " + imageUrl + " failed (attempt " + timesTried + ")");
