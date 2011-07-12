@@ -49,6 +49,22 @@ import android.content.Context;
  * <li>droidfu_progress_dialog_title used by
  * {@link concurrent.BetterAsyncTask}.
  * </ul>
+ *
+ * <h2>Caches</h2>
+ *
+ * Droid-fu enables two kinds of caches, one for http requests, and one for
+ * memory/disk images. The first has to be enabled through {@link
+ * http.BetterHttp#enableResponseCache(int initialCapacity, long
+ * expirationInMinutes, int maxConcurrentThreads)}. The memory/disk cache for
+ * images is automatically used for {@link widgets.WebImageView} objects, but
+ * to make the disk cache effective you need to add to your manifest
+ * permissions the attribute {@link
+ * android.Manifest.permission#WRITE_EXTERNAL_STORAGE} or you won't be able to
+ * save it to disk.
+ * <p>
+ * Both types of cache have automatic expiration limits, but you can force a
+ * purge with {@link cachefu.HttpResponseCache#clear()} and {@link
+ * imageloader.ImageLoader#clearCache()}.
  */
 public class DroidFuApplication extends Application {
 

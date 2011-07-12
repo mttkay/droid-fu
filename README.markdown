@@ -108,6 +108,10 @@ This will create a JavaDoc JAR under `target`.
 
         <uses-permission android:name="android.permission.GET_TASKS"/>
 
+1.  If you want to activate the disk cache for http requests of data and images, add to your `AndroidManifest.xml` the following permission:
+
+        <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+
 ## How is it licensed?
 
 Droid-Fu is free and open source and may be used under the terms of the [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0).
