@@ -224,7 +224,8 @@ public class ImageLoader implements Runnable {
      * {@link android.app.Application#onLowMemory()}.
      */
     public static void clearCache() {
-        imageCache.clear();
+        if (null != imageCache)
+            imageCache.clear();
     }
 
     /**
