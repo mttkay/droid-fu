@@ -260,45 +260,17 @@ public class BetterMapActivity extends MapActivity implements BetterActivity {
         return myLocationOverlay;
     }
 
-    public GestureDetector getTapDetector() {
-        return tapDetector;
-    }
-
-    public void setTapDetector(GestureDetector tapDetector) {
-        this.tapDetector = tapDetector;
-    }
-
-    public OnTouchListener getTapListener() {
-        return tapListener;
-    }
-
-    public void setTapListener(OnTouchListener tapListener) {
-        this.tapListener = tapListener;
-    }
-
-    protected void setMapGestureListener(
-            OnGestureListener mapOnGestureListener,
-            OnTouchListener mapOnTouchListener) {
-        tapDetector = new GestureDetector(mapOnGestureListener);
-        tapListener = mapOnTouchListener;
-        mapView.setOnTouchListener(tapListener);
-    }
-
     protected void setMapGestureListener(OnGestureListener mapOnGestureListener) {
         // Map gesture listener. Our default implementation handles a double tap
-        // action
-        // as a zoom in.
-        tapDetector = new GestureDetector(mapOnGestureListener);
-        tapListener = new View.OnTouchListener() {
+        // action as a zoom in.
+        final GestureDetector gestureDetector = new GestureDetector(this, mapOnGestureListener);
+        OnTouchListener onTouchListener = new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                if (tapDetector.onTouchEvent(event)) {
-                    return true;
-                }
-                return false;
+                return gestureDetector.onTouchEvent(event);
             }
         };
-        mapView.setOnTouchListener(tapListener);
+        mapView.setOnTouchListener(onTouchListener);
     }
 
     @Override
