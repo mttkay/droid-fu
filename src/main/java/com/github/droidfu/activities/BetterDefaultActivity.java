@@ -134,10 +134,21 @@ public class BetterDefaultActivity extends Activity implements BetterActivity {
             getString(messageResourceId), android.R.drawable.ic_dialog_info);
     }
 
+    public AlertDialog newInfoDialog(int titleResourceId, int messageResourceId, int buttonTextResourceId) {
+        return BetterActivityHelper.newMessageDialog(this, getString(titleResourceId),
+                getString(messageResourceId), getString(buttonTextResourceId), android.R.drawable.ic_dialog_info);
+    }
+    
     public AlertDialog newAlertDialog(int titleResourceId, int messageResourceId) {
         return BetterActivityHelper.newMessageDialog(this, getString(titleResourceId),
             getString(messageResourceId), android.R.drawable.ic_dialog_alert);
     }
+
+    public AlertDialog newAlertDialog(int titleResourceId, int messageResourceId, int buttonTextResourceId) {
+        return BetterActivityHelper.newMessageDialog(this, getString(titleResourceId),
+            getString(messageResourceId), getString(buttonTextResourceId), android.R.drawable.ic_dialog_alert);
+    }
+
 
     public AlertDialog newErrorHandlerDialog(int titleResourceId, Exception error) {
         return BetterActivityHelper.newErrorHandlerDialog(this, getString(titleResourceId), error);
