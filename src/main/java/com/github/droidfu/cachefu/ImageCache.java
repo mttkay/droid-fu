@@ -24,6 +24,7 @@ import java.io.IOException;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.util.DisplayMetrics;
 
 /**
  * Implements a cache capable of caching image files. It exposes helper methods to immediately
@@ -69,7 +70,9 @@ public class ImageCache extends AbstractCache<String, byte[]> {
         if (imageData == null) {
             return null;
         }
-        return BitmapFactory.decodeByteArray(imageData, 0, imageData.length);
+        Bitmap ret = BitmapFactory.decodeByteArray(imageData, 0, imageData.length);
+        ret.setDensity(DisplayMetrics.DENSITY_DEFAULT);
+        return ret;
     }
 
     @Override

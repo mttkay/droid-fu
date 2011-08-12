@@ -29,9 +29,11 @@ import android.widget.Gallery.LayoutParams;
 
 import com.github.droidfu.widgets.WebImageView;
 
-/**
- * Can be used as an adapter for an Android {@link Gallery} view. This adapter loads the images to
- * be shown from the web.
+/** Can be used as an adapter for an Android {@link Gallery} view.
+ * This adapter loads the images to be shown from the web. If you want to
+ * customize the layout or other attributes of the returned views, inherit from
+ * this class and override the {@link onGetView(int position, View convertView,
+ * ViewGroup parent)} method.
  * 
  * @author Matthias Kaeppler
  */
@@ -172,6 +174,23 @@ public class WebGalleryAdapter extends BaseAdapter {
         return convertView;
     }
 
+    /** Lets a potential subclass customize the returned view of the adapter.
+     * If you want to customize the look of the views returned by the adapter
+     * you need to subclass WebGalleryAdapter and implement this method, which
+     * currently is a nop. In your implementation access the FrameLayout
+     * containing the WebImageView as a first child to customize it (eg. set a
+     * new padding). Example:
+     * <p><blockquote><pre>
+     *  FrameLayout layout = (FrameLayout)convertView;
+     *  layout.setLayoutParams(new GridView.LayoutParams(width, height));
+     *  WebImageView w = (WebImageView)layout.getChildAt(0);
+     *  ...
+     * </pre></blockquote>
+     * @param position
+     *            the position of the view in the adapter
+     * @param convertView
+     *            the FrameLayout containing a WebImageView as first child.
+     */
     protected void onGetView(int position, View convertView, ViewGroup parent) {
         // for extension
     }
