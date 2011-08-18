@@ -39,11 +39,11 @@ public class WebGalleryAdapter extends BaseAdapter {
 
     public static final int NO_DRAWABLE = -1;
 
-    private List<String> imageUrls;
+    protected List<String> imageUrls;
 
-    private Context context;
+    protected Context context;
 
-    private Drawable progressDrawable, errorDrawable;
+    protected Drawable progressDrawable, errorDrawable;
 
     public WebGalleryAdapter(Context context) {
         initialize(context, null, null, null);

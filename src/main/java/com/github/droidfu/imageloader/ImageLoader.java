@@ -15,13 +15,6 @@
 
 package com.github.droidfu.imageloader;
 
-import java.io.BufferedInputStream;
-import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadPoolExecutor;
-
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -31,10 +24,16 @@ import android.os.Message;
 import android.os.SystemClock;
 import android.util.Log;
 import android.widget.ImageView;
-
 import com.github.droidfu.adapters.WebGalleryAdapter;
 import com.github.droidfu.cachefu.ImageCache;
 import com.github.droidfu.widgets.WebImageView;
+
+import java.io.BufferedInputStream;
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
 
 /**
  * Realizes an background image loader backed by a two-level FIFO cache. If the image to be loaded
@@ -57,26 +56,27 @@ public class ImageLoader implements Runnable {
     // TODO: this currently only affects the in-memory cache, so it's quite pointless
     private static final int DEFAULT_TTL_MINUTES = 24 * 60;
     private static final int DEFAULT_RETRY_HANDLER_SLEEP_TIME = 1000;
-    private static final int DEFAULT_NUM_RETRIES = 3;
+    private static final int DEFAULT_NUM_RETRIES = 1;
 
     private static ThreadPoolExecutor executor;
     private static ImageCache imageCache;
     private static int numRetries = DEFAULT_NUM_RETRIES;
 
     private static long expirationInMinutes = DEFAULT_TTL_MINUTES;
-    
+
+    private static final int DEFAULT_IMAGE_MAX_SIZE = 400;
+    private static final int INITIAL_CAPACITY = 100;
+
+
     /**
-     * @param numThreads
-     *            the maximum number of threads that will be started to download images in parallel
+     * @param numThreads the maximum number of threads that will be started to download images in parallel
      */
     public static void setThreadPoolSize(int numThreads) {
         executor.setMaximumPoolSize(numThreads);
     }
 
     /**
-     * @param numAttempts
-     *            how often the image loader should retry the image download if network connection
-     *            fails
+     * @param numAttempts how often the image loader should retry the image download if network connection fails
      */
     public static void setMaxDownloadAttempts(int numAttempts) {
         ImageLoader.numRetries = numAttempts;
@@ -96,17 +96,17 @@ public class ImageLoader implements Runnable {
             executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(DEFAULT_POOL_SIZE);
         }
         if (imageCache == null) {
-            imageCache = new ImageCache(25, expirationInMinutes, DEFAULT_POOL_SIZE);
-            imageCache.enableDiskCache(context, ImageCache.DISK_CACHE_SDCARD);
+            imageCache = new ImageCache(INITIAL_CAPACITY, expirationInMinutes, DEFAULT_POOL_SIZE);
+            imageCache.enableDiskCache(context, ImageCache.DISK_CACHE_INTERNAL);
         }
     }
 
     public static synchronized void initialize(Context context, long expirationInMinutes) {
-    	ImageLoader.expirationInMinutes = expirationInMinutes;
-    	initialize(context);
+        ImageLoader.expirationInMinutes = expirationInMinutes;
+        initialize(context);
     }
 
-    
+
     private String imageUrl;
 
     private ImageLoaderHandler handler;
@@ -127,7 +127,7 @@ public class ImageLoader implements Runnable {
      *            the ImageView which should be updated with the new image
      */
     public static void start(String imageUrl, ImageView imageView) {
-        start(imageUrl, imageView, new ImageLoaderHandler(imageView, imageUrl), null, null);
+        start(imageUrl, imageView, new ImageLoaderHandler(imageView, imageUrl), null, null, true);
     }
 
     /**
@@ -146,57 +146,62 @@ public class ImageLoader implements Runnable {
      *            the Drawable set to the ImageView if a download error occurs
      */
     public static void start(String imageUrl, ImageView imageView, Drawable dummyDrawable,
-            Drawable errorDrawable) {
+                             Drawable errorDrawable) {
         start(imageUrl, imageView, new ImageLoaderHandler(imageView, imageUrl,
- errorDrawable),
-                dummyDrawable, errorDrawable);
+                errorDrawable),
+                dummyDrawable, errorDrawable, true);
     }
 
     /**
-     * Triggers the image loader for the given image and handler. The image loading will be
-     * performed concurrently to the UI main thread, using a fixed size thread pool. The loaded
-     * image will not be automatically posted to an ImageView; instead, you can pass a custom
-     * {@link ImageLoaderHandler} and handle the loaded image yourself (e.g. cache it for later
-     * use).
-     * 
-     * @param imageUrl
-     *            the URL of the image to download
-     * @param handler
-     *            the handler which is used to handle the downloaded image
+     * Triggers the image loader for the given image and handler. The image loading will be performed concurrently to the UI main
+     * thread, using a fixed size thread pool. The loaded image will not be automatically posted to an ImageView; instead, you can
+     * pass a custom {@link ImageLoaderHandler} and handle the loaded image yourself (e.g. cache it for later use).
+     *
+     * @param imageUrl         the URL of the image to download
+     * @param handler          the handler which is used to handle the downloaded image
+     * @param enableDummyImage define whether or not we want to enable the dummy image set on the images while loading or not
+     */
+    public static void start(String imageUrl, ImageLoaderHandler handler, boolean enableDummyImage) {
+        start(imageUrl, handler.getImageView(), handler, null, null, enableDummyImage);
+    }
+
+    /**
+     * Triggers the image loader for the given image and handler. The image loading will be performed concurrently to the UI main
+     * thread, using a fixed size thread pool. The loaded image will not be automatically posted to an ImageView; instead, you can
+     * pass a custom {@link ImageLoaderHandler} and handle the loaded image yourself (e.g. cache it for later use).
+     *
+     * @param imageUrl the URL of the image to download
+     * @param handler  the handler which is used to handle the downloaded image
      */
     public static void start(String imageUrl, ImageLoaderHandler handler) {
-        start(imageUrl, handler.getImageView(), handler, null, null);
+        start(imageUrl, handler.getImageView(), handler, null, null, true);
     }
 
     /**
-     * Triggers the image loader for the given image and handler. The image loading will be
-     * performed concurrently to the UI main thread, using a fixed size thread pool. The loaded
-     * image will not be automatically posted to an ImageView; instead, you can pass a custom
-     * {@link ImageLoaderHandler} and handle the loaded image yourself (e.g. cache it for later
-     * use).
-     * 
-     * @param imageUrl
-     *            the URL of the image to download
-     * @param handler
-     *            the handler which is used to handle the downloaded image
-     * @param dummyDrawable
-     *            the Drawable set to the ImageView while waiting for the image to be downloaded
-     * @param errorDrawable
-     *            the Drawable set to the ImageView if a download error occurs
+     * Triggers the image loader for the given image and handler. The image loading will be performed concurrently to the UI main
+     * thread, using a fixed size thread pool. The loaded image will not be automatically posted to an ImageView; instead, you can
+     * pass a custom {@link ImageLoaderHandler} and handle the loaded image yourself (e.g. cache it for later use).
+     *
+     * @param imageUrl      the URL of the image to download
+     * @param handler       the handler which is used to handle the downloaded image
+     * @param dummyDrawable the Drawable set to the ImageView while waiting for the image to be downloaded
+     * @param errorDrawable the Drawable set to the ImageView if a download error occurs
      */
     public static void start(String imageUrl, ImageLoaderHandler handler, Drawable dummyDrawable,
-            Drawable errorDrawable) {
-        start(imageUrl, handler.getImageView(), handler, dummyDrawable, errorDrawable);
+                             Drawable errorDrawable) {
+        start(imageUrl, handler.getImageView(), handler, dummyDrawable, errorDrawable, true);
     }
 
     private static void start(String imageUrl, ImageView imageView, ImageLoaderHandler handler,
-            Drawable dummyDrawable, Drawable errorDrawable) {
+                              Drawable dummyDrawable, Drawable errorDrawable, boolean enableDummyImage) {
         if (imageView != null) {
             if (imageUrl == null) {
                 // In a ListView views are reused, so we must be sure to remove the tag that could
                 // have been set to the ImageView to prevent that the wrong image is set.
                 imageView.setTag(null);
-                imageView.setImageDrawable(dummyDrawable);
+                if (enableDummyImage) {
+                    imageView.setImageDrawable(dummyDrawable);
+                }
                 return;
             }
             String oldImageUrl = (String) imageView.getTag();
@@ -205,7 +210,9 @@ public class ImageLoader implements Runnable {
                 return;
             } else {
                 // Set the dummy image while waiting for the actual image to be downloaded.
-                imageView.setImageDrawable(dummyDrawable);
+                 if (enableDummyImage) {
+                     imageView.setImageDrawable(dummyDrawable);
+                 }
                 imageView.setTag(imageUrl);
             }
         }
@@ -219,8 +226,8 @@ public class ImageLoader implements Runnable {
     }
 
     /**
-     * Clears the 1st-level cache (in-memory cache). A good candidate for calling in
-     * {@link android.app.Application#onLowMemory()}.
+     * Clears the 1st-level cache (in-memory cache). A good candidate for calling in {@link
+     * android.app.Application#onLowMemory()}.
      */
     public static void clearCache() {
         imageCache.clear();
@@ -228,7 +235,7 @@ public class ImageLoader implements Runnable {
 
     /**
      * Returns the image cache backing this image loader.
-     * 
+     *
      * @return the {@link ImageCache}
      */
     public static ImageCache getImageCache() {
@@ -253,6 +260,37 @@ public class ImageLoader implements Runnable {
 
     }
 
+    /**
+     * Decoding bytes into bitmap
+     *
+     * @param bytes
+     * @return
+     */
+    private Bitmap decodeByte(byte[] bytes) {
+        Bitmap b = null;
+        try {
+            //Decode image size
+            BitmapFactory.Options o = new BitmapFactory.Options();
+            o.inJustDecodeBounds = true;
+
+            BitmapFactory.decodeByteArray(bytes, 0, bytes.length, o);
+
+            int scale = 1;
+            if (o.outHeight > DEFAULT_IMAGE_MAX_SIZE || o.outWidth > DEFAULT_IMAGE_MAX_SIZE) {
+                scale = (int) Math.pow(2, (int) Math.round(Math.log(DEFAULT_IMAGE_MAX_SIZE / (double) Math.max(o.outHeight, o.outWidth)) / Math.log(0.5)));
+            }
+
+            //Decode with inSampleSize
+            BitmapFactory.Options o2 = new BitmapFactory.Options();
+            o2.inSampleSize = scale;
+            b = BitmapFactory.decodeByteArray(bytes, 0, bytes.length, o2);
+        } catch (Exception e) {
+            Log.e("ImageLoader", "Can't decode bytes into a bitmap", e);
+        }
+
+        return b;
+    }
+
     // TODO: we could probably improve performance by re-using connections instead of closing them
     // after each and every download
     protected Bitmap downloadImage() {
@@ -268,12 +306,24 @@ public class ImageLoader implements Runnable {
                     break;
                 }
 
-                return BitmapFactory.decodeByteArray(imageData, 0, imageData.length);
+                // Option 1
+                //return decodeByte(imageData);
+                // end option 1
 
+				// Option 2
+				//BitmapFactory.Options options = new BitmapFactory.Options();
+                //options.inSampleSize = scale;
+                //return BitmapFactory.decodeByteArray(imageData, 0, imageData.length, options);
+				// end option 2
+
+                return BitmapFactory.decodeByteArray(imageData, 0, imageData.length);
             } catch (Throwable e) {
                 Log.w(LOG_TAG, "download for " + imageUrl + " failed (attempt " + timesTried + ")");
                 e.printStackTrace();
-                SystemClock.sleep(DEFAULT_RETRY_HANDLER_SLEEP_TIME);
+                if(numRetries > 1) {
+                    SystemClock.sleep(DEFAULT_RETRY_HANDLER_SLEEP_TIME);
+				}
+				
                 timesTried++;
             }
         }

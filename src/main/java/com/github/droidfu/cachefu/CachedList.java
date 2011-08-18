@@ -23,7 +23,12 @@ import android.os.Parcelable;
  *            Type of cached models to be stored in list
  */
 public class CachedList<CO extends CachedModel> extends CachedModel {
-
+    
+    @SuppressWarnings("unchecked")
+    public static <T extends CachedModel> Class<CachedList<T>> getGenericClass() {
+            return (Class<CachedList<T>>)(Class<?>)CachedList.class;
+    }
+    
     /**
      * Class type of object list
      */

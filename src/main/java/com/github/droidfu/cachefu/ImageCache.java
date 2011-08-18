@@ -15,15 +15,15 @@
 
 package com.github.droidfu.cachefu;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-
+import android.app.ActivityManager;
+import android.app.ActivityManager.MemoryInfo;
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.Environment;
+import android.os.StatFs;
+
+import java.io.*;
 
 /**
  * Implements a cache capable of caching image files. It exposes helper methods to immediately
@@ -33,6 +33,12 @@ import android.graphics.BitmapFactory;
  * 
  */
 public class ImageCache extends AbstractCache<String, byte[]> {
+
+    private MemoryInfo mi;
+    private ActivityManager activityManager;
+    private File path;
+    private StatFs stat;
+    private Context mContext;
 
     public ImageCache(int initialCapacity, long expirationInMinutes, int maxConcurrentThreads) {
         super("ImageCache", initialCapacity, expirationInMinutes, maxConcurrentThreads);
@@ -74,10 +80,66 @@ public class ImageCache extends AbstractCache<String, byte[]> {
 
     @Override
     protected void writeValueToDisk(File file, byte[] imageData) throws IOException {
-        BufferedOutputStream ostream = new BufferedOutputStream(new FileOutputStream(file));
+        switch(getDiskCacheStatus()){
+            case DISK_CACHE_INTERNAL:
 
-        ostream.write(imageData);
+                activityManager.getMemoryInfo(mi);
 
-        ostream.close();
+                if(mi.availMem > imageData.length){
+                    BufferedOutputStream ostream = new BufferedOutputStream(new FileOutputStream(file));
+                    ostream.write(imageData);
+
+                    ostream.close();
+                } else{
+                    enableDiskCache(mContext, DISK_CACHE_SDCARD);
+                }
+
+                break;
+
+            case DISK_CACHE_SDCARD:
+
+                 long blockSize = stat.getBlockSize();
+                 long availableBlocks = stat.getAvailableBlocks();
+                 Long mFreenSD = (availableBlocks * blockSize);
+
+                if(mFreenSD > imageData.length){
+                    BufferedOutputStream ostream = new BufferedOutputStream(new FileOutputStream(file));
+                    ostream.write(imageData);
+
+                    ostream.close();
+                } else{
+                    enableDiskCache(mContext, DISK_CACHE_INTERNAL);
+                }
+
+                break;
+        }
+
+
+    }
+
+    @Override
+    /**
+     * Enable caching to the phone's internal storage or SD card.
+     *
+     * @param context
+     *            the current context
+     * @param storageDevice
+     *            where to store the cached files, either {@link #DISK_CACHE_INTERNAL} or
+     *            {@link #DISK_CACHE_SDCARD})
+     * @return
+     */
+    public boolean enableDiskCache(Context context, int storageDevice) {
+
+        mContext = context;
+
+        mi = new MemoryInfo();
+        activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+        activityManager.getMemoryInfo(mi);
+
+        path = Environment.getExternalStorageDirectory();
+        stat = new StatFs(path.getPath());
+
+
+        return super.enableDiskCache(context, storageDevice);
     }
 }
