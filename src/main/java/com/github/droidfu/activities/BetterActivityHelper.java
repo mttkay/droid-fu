@@ -245,8 +245,9 @@ public class BetterActivityHelper {
         builder.setSingleChoiceItems(entries, selectedItem, new DialogInterface.OnClickListener() {
 
             public void onClick(DialogInterface dialog, int which) {
-                if (closeOnSelect)
+                if (closeOnSelect) {
                     dialog.dismiss();
+                }
                 listener.onClick(which, elements.get(which));
             }
         });
