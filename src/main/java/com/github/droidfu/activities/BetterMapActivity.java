@@ -33,10 +33,6 @@ public class BetterMapActivity extends MapActivity implements BetterActivity {
     private Intent currentIntent;
     
     private MyLocationOverlay myLocationOverlay;
-    
-    private GestureDetector tapDetector;
-
-    private OnTouchListener tapListener;
 
     private MapView mapView;
     
