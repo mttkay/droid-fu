@@ -15,12 +15,26 @@
 
 package com.github.droidfu.imageloader;
 
-import java.io.BufferedInputStream;
 import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
+
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpVersion;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.conn.params.ConnManagerParams;
+import org.apache.http.conn.params.ConnPerRouteBean;
+import org.apache.http.conn.scheme.PlainSocketFactory;
+import org.apache.http.conn.scheme.Scheme;
+import org.apache.http.conn.scheme.SchemeRegistry;
+import org.apache.http.conn.ssl.SSLSocketFactory;
+import org.apache.http.impl.client.AbstractHttpClient;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
+import org.apache.http.params.BasicHttpParams;
+import org.apache.http.params.HttpConnectionParams;
+import org.apache.http.params.HttpProtocolParams;
+import org.apache.http.util.EntityUtils;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -34,6 +48,8 @@ import android.widget.ImageView;
 
 import com.github.droidfu.adapters.WebGalleryAdapter;
 import com.github.droidfu.cachefu.ImageCache;
+import com.github.droidfu.http.ssl.EasySSLSocketFactory;
+import com.github.droidfu.support.DiagnosticSupport;
 import com.github.droidfu.widgets.WebImageView;
 
 /**
@@ -64,7 +80,9 @@ public class ImageLoader implements Runnable {
     private static int numRetries = DEFAULT_NUM_RETRIES;
 
     private static long expirationInMinutes = DEFAULT_TTL_MINUTES;
-    
+
+    private static AbstractHttpClient httpClient;
+
     /**
      * @param numThreads
      *            the maximum number of threads that will be started to download images in parallel
@@ -99,14 +117,16 @@ public class ImageLoader implements Runnable {
             imageCache = new ImageCache(25, expirationInMinutes, DEFAULT_POOL_SIZE);
             imageCache.enableDiskCache(context, ImageCache.DISK_CACHE_SDCARD);
         }
+        if (httpClient == null) {
+            setupHttpClient();
+        }
     }
 
     public static synchronized void initialize(Context context, long expirationInMinutes) {
-    	ImageLoader.expirationInMinutes = expirationInMinutes;
-    	initialize(context);
+        ImageLoader.expirationInMinutes = expirationInMinutes;
+        initialize(context);
     }
 
-    
     private String imageUrl;
 
     private ImageLoaderHandler handler;
@@ -114,6 +134,32 @@ public class ImageLoader implements Runnable {
     private ImageLoader(String imageUrl, ImageLoaderHandler handler) {
         this.imageUrl = imageUrl;
         this.handler = handler;
+    }
+
+    private static void setupHttpClient() {
+        BasicHttpParams httpParams = new BasicHttpParams();
+
+        ConnManagerParams.setTimeout(httpParams, 4000);
+        ConnManagerParams.setMaxConnectionsPerRoute(httpParams, new ConnPerRouteBean(10));
+        ConnManagerParams.setMaxTotalConnections(httpParams, 10);
+        HttpConnectionParams.setSoTimeout(httpParams, 4000);
+        HttpConnectionParams.setTcpNoDelay(httpParams, true);
+        HttpProtocolParams.setVersion(httpParams, HttpVersion.HTTP_1_1);
+        HttpProtocolParams.setUserAgent(httpParams, "Droid-Fu/ImageLoader/VF");
+
+        SchemeRegistry schemeRegistry = new SchemeRegistry();
+        schemeRegistry.register(new Scheme("http", PlainSocketFactory.getSocketFactory(), 80));
+        if (DiagnosticSupport.ANDROID_API_LEVEL >= 7) {
+            schemeRegistry.register(new Scheme("https", SSLSocketFactory.getSocketFactory(), 443));
+        } else {
+            // used to work around a bug in Android 1.6:
+            // http://code.google.com/p/android/issues/detail?id=1946
+            // TODO: is there a less rigorous workaround for this?
+            schemeRegistry.register(new Scheme("https", new EasySSLSocketFactory(), 443));
+        }
+
+        ThreadSafeClientConnManager cm = new ThreadSafeClientConnManager(httpParams, schemeRegistry);
+        httpClient = new DefaultHttpClient(cm, httpParams);
     }
 
     /**
@@ -147,8 +193,7 @@ public class ImageLoader implements Runnable {
      */
     public static void start(String imageUrl, ImageView imageView, Drawable dummyDrawable,
             Drawable errorDrawable) {
-        start(imageUrl, imageView, new ImageLoaderHandler(imageView, imageUrl,
- errorDrawable),
+        start(imageUrl, imageView, new ImageLoaderHandler(imageView, imageUrl, errorDrawable),
                 dummyDrawable, errorDrawable);
     }
 
@@ -282,31 +327,11 @@ public class ImageLoader implements Runnable {
     }
 
     protected byte[] retrieveImageData() throws IOException {
-        URL url = new URL(imageUrl);
-        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        HttpGet request = new HttpGet(imageUrl);
 
-        // determine the image size and allocate a buffer
-        int fileSize = connection.getContentLength();
-        if (fileSize < 0) {
-            return null;
-        }
-        byte[] imageData = new byte[fileSize];
+        HttpResponse response = httpClient.execute(request);
 
-        // download the file
-        Log.d(LOG_TAG, "fetching image " + imageUrl + " (" + fileSize + ")");
-        BufferedInputStream istream = new BufferedInputStream(connection.getInputStream());
-        int bytesRead = 0;
-        int offset = 0;
-        while (bytesRead != -1 && offset < fileSize) {
-            bytesRead = istream.read(imageData, offset, fileSize - offset);
-            offset += bytesRead;
-        }
-
-        // clean up
-        istream.close();
-        connection.disconnect();
-
-        return imageData;
+        return EntityUtils.toByteArray(response.getEntity());
     }
 
     public void notifyImageLoaded(String url, Bitmap bitmap) {
