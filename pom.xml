@@ -39,8 +39,8 @@
   </issueManagement>
 
   <properties>
-    <androidVersion>2.3.1</androidVersion>
-    <androidApiLevel>9</androidApiLevel>
+    <androidVersion>2.3.3</androidVersion>
+    <androidApiLevel>10</androidApiLevel>
     <androidApiRevision>_r2</androidApiRevision>
 
     <powermock.version>1.3.8</powermock.version>
