@@ -35,4 +35,12 @@ public class CachedHttpRequest implements BetterHttpRequest {
     public BetterHttpRequest withTimeout(int timeout) {
         return this;
     }
+
+    public BetterHttpRequest addHeader(String option, String value) {
+        return this;
+    }
+
+    public BetterHttpRequest removeHeader(String option) {
+        return this;
+    }
 }

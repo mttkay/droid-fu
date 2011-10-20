@@ -154,4 +154,35 @@ public abstract class BetterHttpRequestBase implements BetterHttpRequest,
         }
         return bhttpr;
     }
+    
+    public BetterHttpRequest addHeader(String option, String value) {
+        if(request != null)
+        {
+            if(!request.containsHeader(option))
+            {
+                request.addHeader(option, value);
+            }
+            else
+            {
+                request.setHeader(option, value);
+            }
+        }
+        else
+        {
+            Log.e(BetterHttp.LOG_TAG, "Could not add header "+option+" because request was null.");
+        }
+        return this;
+    }
+    
+    public BetterHttpRequest removeHeader(String option) {
+        if(request != null && request.containsHeader(option))
+        {
+            request.removeHeaders(option);
+        }
+        else
+        {
+            Log.e(BetterHttp.LOG_TAG, "Could not add header "+option+" because request was null.");
+        }
+        return this;
+    }
 }
