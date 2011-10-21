@@ -34,7 +34,7 @@ import com.github.droidfu.imageloader.ImageLoaderHandler;
 /**
  * An image view that fetches its image off the web using the supplied URL. While the image is being
  * downloaded, a progress indicator will be shown.
- * 
+ *
  * @author Matthias Kaeppler
  */
 public class WebImageView extends ViewSwitcher {
@@ -200,7 +200,7 @@ public class WebImageView extends ViewSwitcher {
     /**
      * Often you have resources which usually have an image, but some don't. For these cases, use
      * this method to supply a placeholder drawable which will be loaded instead of a web image.
-     * 
+     *
      * @param imageResourceId
      *            the resource of the placeholder image drawable
      */

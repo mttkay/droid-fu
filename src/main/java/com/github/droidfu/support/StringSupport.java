@@ -10,7 +10,7 @@ public class StringSupport {
     /**
      * Turns a camel case string into an underscored one, e.g. "HelloWorld"
      * becomes "hello_world".
-     * 
+     *
      * @param camelCaseString
      *        the string to underscore
      * @return the underscored string
@@ -30,7 +30,7 @@ public class StringSupport {
      * token of type <code>Character.LOWERCASE_LETTER</code> will belong to the
      * following token rather than to the preceding, if any,
      * <code>Character.UPPERCASE_LETTER</code> token.
-     * 
+     *
      * <pre>
      * StringUtils.splitByCharacterTypeCamelCase(null)         = null
      * StringUtils.splitByCharacterTypeCamelCase("")           = []
@@ -42,7 +42,7 @@ public class StringSupport {
      * StringUtils.splitByCharacterTypeCamelCase("foo200Bar")  = ["foo", "200", "Bar"]
      * StringUtils.splitByCharacterTypeCamelCase("ASFRules")   = ["ASF", "Rules"]
      * </pre>
-     * 
+     *
      * @param str
      *        the String to split, may be <code>null</code>
      * @return an array of parsed Strings, <code>null</code> if null String
@@ -64,7 +64,7 @@ public class StringSupport {
      * <code>Character.LOWERCASE_LETTER</code> will belong to the following
      * token rather than to the preceding, if any,
      * <code>Character.UPPERCASE_LETTER</code> token.
-     * 
+     *
      * @param str
      *        the String to split, may be <code>null</code>
      * @param camelCase

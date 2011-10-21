@@ -34,7 +34,7 @@ public class IntentSupport {
     /**
      * Checks whether there are applications installed which are able to handle the given
      * action/data.
-     * 
+     *
      * @param context
      *            the current context
      * @param action
@@ -58,7 +58,7 @@ public class IntentSupport {
     /**
      * Checks whether there are applications installed which are able to handle the given
      * action/type.
-     * 
+     *
      * @param context
      *            the current context
      * @param action
@@ -79,7 +79,7 @@ public class IntentSupport {
 
     /**
      * Checks whether there are applications installed which are able to handle the given intent.
-     * 
+     *
      * @param context
      *            the current context
      * @param intent
@@ -129,7 +129,7 @@ public class IntentSupport {
     /**
      * Creates an intent which when fired, will launch the camera to take a picture that's saved to
      * a temporary file so you can use it directly without going through the gallery.
-     * 
+     *
      * @param tempFile
      *            the file that should be used to temporarily store the picture
      * @return the intent
@@ -143,7 +143,7 @@ public class IntentSupport {
     /**
      * Creates an intent which when fired, will launch the phone's picture gallery to select a
      * picture from it.
-     * 
+     *
      * @return the intent
      */
     public static Intent newSelectPictureIntent() {
@@ -156,7 +156,7 @@ public class IntentSupport {
      * Creates an intent that will open the phone app and enter the given number. Unlike
      * {@link #newCallNumberIntent(String)}, this does not actually dispatch the call, so it gives
      * the user a chance to review and edit the number.
-     * 
+     *
      * @param phoneNumber
      *            the number to dial
      * @return the intent
@@ -169,7 +169,7 @@ public class IntentSupport {
      * Creates an intent that will immediately dispatch a call to the given number. NOTE that unlike
      * {@link #newDialNumberIntent(String)}, this intent requires the
      * {@link android.Manifest.permission#CALL_PHONE} permission to be set.
-     * 
+     *
      * @param phoneNumber
      *            the number to call
      * @return the intent

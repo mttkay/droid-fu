@@ -13,9 +13,9 @@ import com.github.droidfu.http.CachedHttpResponse.ResponseData;
  * Allows caching HTTP responses (only status code and payload at the moment) using the features
  * provided by {@link AbstractCache}. The key into the cache will be the request URL used to
  * retrieve the HTTP response in the first place.
- * 
+ *
  * @author Matthias Kaeppler
- * 
+ *
  */
 public class HttpResponseCache extends AbstractCache<String, ResponseData> {
 

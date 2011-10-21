@@ -65,7 +65,7 @@ import com.google.common.base.Function;
  * <p>
  * For example, the following strategy emulates the behavior of
  * {@link java.util.concurrent.ConcurrentHashMap}:
- * 
+ *
  * <pre>
  * &#064;code
  * class ConcurrentHashMapStrategy&lt;K, V&gt;
@@ -108,17 +108,17 @@ import com.google.common.base.Function;
  * }
  * }
  * </pre>
- * 
+ *
  * To create a {@link java.util.concurrent.ConcurrentMap} using the strategy
  * above:
- * 
+ *
  * <pre>
  * &#064;code
  *   ConcurrentMap&lt;K, V&gt; map = new CustomConcurrentHashMap.Builder()
  *       .build(new ConcurrentHashMapStrategy&lt;K, V&gt;());
  * }
  * </pre>
- * 
+ *
  * @author Bob Lee
  * @author Doug Lea
  */
@@ -146,7 +146,7 @@ final class CustomConcurrentHashMap {
          * other kind of hash table is a relatively slow operation, so, when
          * possible, it is a good idea to provide estimates of expected table
          * sizes.
-         * 
+         *
          * @throws IllegalArgumentException
          *         if initialCapacity < 0
          */
@@ -175,7 +175,7 @@ final class CustomConcurrentHashMap {
          * magnitude do not usually have much noticeable impact. A value of one
          * is appropriate when it is known that only one thread will modify and
          * all others will only read. Defaults to {@literal 16}.
-         * 
+         *
          * @throws IllegalArgumentException
          *         if concurrencyLevel < 0
          */
@@ -193,7 +193,7 @@ final class CustomConcurrentHashMap {
 
         /**
          * Creates a new concurrent hash map backed by the given strategy.
-         * 
+         *
          * @param strategy
          *        used to implement and manipulate the entries
          * @param <K>
@@ -239,7 +239,7 @@ final class CustomConcurrentHashMap {
          * of a type other than {@code K} can result in that object being
          * unsafely passed to the computer function as type {@code K} not to
          * mention the unsafe key being stored in the map.
-         * 
+         *
          * @param strategy
          *        used to implement and manipulate the entries
          * @param computer
@@ -295,7 +295,7 @@ final class CustomConcurrentHashMap {
      * example. Strategy implementations should proactively remove partially
      * reclaimed entries so that {@link Map#isEmpty} and {@link Map#size()}
      * return up-to-date results.
-     * 
+     *
      * @param <K>
      *        the type of keys to be stored in the returned map
      * @param <V>
@@ -313,7 +313,7 @@ final class CustomConcurrentHashMap {
          * whether next is null or not. For example, if next is null (as will
          * often be the case), this factory might use an entry class that
          * doesn't waste memory on an unnecessary field.
-         * 
+         *
          * @param key
          *        for this entry
          * @param hash
@@ -331,7 +331,7 @@ final class CustomConcurrentHashMap {
          * {@code original} to the returned entry. For example,
          * CustomConcurrentHashMap might use this method when removing other
          * entries or expanding the internal table.
-         * 
+         *
          * @param key
          *        for {@code original} as well as the returned entry. Explicitly
          *        provided here to prevent reclamation of the key at an
@@ -348,7 +348,7 @@ final class CustomConcurrentHashMap {
         /**
          * Sets the value of an entry using volatile semantics. Values are set
          * synchronously on a per-entry basis.
-         * 
+         *
          * @param entry
          *        to set the value on
          * @param value
@@ -358,7 +358,7 @@ final class CustomConcurrentHashMap {
 
         /**
          * Gets the value of an entry using volatile semantics.
-         * 
+         *
          * @param entry
          *        to get the value from
          */
@@ -367,7 +367,7 @@ final class CustomConcurrentHashMap {
         /**
          * Returns true if the two given keys are equal, false otherwise.
          * Neither key will be null.
-         * 
+         *
          * @param a
          *        key from inside the map
          * @param b
@@ -379,7 +379,7 @@ final class CustomConcurrentHashMap {
         /**
          * Returns true if the two given values are equal, false otherwise.
          * Neither value will be null.
-         * 
+         *
          * @param a
          *        value from inside the map
          * @param b
@@ -390,7 +390,7 @@ final class CustomConcurrentHashMap {
 
         /**
          * Returns a hash code for the given key.
-         * 
+         *
          * @see Object#hashCode the same contractual obligations apply here
          */
         int hashKey(Object key);
@@ -398,7 +398,7 @@ final class CustomConcurrentHashMap {
         /**
          * Gets the key for the given entry. This may return null (for example,
          * if the key was reclaimed by the garbage collector).
-         * 
+         *
          * @param entry
          *        to get key from
          * @return key from the given entry
@@ -409,7 +409,7 @@ final class CustomConcurrentHashMap {
          * Gets the next entry relative to the given entry, the exact same entry
          * that was provided to {@link Strategy#newEntry} when the given entry
          * was created.
-         * 
+         *
          * @return the next entry or null if null was passed to
          *         {@link Strategy#newEntry}
          */
@@ -434,7 +434,7 @@ final class CustomConcurrentHashMap {
          * entries to this strategy. Invoked once when the map is created.
          * Strategies that don't need access to the map's internal entries can
          * simply ignore the argument.
-         * 
+         *
          * @param internals
          *        of the map, enables direct interaction with the internal
          *        entries
@@ -456,7 +456,7 @@ final class CustomConcurrentHashMap {
         /**
          * Returns the internal entry corresponding to the given key from the
          * map.
-         * 
+         *
          * @param key
          *        to retrieve entry for
          * @throws NullPointerException
@@ -467,7 +467,7 @@ final class CustomConcurrentHashMap {
         /**
          * Removes the given entry from the map if the value of the entry in the
          * map matches the given value.
-         * 
+         *
          * @param entry
          *        to remove
          * @param value
@@ -479,7 +479,7 @@ final class CustomConcurrentHashMap {
 
         /**
          * Removes the given entry from the map.
-         * 
+         *
          * @param entry
          *        to remove
          * @throws NullPointerException
@@ -499,7 +499,7 @@ final class CustomConcurrentHashMap {
      * Implementations can throw {@link UnsupportedOperationException} in
      * {@link #setValue(Object, Object)} if they wish to prevent users from
      * setting values directly.
-     * 
+     *
      * @see Builder#buildComputingMap(CustomConcurrentHashMap.ComputingStrategy,
      *      Function)
      */
@@ -510,7 +510,7 @@ final class CustomConcurrentHashMap {
          * Called as a result of {@link Map#get}. If this method throws an
          * exception, CustomConcurrentHashMap will remove the entry and retry
          * the computation on subsequent requests.
-         * 
+         *
          * @param entry
          *        that was created
          * @param computer
@@ -528,7 +528,7 @@ final class CustomConcurrentHashMap {
          * {@link #compute} if necessary. Returns null if a value isn't
          * available at which point CustomConcurrentHashMap tries to compute a
          * new value.
-         * 
+         *
          * @param entry
          *        to return value from
          * @return stored value or null if the value isn't available
@@ -543,7 +543,7 @@ final class CustomConcurrentHashMap {
      * against poor quality hash functions. This is critical when the concurrent
      * hash map uses power-of-two length hash tables, that otherwise encounter
      * collisions for hash codes that do not differ in lower or upper bits.
-     * 
+     *
      * @param h
      *        hash code
      */
@@ -706,7 +706,7 @@ final class CustomConcurrentHashMap {
 
         /**
          * Returns the segment that should be used for key with given hash
-         * 
+         *
          * @param hash
          *        the hash code for the key
          * @return the segment
@@ -1243,7 +1243,7 @@ final class CustomConcurrentHashMap {
 
         /**
          * Returns {@code true} if this map contains no key-value mappings.
-         * 
+         *
          * @return {@code true} if this map contains no key-value mappings
          */
         @Override
@@ -1283,7 +1283,7 @@ final class CustomConcurrentHashMap {
          * Returns the number of key-value mappings in this map. If the map
          * contains more than {@code Integer.MAX_VALUE} elements, returns
          * {@code Integer.MAX_VALUE}.
-         * 
+         *
          * @return the number of key-value mappings in this map
          */
         @Override
@@ -1342,7 +1342,7 @@ final class CustomConcurrentHashMap {
          * a value {@code v} such that {@code key.equals(k)}, then this method
          * returns {@code v}; otherwise it returns {@code null}. (There can be
          * at most one such mapping.)
-         * 
+         *
          * @throws NullPointerException
          *         if the specified key is null
          */
@@ -1357,7 +1357,7 @@ final class CustomConcurrentHashMap {
 
         /**
          * Tests if the specified object is a key in this table.
-         * 
+         *
          * @param key
          *        possible key
          * @return {@code true} if and only if the specified object is a key in
@@ -1380,7 +1380,7 @@ final class CustomConcurrentHashMap {
          * specified value. Note: This method requires a full internal traversal
          * of the hash table, and so is much slower than method {@code
          * containsKey}.
-         * 
+         *
          * @param value
          *        value whose presence in this map is to be tested
          * @return {@code true} if this map maps one or more keys to the
@@ -1451,7 +1451,7 @@ final class CustomConcurrentHashMap {
          * <p>
          * The value can be retrieved by calling the {@code get} method with a
          * key that is equal to the original key.
-         * 
+         *
          * @param key
          *        key with which the specified value is to be associated
          * @param value
@@ -1475,7 +1475,7 @@ final class CustomConcurrentHashMap {
 
         /**
          * {@inheritDoc}
-         * 
+         *
          * @return the previous value associated with the specified key, or
          *         {@code null} if there was no mapping for the key
          * @throws NullPointerException
@@ -1496,7 +1496,7 @@ final class CustomConcurrentHashMap {
          * Copies all of the mappings from the specified map to this one. These
          * mappings replace any mappings that this map had for any of the keys
          * currently in the specified map.
-         * 
+         *
          * @param m
          *        mappings to be stored in this map
          */
@@ -1510,7 +1510,7 @@ final class CustomConcurrentHashMap {
         /**
          * Removes the key (and its corresponding value) from this map. This
          * method does nothing if the key is not in the map.
-         * 
+         *
          * @param key
          *        the key that needs to be removed
          * @return the previous value associated with {@code key}, or {@code
@@ -1529,7 +1529,7 @@ final class CustomConcurrentHashMap {
 
         /**
          * {@inheritDoc}
-         * 
+         *
          * @throws NullPointerException
          *         if the specified key is null
          */
@@ -1543,7 +1543,7 @@ final class CustomConcurrentHashMap {
 
         /**
          * {@inheritDoc}
-         * 
+         *
          * @throws NullPointerException
          *         if any of the arguments are null
          */
@@ -1563,7 +1563,7 @@ final class CustomConcurrentHashMap {
 
         /**
          * {@inheritDoc}
-         * 
+         *
          * @return the previous value associated with the specified key, or
          *         {@code null} if there was no mapping for the key
          * @throws NullPointerException
@@ -2155,7 +2155,7 @@ final class CustomConcurrentHashMap {
      * {@link SimpleInternalEntry}. Intended to be subclassed to provide
      * customized behavior. For example, the following creates a map that uses
      * byte arrays as keys:
-     * 
+     *
      * <pre>
      * &#064;code
      *   return new CustomConcurrentHashMap.Builder().buildMap(
@@ -2168,7 +2168,7 @@ final class CustomConcurrentHashMap {
      *         }
      *       });}
      * </pre>
-     * 
+     *
      * With nothing overridden, it yields map behavior equivalent to that of
      * {@link ConcurrentHashMap}.
      */

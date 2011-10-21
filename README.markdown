@@ -44,7 +44,7 @@ You only need to perform this step when Google releases a new platform version o
 Update your SDK files to the latest version like so:
 
     $ android update sdk --no-ui
-    
+
 It's important that you repeat this command until you see the message "There is nothing to install or update." That's because the tools update themselves,
 so it may take several iterations of this command until everything is fully updated.
 

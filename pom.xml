@@ -6,7 +6,7 @@
   <version>1.0-SNAPSHOT</version>
   <description>A utility library for your daily Android needs.</description>
   <url>http://github.com/kaeppler/droid-fu</url>
-  
+
   <developers>
     <developer>
       <id>mk</id>
@@ -50,13 +50,13 @@
 
   <!-- build settings -->
   <packaging>jar</packaging>
-  
+
   <build>
-  
+
     <defaultGoal>package</defaultGoal>
-    
+
     <plugins>
-    
+
       <!-- compiler settings -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -66,7 +66,7 @@
           <target>1.5</target>
         </configuration>
       </plugin>
-      
+
       <!-- jar builder settings -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -77,12 +77,12 @@
               <exclude>**/*.apk</exclude>
               <exclude>**/*.dex</exclude>
               <exclude>**/*.ap_</exclude>
-          </excludes>        
+          </excludes>
         </configuration>
       </plugin>
-      
+
       <!-- we always wanna have a nice up-to-date JavaDoc JAR -->
-      <!-- 
+      <!--
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
@@ -106,7 +106,7 @@
           <tagBase>http://github.com/kaeppler/droid-fu/tree</tagBase>
         </configuration>
       </plugin>
-      
+
       <plugin>
         <groupId>com.jayway.maven.plugins.android.generation2</groupId>
         <artifactId>maven-android-plugin</artifactId>
@@ -121,10 +121,10 @@
         </configuration>
         <extensions>true</extensions>
       </plugin>
-            
+
     </plugins>
   </build>
-  
+
   <dependencies>
     <dependency>
       <groupId>com.google.android</groupId>
@@ -132,7 +132,7 @@
       <version>${androidVersion}</version>
       <scope>provided</scope>
     </dependency>
-    
+
     <dependency>
       <groupId>com.google.android.maps</groupId>
       <artifactId>maps</artifactId>
@@ -146,23 +146,23 @@
       <version>2.2.1</version>
       <scope>provided</scope>
     </dependency>
-  
-     
+
+
     <dependency>
       <groupId>org.powermock.modules</groupId>
       <artifactId>powermock-module-junit4</artifactId>
       <version>${powermock.version}</version>
       <scope>test</scope>
     </dependency>
-    
+
     <dependency>
       <groupId>org.powermock.api</groupId>
       <artifactId>powermock-api-mockito</artifactId>
       <version>${powermock.version}</version>
       <scope>test</scope>
-    </dependency>    
-    
-  </dependencies>  
+    </dependency>
+
+  </dependencies>
 
   <!-- external repositories -->
   <repositories>
@@ -175,7 +175,7 @@
   <distributionManagement>
     <downloadUrl>http://github.com/kaeppler/droid-fu/downloads</downloadUrl>
   </distributionManagement>
-   
+
   <profiles>
     <profile>
       <id>copy-jar</id>
@@ -201,11 +201,11 @@
                 </configuration>
               </execution>
             </executions>
-          </plugin>        
+          </plugin>
         </plugins>
       </build>
     </profile>
-  
+
     <!-- Sonatype requires releases to be signed before being pushed to central -->
     <profile>
       <id>release-sign-artifacts</id>

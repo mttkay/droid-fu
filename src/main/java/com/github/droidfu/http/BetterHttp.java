@@ -94,7 +94,7 @@ public class BetterHttp {
      * Enables caching of HTTP responses. This will only enable the in-memory cache. If you also
      * want to enable the disk cache, see {@link #enableResponseCache(Context, int, long, int, int)}
      * .
-     * 
+     *
      * @param initialCapacity
      *            the initial element size of the cache
      * @param expirationInMinutes
@@ -123,7 +123,7 @@ public class BetterHttp {
 
     /**
      * Enables caching of HTTP responses. This will also enable the disk cache.
-     * 
+     *
      * @param context
      *            the current context
      * @param initialCapacity
@@ -232,7 +232,7 @@ public class BetterHttp {
     /**
      * Adjust the socket timeout, i.e. the amount of time that may pass when waiting for a server
      * response. Time unit is milliseconds.
-     * 
+     *
      * @param socketTimeout
      *            the timeout in milliseconds
      */

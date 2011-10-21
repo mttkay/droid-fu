@@ -50,7 +50,7 @@ import com.google.common.collect.MapMaker;
  * Pushes to the cache are always write-through (i.e. the data will be stored both on disk, if disk
  * caching is enabled, and in memory).
  * </p>
- * 
+ *
  * @author Matthias Kaeppler
  */
 public abstract class AbstractCache<KeyT, ValT> implements Map<KeyT, ValT> {
@@ -67,12 +67,12 @@ public abstract class AbstractCache<KeyT, ValT> implements Map<KeyT, ValT> {
     private ConcurrentMap<KeyT, ValT> cache;
 
     private String name;
-    
+
     private long expirationInMinutes;
 
     /**
      * Creates a new cache instance.
-     * 
+     *
      * @param name
      *            a human readable identifier for this cache. Note that this value will be used to
      *            derive a directory name if the disk cache is enabled, so don't get too creative
@@ -90,7 +90,7 @@ public abstract class AbstractCache<KeyT, ValT> implements Map<KeyT, ValT> {
 
         this.name = name;
         this.expirationInMinutes = expirationInMinutes;
-                
+
         MapMaker mapMaker = new MapMaker();
         mapMaker.initialCapacity(initialCapacity);
         mapMaker.expiration(expirationInMinutes * 60, TimeUnit.SECONDS);
@@ -112,7 +112,7 @@ public abstract class AbstractCache<KeyT, ValT> implements Map<KeyT, ValT> {
         	long lastModified = f.lastModified();
         	Date now = new Date();
         	long ageInMinutes = ((now.getTime() - lastModified) / (1000*60));
-        	
+
         	if (ageInMinutes >= expirationInMinutes) {
         		Log.d(name, "DISK cache expiration for file " + f.toString());
         		f.delete();
@@ -122,7 +122,7 @@ public abstract class AbstractCache<KeyT, ValT> implements Map<KeyT, ValT> {
 
 	/**
      * Enable caching to the phone's internal storage or SD card.
-     * 
+     *
      * @param context
      *            the current context
      * @param storageDevice
@@ -182,7 +182,7 @@ public abstract class AbstractCache<KeyT, ValT> implements Map<KeyT, ValT> {
 
     /**
      * Only meaningful if disk caching is enabled. See {@link #enableDiskCache}.
-     * 
+     *
      * @return the full absolute path to the directory where files are cached, if the disk cache is
      *         enabled, otherwise null
      */
@@ -194,7 +194,7 @@ public abstract class AbstractCache<KeyT, ValT> implements Map<KeyT, ValT> {
      * Only meaningful if disk caching is enabled. See {@link #enableDiskCache}. Turns a cache key
      * into the file name that will be used to persist the value to disk. Subclasses must implement
      * this.
-     * 
+     *
      * @param key
      *            the cache key
      * @return the file name
@@ -204,7 +204,7 @@ public abstract class AbstractCache<KeyT, ValT> implements Map<KeyT, ValT> {
     /**
      * Only meaningful if disk caching is enabled. See {@link #enableDiskCache}. Restores a value
      * previously persisted to the disk cache.
-     * 
+     *
      * @param file
      *            the file holding the cached value
      * @return the cached value
@@ -215,7 +215,7 @@ public abstract class AbstractCache<KeyT, ValT> implements Map<KeyT, ValT> {
     /**
      * Only meaningful if disk caching is enabled. See {@link #enableDiskCache}. Persists a value to
      * the disk cache.
-     * 
+     *
      * @param ostream
      *            the file output stream (buffered).
      * @param value
@@ -246,7 +246,7 @@ public abstract class AbstractCache<KeyT, ValT> implements Map<KeyT, ValT> {
     /**
      * Reads a value from the cache by probing the in-memory cache, and if enabled and the in-memory
      * probe was a miss, the disk cache.
-     * 
+     *
      * @param elementKey
      *            the cache key
      * @return the cached value, or null if element was not cached
@@ -268,13 +268,13 @@ public abstract class AbstractCache<KeyT, ValT> implements Map<KeyT, ValT> {
         	long lastModified = file.lastModified();
         	Date now = new Date();
         	long ageInMinutes = ((now.getTime() - lastModified) / (1000*60));
-        	
+
         	if (ageInMinutes >= expirationInMinutes) {
         		Log.d(name, "DISK cache expiration for file " + file.toString());
         		file.delete();
         		return null;
         	}
-        	
+
         	// disk hit
             Log.d(name, "DISK cache hit for " + key.toString());
             try {
@@ -314,7 +314,7 @@ public abstract class AbstractCache<KeyT, ValT> implements Map<KeyT, ValT> {
     /**
      * Checks if a value is present in the cache. If the disk cached is enabled, this will also
      * check whether the value has been persisted to disk.
-     * 
+     *
      * @param key
      *            the cache key
      * @return true if the value is cached in memory or on disk, false otherwise
@@ -326,7 +326,7 @@ public abstract class AbstractCache<KeyT, ValT> implements Map<KeyT, ValT> {
 
     /**
      * Checks if a value is present in the in-memory cache. This method ignores the disk cache.
-     * 
+     *
      * @param key
      *            the cache key
      * @return true if the value is currently hold in memory, false otherwise
@@ -382,7 +382,7 @@ public abstract class AbstractCache<KeyT, ValT> implements Map<KeyT, ValT> {
     }
 
     /**
-     * 
+     *
      * @param rootDir
      *            a folder name to enable caching or null to disable it.
      */

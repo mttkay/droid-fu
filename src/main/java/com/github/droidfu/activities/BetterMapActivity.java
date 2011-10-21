@@ -23,27 +23,27 @@ import com.google.android.maps.MapView;
 import com.google.android.maps.MyLocationOverlay;
 
 public class BetterMapActivity extends MapActivity implements BetterActivity {
-    
+
     private boolean wasCreated, wasInterrupted;
-    
+
     private int progressDialogTitleId;
 
     private int progressDialogMsgId;
-    
+
     private Intent currentIntent;
-    
+
     private MyLocationOverlay myLocationOverlay;
-    
+
     private GestureDetector tapDetector;
 
     private OnTouchListener tapListener;
 
     private MapView mapView;
-    
+
     @Override
     protected void onCreate(Bundle icicle) {
         super.onCreate(icicle);
-        
+
         this.wasCreated = true;
         this.currentIntent = getIntent();
 
@@ -52,32 +52,32 @@ public class BetterMapActivity extends MapActivity implements BetterActivity {
             ((DroidFuApplication) application).setActiveContext(getClass().getCanonicalName(), this);
         }
     }
-    
+
     @Override
     protected void onPause() {
         super.onPause();
         wasCreated = wasInterrupted = false;
-        
+
         if (myLocationOverlay != null) {
             myLocationOverlay.disableMyLocation();
         }
     }
-    
+
     @Override
     protected void onResume() {
         super.onResume();
-        
+
         if (myLocationOverlay != null) {
             myLocationOverlay.enableMyLocation();
         }
     }
-    
+
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
         wasInterrupted = true;
     }
-    
+
     @Override
     public void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
@@ -151,7 +151,7 @@ public class BetterMapActivity extends MapActivity implements BetterActivity {
             boolean closeOnSelect) {
         return BetterActivityHelper.newListDialog(this, title, elements, listener, closeOnSelect);
     }
-    
+
     @Override
     protected Dialog onCreateDialog(int id) {
         return BetterActivityHelper.createProgressDialog(this, progressDialogTitleId,
@@ -165,14 +165,14 @@ public class BetterMapActivity extends MapActivity implements BetterActivity {
     public void setProgressDialogMsgId(int progressDialogMsgId) {
         this.progressDialogMsgId = progressDialogMsgId;
     }
-    
+
     public void setMapView(int mapLayoutId) {
         this.mapView = (MapView) findViewById(mapLayoutId);
     }
-    
+
     public void setMapViewWithZoom(int mapLayoutId, int zoomControlsLayoutId) {
         this.mapView = (MapView) findViewById(mapLayoutId);
-        
+
         ZoomControls zoomControls = (ZoomControls) findViewById(zoomControlsLayoutId);
         zoomControls.setOnZoomInClickListener(new View.OnClickListener() {
                 public void onClick(View v) {
@@ -186,23 +186,23 @@ public class BetterMapActivity extends MapActivity implements BetterActivity {
             }
         });
     }
-    
+
     public MapView getMapView() {
         return mapView;
     }
-    
+
     public void setMyLocationOverlay(MyLocationOverlay myLocationOverlay) {
         // Create the overlay and add it to the map.
         this.myLocationOverlay = myLocationOverlay;
         mapView.getOverlays().add(this.myLocationOverlay);
     }
-    
+
     public MyLocationOverlay getMyLocationOverlay() {
         return myLocationOverlay;
     }
-    
+
     protected void setMapGestureListener(MapGestureListener mapGestureListener) {
-        // Map gesture listener. Our default implementation handles a double tap action 
+        // Map gesture listener. Our default implementation handles a double tap action
         // as a zoom in.
         tapDetector = new GestureDetector(mapGestureListener);
         tapListener = new View.OnTouchListener() {

@@ -47,7 +47,7 @@ public class DiagnosticSupport {
      * Returns the ANDROID_ID unique device ID for the current device. Reading that ID has changed
      * between platform versions, so this method takes care of attempting to read it in different
      * ways, if one failed.
-     * 
+     *
      * @param context
      *            the context
      * @return the device's ANDROID_ID, or null if it could not be determined
@@ -65,7 +65,7 @@ public class DiagnosticSupport {
 
     /**
      * Same as {@link #getAndroidId(Context)}, but never returns null.
-     * 
+     *
      * @param context
      *            the context
      * @param fallbackValue

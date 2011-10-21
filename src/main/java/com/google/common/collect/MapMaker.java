@@ -36,7 +36,7 @@ import com.google.common.collect.CustomConcurrentHashMap.Internals;
  * {@linkplain SoftReference soft} or {@linkplain WeakReference weak} keys, soft
  * or weak values, timed expiration, and on-demand computation of values. Usage
  * example:
- * 
+ *
  * <pre>
  * &#064;code
  *   ConcurrentMap&lt;Key, Graph&gt; graphs = new MapMaker()
@@ -51,7 +51,7 @@ import com.google.common.collect.CustomConcurrentHashMap.Internals;
  *             }
  *           });}
  * </pre>
- * 
+ *
  * These features are all optional; {@code new MapMaker().makeMap()} returns a
  * valid concurrent map that behaves exactly like a {@link ConcurrentHashMap}.
  * The returned map is implemented as a hash table with similar performance
@@ -82,7 +82,7 @@ import com.google.common.collect.CustomConcurrentHashMap.Internals;
  * drop-in replacement for {@link java.util.WeakHashMap}, adding concurrency,
  * asynchronous cleanup, identity-based equality for keys, and great
  * flexibility.
- * 
+ *
  * @author Bob Lee
  * @author Kevin Bourrillion
  */
@@ -104,7 +104,7 @@ public final class MapMaker {
      * Sets a custom initial capacity (defaults to 16). Resizing this or any
      * other kind of hash table is a relatively slow operation, so, when
      * possible, it is a good idea to provide estimates of expected table sizes.
-     * 
+     *
      * @throws IllegalArgumentException
      *         if {@code initialCapacity} is negative
      * @throws IllegalStateException
@@ -128,7 +128,7 @@ public final class MapMaker {
      * noticeable impact. A value of one is appropriate when it is known that
      * only one thread will modify and all others will only read. Defaults to
      * 16.
-     * 
+     *
      * @throws IllegalArgumentException
      *         if {@code concurrencyLevel} is nonpositive
      * @throws IllegalStateException
@@ -148,7 +148,7 @@ public final class MapMaker {
      * example, storing a key in the map and then attempting a lookup using a
      * different but {@link Object#equals(Object) equals}-equivalent key will
      * always fail.
-     * 
+     *
      * @throws IllegalStateException
      *         if the key strength was already set
      * @see WeakReference
@@ -166,7 +166,7 @@ public final class MapMaker {
      * example, storing a key in the map and then attempting a lookup using a
      * different but {@link Object#equals(Object) equals}-equivalent key will
      * always fail.
-     * 
+     *
      * @throws IllegalStateException
      *         if the key strength was already set
      * @see SoftReference
@@ -197,7 +197,7 @@ public final class MapMaker {
      * of {@link Map#containsValue(Object) containsValue},
      * {@link ConcurrentMap#remove(Object, Object) remove(Object, Object)}, and
      * {@link ConcurrentMap#replace(Object, Object, Object) replace(K, V, V)}.
-     * 
+     *
      * @throws IllegalStateException
      *         if the key strength was already set
      * @see WeakReference
@@ -219,7 +219,7 @@ public final class MapMaker {
      * of {@link Map#containsValue(Object) containsValue},
      * {@link ConcurrentMap#remove(Object, Object) remove(Object, Object)}, and
      * {@link ConcurrentMap#replace(Object, Object, Object) replace(K, V, V)}.
-     * 
+     *
      * @throws IllegalStateException
      *         if the value strength was already set
      * @see SoftReference
@@ -241,7 +241,7 @@ public final class MapMaker {
     /**
      * Specifies that each entry should be automatically removed from the map
      * once a fixed duration has passed since the entry's creation.
-     * 
+     *
      * @param duration
      *        the length of time after an entry is created that it should be
      *        automatically removed
@@ -269,7 +269,7 @@ public final class MapMaker {
      * Builds the final map, without on-demand computation of values. This
      * method does not alter the state of this {@code MapMaker} instance, so it
      * can be invoked again to create multiple independent maps.
-     * 
+     *
      * @param <K>
      *        the type of keys to be stored in the returned map
      * @param <V>
@@ -829,7 +829,7 @@ public final class MapMaker {
 
         /**
          * Sets the value reference for this entry.
-         * 
+         *
          * @param valueReference
          */
         void setValueReference(ValueReference<K, V> valueReference);

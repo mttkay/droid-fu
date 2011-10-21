@@ -40,7 +40,7 @@ public class ArraySupport {
     /**
      * Attempts to find an object in a potentially unsorted array. Complexity is
      * O(N).
-     * 
+     *
      * @param <T>
      * @param array
      *        the input array

@@ -15,7 +15,7 @@ import java.util.Arrays;
 
 /**
  * Helper functions that can operate on any {@code Object}.
- * 
+ *
  * @author Laurence Gonsalves
  */
 public final class Objects {
@@ -45,13 +45,13 @@ public final class Objects {
      * This is useful for implementing {@link Object#hashCode()}. For example,
      * in an object that has three properties, {@code x}, {@code y}, and {@code
      * z}, one could write:
-     * 
+     *
      * <pre>
      * public int hashCode() {
      *     return Objects.hashCode(getX(), getY(), getZ());
      * }
      * </pre>
-     * 
+     *
      * <b>Warning</b>: When a single object is supplied, the returned hash code
      * does not equal the hash code of that object.
      */

@@ -7,13 +7,13 @@ import android.os.Parcelable;
 
 /**
  * Superclass of all objects to be stored in {@link ModelCache}.
- * 
+ *
  * To save an object to the cache use {@link #save(ModelCache)}, when updating an object with any
  * new data use {@link #reload(ModelCache)}, and when wanting to find an object from the cache, use
  * {@link #find(ModelCache, String, Class)}.
- * 
+ *
  * @author michaelengland
- * 
+ *
  */
 public abstract class CachedModel implements Parcelable {
 
@@ -30,7 +30,7 @@ public abstract class CachedModel implements Parcelable {
     /**
      * Constructor setting variables from parcel. Same as using a blank constructor and calling
      * readFromParcel.
-     * 
+     *
      * @param source
      *            Parcel to be read from.
      * @throws IOException
@@ -41,7 +41,7 @@ public abstract class CachedModel implements Parcelable {
 
     /**
      * Constructor setting ID given.
-     * 
+     *
      * @param id
      *            ID of new object (used when generating cache key).
      */
@@ -51,7 +51,7 @@ public abstract class CachedModel implements Parcelable {
 
     /**
      * Returns ID of object used in key generation.
-     * 
+     *
      * @return ID of new object (used when generating cache key).
      */
     public String getId() {
@@ -60,7 +60,7 @@ public abstract class CachedModel implements Parcelable {
 
     /**
      * Set ID of object used in key generation.
-     * 
+     *
      * @param id
      *            ID of new object (used when generating cache key).
      */
@@ -85,7 +85,7 @@ public abstract class CachedModel implements Parcelable {
 
     /**
      * Method for looking up object in cache.
-     * 
+     *
      * @param modelCache
      *            Cache to be searched.
      * @param id
@@ -118,9 +118,9 @@ public abstract class CachedModel implements Parcelable {
     /**
      * Attempts to store the object in the cache using this object's key. Generally this is the
      * required used.
-     * 
+     *
      * Overwritten when saving subclasses over the top of separate superclass cache stores. e.g.:
-     * 
+     *
      * <pre>
      * {@code
      * public boolean save(ModelCache modelCache) {
@@ -128,7 +128,7 @@ public abstract class CachedModel implements Parcelable {
      * }
      * }
      * </pre>
-     * 
+     *
      * @param modelCache
      *            Cache to save to.
      * @return Whether or not saving to the cache was successful.
@@ -140,7 +140,7 @@ public abstract class CachedModel implements Parcelable {
     /**
      * Attempts to save the object in the cache using a given key. Generally only used for saving
      * subclasses over the top of separate superclass cache stores.
-     * 
+     *
      * @param modelCache
      *            Cache to save to.
      * @param saveKey
@@ -158,7 +158,7 @@ public abstract class CachedModel implements Parcelable {
 
     /**
      * Attempts to reload any new data from cache.
-     * 
+     *
      * @param modelCache
      *            Cache to be reloaded from.
      * @return Whether or not newer data was found in the cache.
@@ -181,7 +181,7 @@ public abstract class CachedModel implements Parcelable {
 
     /**
      * Method called to determine a key in the cache using the object's id e.g.:
-     * 
+     *
      * <pre>
      * {@code
      * public String createKey(String id) {
@@ -189,7 +189,7 @@ public abstract class CachedModel implements Parcelable {
      * }
      * }
      * </pre>
-     * 
+     *
      * @param id
      *            ID of object to be stored.
      * @return Key that object with given ID should be stored in cache under.
@@ -198,7 +198,7 @@ public abstract class CachedModel implements Parcelable {
 
     /**
      * Method called to reload any data from a more recently stored object e.g.:
-     * 
+     *
      * <pre>
      * {@code
      * public boolean reloadFromCachedModel(ModelCache modelCache, CachedModel cachedModel) {
@@ -208,9 +208,9 @@ public abstract class CachedModel implements Parcelable {
      * }
      * }
      * </pre>
-     * 
+     *
      * Can also be used to reload internal cached objects. e.g.:
-     * 
+     *
      * <pre>
      * {@code
      * public boolean reloadFromCachedModel(ModelCache modelCache, CachedModel cachedModel) {
@@ -220,7 +220,7 @@ public abstract class CachedModel implements Parcelable {
      * }
      * }
      * </pre>
-     * 
+     *
      * @param modelCache
      *            Cache that is currently being reloaded from.
      * @param cachedModel
@@ -249,7 +249,7 @@ public abstract class CachedModel implements Parcelable {
 
     /**
      * Saves data to parcel.
-     * 
+     *
      * @param source
      *            Parcel to save to.
      * @throws IOException

@@ -41,7 +41,7 @@ import com.github.droidfu.widgets.WebImageView;
  * is present in the cache, it is set immediately on the given view. Otherwise, a thread from a
  * thread pool will be used to download the image in the background and set the image on the view as
  * soon as it completes.
- * 
+ *
  * @author Matthias Kaeppler
  */
 public class ImageLoader implements Runnable {
@@ -64,7 +64,7 @@ public class ImageLoader implements Runnable {
     private static int numRetries = DEFAULT_NUM_RETRIES;
 
     private static long expirationInMinutes = DEFAULT_TTL_MINUTES;
-    
+
     /**
      * @param numThreads
      *            the maximum number of threads that will be started to download images in parallel
@@ -87,7 +87,7 @@ public class ImageLoader implements Runnable {
      * when using ImageLoader as part of {@link WebImageView} or {@link WebGalleryAdapter}, then
      * there is no need to call this method, since those classes will already do that for you. This
      * method is idempotent. You may call it multiple times without any side effects.
-     * 
+     *
      * @param context
      *            the current context
      */
@@ -106,7 +106,7 @@ public class ImageLoader implements Runnable {
     	initialize(context);
     }
 
-    
+
     private String imageUrl;
 
     private ImageLoaderHandler handler;
@@ -120,7 +120,7 @@ public class ImageLoader implements Runnable {
      * Triggers the image loader for the given image and view. The image loading will be performed
      * concurrently to the UI main thread, using a fixed size thread pool. The loaded image will be
      * posted back to the given ImageView upon completion.
-     * 
+     *
      * @param imageUrl
      *            the URL of the image to download
      * @param imageView
@@ -135,7 +135,7 @@ public class ImageLoader implements Runnable {
      * for the download to finish. The image loading will be performed concurrently to the UI main
      * thread, using a fixed size thread pool. The loaded image will be posted back to the given
      * ImageView upon completion.
-     * 
+     *
      * @param imageUrl
      *            the URL of the image to download
      * @param imageView
@@ -158,7 +158,7 @@ public class ImageLoader implements Runnable {
      * image will not be automatically posted to an ImageView; instead, you can pass a custom
      * {@link ImageLoaderHandler} and handle the loaded image yourself (e.g. cache it for later
      * use).
-     * 
+     *
      * @param imageUrl
      *            the URL of the image to download
      * @param handler
@@ -174,7 +174,7 @@ public class ImageLoader implements Runnable {
      * image will not be automatically posted to an ImageView; instead, you can pass a custom
      * {@link ImageLoaderHandler} and handle the loaded image yourself (e.g. cache it for later
      * use).
-     * 
+     *
      * @param imageUrl
      *            the URL of the image to download
      * @param handler
@@ -228,7 +228,7 @@ public class ImageLoader implements Runnable {
 
     /**
      * Returns the image cache backing this image loader.
-     * 
+     *
      * @return the {@link ImageCache}
      */
     public static ImageCache getImageCache() {
