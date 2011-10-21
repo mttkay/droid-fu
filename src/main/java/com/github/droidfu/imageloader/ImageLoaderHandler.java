@@ -56,7 +56,7 @@ public class ImageLoaderHandler extends Handler {
     /**
      * Override this method if you need custom handler logic. Note that this method can actually be
      * called directly for performance reasons, in which case the message will be null
-     * 
+     *
      * @param bitmap
      *            the bitmap returned from the image loader
      * @param msg

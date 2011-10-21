@@ -23,7 +23,7 @@ package com.google.common.base;
  * <p>
  * Implementations which may cause side effects upon evaluation are strongly
  * encouraged to state this fact clearly in their API documentation.
- * 
+ *
  * @param <F>
  *        the type of the function input
  * @param <T>
@@ -37,7 +37,7 @@ public interface Function<F, T> {
      * Applies the function to an object of type {@code F}, resulting in an
      * object of type {@code T}. Note that types {@code F} and {@code T} may or
      * may not be the same.
-     * 
+     *
      * @param from
      *        the source object
      * @return the resulting object

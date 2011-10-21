@@ -41,7 +41,7 @@ public interface BetterHttpRequest {
      * where it is common to serve error stati that indicate a failure in the application logic
      * (e.g. 404 if a resource doesn't exist). You typically don't want to treat those as connection
      * errors, but gracefully handle them like a normal success code.
-     * 
+     *
      * @param statusCodes
      *            the set of status codes that you want to manually handle as part of the response
      * @return this request
@@ -50,7 +50,7 @@ public interface BetterHttpRequest {
 
     /**
      * Set maximum number of retries for this particular request.
-     * 
+     *
      * @param retries
      *            the maximum number of retries should the request fail
      * @return this request
@@ -59,7 +59,7 @@ public interface BetterHttpRequest {
 
     /**
      * Set the socket timeout for this specific request.
-     * 
+     *
      * @param timeout
      *            the timeout in milliseconds
      * @return this request

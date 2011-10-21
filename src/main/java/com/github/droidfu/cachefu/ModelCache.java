@@ -13,15 +13,15 @@ import android.os.Parcel;
  * Allows caching Model objects using the features provided by {@link AbstractCache}. The key into
  * the cache will be based around the cached object's key, and the object will be able to save and
  * reload itself from the cache.
- * 
+ *
  * @author Michael England
- * 
+ *
  */
 public class ModelCache extends AbstractCache<String, CachedModel> {
 
     /**
      * Creates an {@link AbstractCache} with params provided and name 'ModelCache'.
-     * 
+     *
      * @see com.github.droidfu.cachefu.AbstractCache#AbstractCache(java.lang.String, int, long, int)
      */
     public ModelCache(int initialCapacity, long expirationInMinutes, int maxConcurrentThreads) {
@@ -43,7 +43,7 @@ public class ModelCache extends AbstractCache<String, CachedModel> {
 
     /**
      * Removes all cached objects with key prefix.
-     * 
+     *
      * @param prefix
      *            Prefix of all cached object keys to be removed
      */

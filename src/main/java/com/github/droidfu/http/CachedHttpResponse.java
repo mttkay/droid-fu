@@ -10,7 +10,7 @@ import com.github.droidfu.cachefu.HttpResponseCache;
 
 /**
  * A response proxy returning data from a {@link HttpResponseCache}
- * 
+ *
  * @author Matthias Kaeppler
  */
 public class CachedHttpResponse implements BetterHttpResponse {

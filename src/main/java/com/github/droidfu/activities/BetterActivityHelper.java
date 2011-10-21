@@ -67,7 +67,7 @@ public class BetterActivityHelper {
 
     /**
      * Creates a new ProgressDialog
-     * 
+     *
      * @param activity
      * @param progressDialogTitleId
      *            The resource id for the title. If this is less than or equal to 0, a default title
@@ -102,7 +102,7 @@ public class BetterActivityHelper {
 
     /**
      * Creates a new Yes/No AlertDialog
-     * 
+     *
      * @param context
      * @param dialogTitle
      * @param screenMessage
@@ -126,7 +126,7 @@ public class BetterActivityHelper {
 
     /**
      * Creates a new AlertDialog to display a simple message
-     * 
+     *
      * @param context
      * @param dialogTitle
      * @param screenMessage
@@ -157,7 +157,7 @@ public class BetterActivityHelper {
      * droidfu_error_report_email_address - The email address the exception is sent to.
      * droidfu_error_report_email_subject - The subject of the email.
      * droidfu_dialog_button_send_error_report - The text on the Send Email button.
-     * 
+     *
      * @param activity
      * @param dialogTitle
      * @param error
@@ -214,7 +214,7 @@ public class BetterActivityHelper {
     /**
      * Creates a AlertDialog that shows a list of elements. The listener's onClick method gets
      * called when the user taps a list item.
-     * 
+     *
      * @param <T>
      *            The type of each element
      * @param context
@@ -262,7 +262,7 @@ public class BetterActivityHelper {
 
     /**
      * Checks if the application is in the background (i.e behind another application's Activity).
-     * 
+     *
      * @param context
      * @return true if another application is above this one.
      */
@@ -284,7 +284,7 @@ public class BetterActivityHelper {
      * {@link DroidFuApplication#onClose()} life-cycle handler. Application close is being defined
      * as the transition of the last running Activity of the current application to the Android home
      * screen using the BACK button.
-     * 
+     *
      * @param context
      *            the current context
      * @param keyCode

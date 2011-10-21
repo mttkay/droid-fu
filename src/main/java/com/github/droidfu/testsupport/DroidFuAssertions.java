@@ -47,7 +47,7 @@ public class DroidFuAssertions {
      * Asserts that two dates are equal down to the granularity of a day. This
      * assertion ignores the time component entirely, i.e. two dates are
      * considered equal even if the times of day differ.
-     * 
+     *
      * @param expected
      * @param actual
      */
@@ -77,7 +77,7 @@ public class DroidFuAssertions {
      * Asserts that two dates are equal down to the granularity of a second.
      * This assertion ignores milliseconds, so two dates will be considered
      * equal even if their milliseconds fractions differ.
-     * 
+     *
      * @param expected
      * @param actual
      */

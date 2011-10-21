@@ -166,7 +166,7 @@ public class TestDroidFuAssertions {
 
         Date expected = cal.getTime();
         Date actual = new Date(cal.getTime().getTime() + 50); // 50ms deviation
-        
+
         DroidFuAssertions.assertTimeEquals(expected, actual);
     }
 }

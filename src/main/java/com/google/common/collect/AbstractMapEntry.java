@@ -18,7 +18,7 @@ import com.google.common.base.Objects;
 /**
  * Implementation of the {@code equals}, {@code hashCode}, and {@code toString}
  * methods of {@code Entry}.
- * 
+ *
  * @author Jared Levy
  */
 abstract class AbstractMapEntry<K, V> implements Entry<K, V> {

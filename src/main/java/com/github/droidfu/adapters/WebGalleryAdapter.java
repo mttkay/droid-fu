@@ -32,7 +32,7 @@ import com.github.droidfu.widgets.WebImageView;
 /**
  * Can be used as an adapter for an Android {@link Gallery} view. This adapter loads the images to
  * be shown from the web.
- * 
+ *
  * @author Matthias Kaeppler
  */
 public class WebGalleryAdapter extends BaseAdapter {

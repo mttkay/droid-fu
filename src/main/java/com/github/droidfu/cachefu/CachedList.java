@@ -8,17 +8,17 @@ import android.os.Parcelable;
 
 /**
  * Superclass of all list objects to be stored in {@link ModelCache}.
- * 
+ *
  * Operates just as standard cached object, and contains an array list of objects.
- * 
+ *
  * <b>Must</b> be initialized with the class of the objects stored, as this is used in
  * parcelling/unparcelling.
- * 
+ *
  * In order to ensure thread-safe use of list (such as iteration), use the {@link #getList()}
  * method, creating a copy of the list in its current state.
- * 
+ *
  * @author michaelengland
- * 
+ *
  * @param <CO>
  *            Type of cached models to be stored in list
  */
@@ -36,7 +36,7 @@ public class CachedList<CO extends CachedModel> extends CachedModel {
     /**
      * Simple parameter-less constructor. <b>Must</b> also have parameter-less constructor in
      * subclasses in order for parceling to work.
-     * 
+     *
      * <b>Do not use this constructor when creating a list, use one setting class instead.</b>
      */
     public CachedList() {
@@ -46,7 +46,7 @@ public class CachedList<CO extends CachedModel> extends CachedModel {
     /**
      * Constructor setting variables from parcel. Same as using a blank constructor and calling
      * readFromParcel.
-     * 
+     *
      * @param source
      *            Parcel to be read from.
      * @throws IOException
@@ -57,7 +57,7 @@ public class CachedList<CO extends CachedModel> extends CachedModel {
 
     /**
      * Constructor initializing class of objects stored.
-     * 
+     *
      * @param clazz
      *            Required for parcelling and unparcelling of list
      */
@@ -68,7 +68,7 @@ public class CachedList<CO extends CachedModel> extends CachedModel {
 
     /**
      * Constructor initializing class of objects stored as well as initial length of list.
-     * 
+     *
      * @param clazz
      *            Required for parcelling and unparcelling of list
      * @param initialLength
@@ -81,7 +81,7 @@ public class CachedList<CO extends CachedModel> extends CachedModel {
 
     /**
      * Constructor initializing class of objects stored as well as id used in key generation.
-     * 
+     *
      * @param clazz
      *            Required for parcelling and unparcelling of list
      * @param id
@@ -96,7 +96,7 @@ public class CachedList<CO extends CachedModel> extends CachedModel {
     /**
      * Synchronized method to get a copy of the list in its current state. This should be used when
      * iterating over the list in order to avoid thread-unsafe operations.
-     * 
+     *
      * @return Copy of list in its current state
      */
     public synchronized ArrayList<CO> getList() {
@@ -105,7 +105,7 @@ public class CachedList<CO extends CachedModel> extends CachedModel {
 
     /**
      * Synchronized method used to append an object to the list.
-     * 
+     *
      * @param cachedObject
      *            Object to add to list
      */
@@ -115,7 +115,7 @@ public class CachedList<CO extends CachedModel> extends CachedModel {
 
     /**
      * Synchronized method used to set an object at a location in the list.
-     * 
+     *
      * @param index
      *            Index of item to set
      * @param cachedObject
@@ -127,7 +127,7 @@ public class CachedList<CO extends CachedModel> extends CachedModel {
 
     /**
      * Synchronized method used to get an object from the live list.
-     * 
+     *
      * @param index
      *            Index of item in list
      * @return Item in list
@@ -138,7 +138,7 @@ public class CachedList<CO extends CachedModel> extends CachedModel {
 
     /**
      * Synchronized method used to return size of list.
-     * 
+     *
      * @return Size of list
      */
     public synchronized int size() {
