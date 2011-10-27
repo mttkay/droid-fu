@@ -176,8 +176,8 @@
     <downloadUrl>http://github.com/kaeppler/droid-fu/downloads</downloadUrl>
 
     <snapshotRepository>
-      <id>maven2-snapshot-repository</id>
-      <url>file:///tmp/maven-snapshots</url>
+      <id>qype-snapshots-repository</id>
+      <url>http://gandalf.qype.hamburg:8081/nexus/content/repositories/snapshots</url>
       <uniqueVersion>true</uniqueVersion>
     </snapshotRepository>
   </distributionManagement>
