@@ -46,6 +46,8 @@
     <powermock.version>1.3.8</powermock.version>
 
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+    <qypeRepositoryUrl>http://gandalf.qype.hamburg:8081/nexus/content/repositories</qypeRepositoryUrl>
   </properties>
 
   <!-- build settings -->
