@@ -1,9 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <name>Droid-Fu</name>
   <groupId>com.github.droidfu</groupId>
   <artifactId>droid-fu</artifactId>
-  <version>1.0-SNAPSHOT</version>
+  <version>1.1-SNAPSHOT</version>
   <description>A utility library for your daily Android needs.</description>
   <url>http://github.com/kaeppler/droid-fu</url>
   
@@ -16,6 +17,15 @@
       <organization>Qype GmbH</organization>
       <organizationUrl>http://www.qype.com</organizationUrl>
       <timezone>+1</timezone>
+    </developer>
+    <developer>
+      <id>fb</id>
+      <name>Free Beachler</name>
+      <email>fbeachler@silverchalice.com</email>
+      <url>http://www.freebeachler.com</url>
+      <organization>Silver Chalice Inc.</organization>
+      <organizationUrl>http://www.silverchalice.com</organizationUrl>
+      <timezone>-7</timezone>
     </developer>
   </developers>
 
@@ -42,14 +52,12 @@
     <androidVersion>2.3.3</androidVersion>
     <androidApiLevel>10</androidApiLevel>
     <androidApiRevision>_r2</androidApiRevision>
-
     <powermock.version>1.3.8</powermock.version>
-
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
 
   <!-- build settings -->
-  <packaging>jar</packaging>
+  <packaging>pom</packaging>
   
   <build>
   
@@ -177,6 +185,20 @@
   </distributionManagement>
    
   <profiles>
+      <profile>
+          <!-- the standard profile -->
+          <id>package</id>
+          <activation>
+              <activeByDefault>true</activeByDefault>
+          </activation>
+          <modules>
+              <module>droid-fu-core</module>
+              <module>droid-fu-support</module>
+              <module>droid-fu-google</module>
+              <module>droid-fu-cachefu</module>
+              <module>droid-fu-http</module>
+          </modules>
+      </profile>
     <profile>
       <id>copy-jar</id>
       <activation>
