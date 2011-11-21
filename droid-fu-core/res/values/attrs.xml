@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <declare-styleable name="GalleryItem">
+    <attr name="imageUrl" format="string" />
+    <attr name="autoLoad" format="boolean" />
+    <attr name="progressDrawable" format="integer" />
+    <attr name="test" format="string" />
+  </declare-styleable>
+</resources>

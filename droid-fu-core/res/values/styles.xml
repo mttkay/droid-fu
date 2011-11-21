@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Base application theme is the default theme. -->
+    <style name="Theme" parent="android:Theme">
+    </style>
+
+    <!-- Variation on our application theme that forces a plain
+        text style. -->
+    <style name="Theme.GalleryItem">
+    </style>
+
+</resources>

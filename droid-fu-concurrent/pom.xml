@@ -1,0 +1,239 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <name>Droid-Fu</name>
+  <groupId>com.github.droidfu</groupId>
+  <artifactId>droid-fu</artifactId>
+  <version>1.0-SNAPSHOT</version>
+  <description>A utility library for your daily Android needs.</description>
+  <url>http://github.com/kaeppler/droid-fu</url>
+  
+  <developers>
+    <developer>
+      <id>mk</id>
+      <name>Matthias Käppler</name>
+      <email>matthias@qype.com</email>
+      <url>http://matthiaskaeppler.de</url>
+      <organization>Qype GmbH</organization>
+      <organizationUrl>http://www.qype.com</organizationUrl>
+      <timezone>+1</timezone>
+    </developer>
+  </developers>
+
+  <licenses>
+    <license>
+      <name>The Apache Software License, Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+
+  <scm>
+    <url>http://github.com/kaeppler/droid-fu</url>
+    <connection>scm:git:git://github.com/kaeppler/droid-fu.git</connection>
+    <developerConnection>scm:git:git@github.com:kaeppler/droid-fu.git</developerConnection>
+  </scm>
+
+  <issueManagement>
+    <system>GitHub</system>
+    <url>http://github.com/kaeppler/droid-fu/issues</url>
+  </issueManagement>
+
+  <properties>
+    <androidVersion>2.3.3</androidVersion>
+    <androidApiLevel>10</androidApiLevel>
+    <androidApiRevision>_r2</androidApiRevision>
+
+    <powermock.version>1.3.8</powermock.version>
+
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
+
+  <!-- build settings -->
+  <packaging>jar</packaging>
+  
+  <build>
+  
+    <defaultGoal>package</defaultGoal>
+    
+    <plugins>
+    
+      <!-- compiler settings -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>1.5</source>
+          <target>1.5</target>
+        </configuration>
+      </plugin>
+      
+      <!-- jar builder settings -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <version>2.2</version>
+        <configuration>
+          <excludes>
+              <exclude>**/*.apk</exclude>
+              <exclude>**/*.dex</exclude>
+              <exclude>**/*.ap_</exclude>
+          </excludes>        
+        </configuration>
+      </plugin>
+      
+      <!-- we always wanna have a nice up-to-date JavaDoc JAR -->
+      <!-- 
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <version>2.6.1</version>
+        <executions>
+            <execution>
+            <id>generate-javadoc-jar</id>
+            <phase>package</phase>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      -->
+      <!-- config for release builds -->
+      <plugin>
+        <artifactId>maven-release-plugin</artifactId>
+        <version>2.0-beta-9</version>
+        <configuration>
+          <tagBase>http://github.com/kaeppler/droid-fu/tree</tagBase>
+        </configuration>
+      </plugin>
+      
+      <plugin>
+        <groupId>com.jayway.maven.plugins.android.generation2</groupId>
+        <artifactId>maven-android-plugin</artifactId>
+        <version>2.8.3</version>
+        <configuration>
+          <deleteConflictingFiles>true</deleteConflictingFiles>
+          <undeployBeforeDeploy>true</undeployBeforeDeploy>
+          <sdk>
+            <path>${env.ANDROID_HOME}</path>
+            <platform>${androidVersion}</platform>
+          </sdk>
+        </configuration>
+        <extensions>true</extensions>
+      </plugin>
+            
+    </plugins>
+  </build>
+  
+  <dependencies>
+    <dependency>
+      <groupId>com.google.android</groupId>
+      <artifactId>android</artifactId>
+      <version>${androidVersion}</version>
+      <scope>provided</scope>
+    </dependency>
+    
+    <dependency>
+      <groupId>com.google.android.maps</groupId>
+      <artifactId>maps</artifactId>
+      <version>${androidApiLevel}${androidApiRevision}</version>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>com.google.android</groupId>
+      <artifactId>android-test</artifactId>
+      <version>2.2.1</version>
+      <scope>provided</scope>
+    </dependency>
+  
+     
+    <dependency>
+      <groupId>org.powermock.modules</groupId>
+      <artifactId>powermock-module-junit4</artifactId>
+      <version>${powermock.version}</version>
+      <scope>test</scope>
+    </dependency>
+    
+    <dependency>
+      <groupId>org.powermock.api</groupId>
+      <artifactId>powermock-api-mockito</artifactId>
+      <version>${powermock.version}</version>
+      <scope>test</scope>
+    </dependency>    
+    
+  </dependencies>  
+
+  <!-- external repositories -->
+  <repositories>
+    <repository>
+      <id>powermock-repo</id>
+      <url>http://powermock.googlecode.com/svn/repo/</url>
+    </repository>
+  </repositories>
+
+  <distributionManagement>
+    <downloadUrl>http://github.com/kaeppler/droid-fu/downloads</downloadUrl>
+  </distributionManagement>
+   
+  <profiles>
+    <profile>
+      <id>copy-jar</id>
+      <activation>
+        <property>
+            <name>copyTo</name>
+        </property>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <executions>
+              <execution>
+                <phase>install</phase>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+                <configuration>
+                  <tasks>
+                    <copy file="${build.directory}/${build.finalName}.${project.packaging}" todir="${copyTo}" />
+                  </tasks>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>        
+        </plugins>
+      </build>
+    </profile>
+  
+    <!-- Sonatype requires releases to be signed before being pushed to central -->
+    <profile>
+      <id>release-sign-artifacts</id>
+      <activation>
+        <property>
+          <name>performRelease</name>
+          <value>true</value>
+        </property>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-gpg-plugin</artifactId>
+            <version>1.0-alpha-4</version>
+            <executions>
+              <execution>
+                <id>sign-artifacts</id>
+                <phase>verify</phase>
+                <goals>
+                  <goal>sign</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+
+</project>
