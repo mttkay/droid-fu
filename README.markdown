@@ -1,3 +1,9 @@
+# Modular Droid-Fu JARs
+
+This is a forked version of Droid-Fu that provides a modularized Maven build.  Instead of having to pull 270K+ of binary
+code into your Android application, you can pick and choose the modules you want.  Eventually there will also
+be a goal/target to build all the JARs, so you can still obtain the full Droid-Fu JAR if you want.
+
 # Just looking for the API docs?
 
 You can find them [here](http://kaeppler.github.com/droid-fu).
