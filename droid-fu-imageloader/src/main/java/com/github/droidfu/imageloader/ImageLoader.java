@@ -32,9 +32,7 @@ import android.os.SystemClock;
 import android.util.Log;
 import android.widget.ImageView;
 
-import com.github.droidfu.adapters.WebGalleryAdapter;
 import com.github.droidfu.cachefu.ImageCache;
-import com.github.droidfu.widgets.WebImageView;
 
 /**
  * Realizes an background image loader backed by a two-level FIFO cache. If the image to be loaded
@@ -64,7 +62,7 @@ public class ImageLoader implements Runnable {
     private static int numRetries = DEFAULT_NUM_RETRIES;
 
     private static long expirationInMinutes = DEFAULT_TTL_MINUTES;
-    
+
     /**
      * @param numThreads
      *            the maximum number of threads that will be started to download images in parallel
@@ -84,9 +82,10 @@ public class ImageLoader implements Runnable {
 
     /**
      * This method must be called before any other method is invoked on this class. Please note that
-     * when using ImageLoader as part of {@link WebImageView} or {@link WebGalleryAdapter}, then
-     * there is no need to call this method, since those classes will already do that for you. This
-     * method is idempotent. You may call it multiple times without any side effects.
+     * when using ImageLoader as part of {@link com.github.droidfu.widgets.WebImageView} or
+     * {@link com.github.droidfu.adapters.WebGalleryAdapter}, then there is no need to call this
+     * method, since those classes will already do that for you. This method is idempotent. You may
+     * call it multiple times without any side effects.
      * 
      * @param context
      *            the current context
@@ -102,11 +101,10 @@ public class ImageLoader implements Runnable {
     }
 
     public static synchronized void initialize(Context context, long expirationInMinutes) {
-    	ImageLoader.expirationInMinutes = expirationInMinutes;
-    	initialize(context);
+        ImageLoader.expirationInMinutes = expirationInMinutes;
+        initialize(context);
     }
 
-    
     private String imageUrl;
 
     private ImageLoaderHandler handler;
@@ -147,8 +145,7 @@ public class ImageLoader implements Runnable {
      */
     public static void start(String imageUrl, ImageView imageView, Drawable dummyDrawable,
             Drawable errorDrawable) {
-        start(imageUrl, imageView, new ImageLoaderHandler(imageView, imageUrl,
- errorDrawable),
+        start(imageUrl, imageView, new ImageLoaderHandler(imageView, imageUrl, errorDrawable),
                 dummyDrawable, errorDrawable);
     }
 

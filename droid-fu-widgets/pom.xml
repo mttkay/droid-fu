@@ -2,9 +2,9 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<name>Droid-Fu-Support</name>
+	<name>Droid-Fu-Widgets</name>
 	<groupId>com.github.droidfu</groupId>
-	<artifactId>droid-fu-support</artifactId>
+	<artifactId>droid-fu-widgets</artifactId>
 	<version>1.1-SNAPSHOT</version>
 	<description>A utility library for your daily Android needs.</description>
 	<url>http://github.com/kaeppler/droid-fu</url>
@@ -19,9 +19,20 @@
 	<dependencies>
 		<dependency>
 			<groupId>com.github.droidfu</groupId>
-			<artifactId>droid-fu-testsupport</artifactId>
+			<artifactId>droid-fu-core</artifactId>
 			<version>1.1-SNAPSHOT</version>
-			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>com.github.droidfu</groupId>
+			<artifactId>droid-fu-support</artifactId>
+			<version>1.1-SNAPSHOT</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.github.droidfu</groupId>
+			<artifactId>droid-fu-imageloader</artifactId>
+			<version>1.1-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
 

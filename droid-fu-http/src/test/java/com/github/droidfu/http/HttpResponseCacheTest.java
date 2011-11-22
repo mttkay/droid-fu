@@ -37,7 +37,7 @@ import android.util.Log;
 
 import com.github.droidfu.cachefu.CacheHelper;
 import com.github.droidfu.cachefu.HttpResponseCache;
-import com.github.droidfu.http.CachedHttpResponse.ResponseData;
+import com.github.droidfu.support.ResponseData;
 import com.github.droidfu.support.StringSupport;
 
 @RunWith(PowerMockRunner.class)

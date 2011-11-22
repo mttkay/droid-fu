@@ -25,7 +25,8 @@ public class TestBase {
             public Integer answer(InvocationOnMock invocation) throws Throwable {
                 String tag = (String) invocation.getArguments()[0];
                 String msg = (String) invocation.getArguments()[1];
-                System.out.println("[" + tag + "] " + msg);
+                System.out.println(new StringBuilder("[").append(tag).append("] ").append(msg)
+                        .toString());
                 return 0;
             }
         });
