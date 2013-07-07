@@ -135,9 +135,24 @@ public class BetterActivityHelper {
      */
     public static AlertDialog newMessageDialog(final Context context, String dialogTitle,
             String screenMessage, int iconResourceId) {
+        return newMessageDialog(context, dialogTitle, screenMessage, "Okay", iconResourceId);
+    }
+
+    /**
+     * Creates a new AlertDialog to display a simple message
+     * 
+     * @param context
+     * @param dialogTitle
+     * @param screenMessage
+     * @param buttonText
+     * @param iconResourceId
+     * @return
+     */
+    public static AlertDialog newMessageDialog(final Context context, String dialogTitle,
+            String screenMessage, String buttonText, int iconResourceId) {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setCancelable(false);
-        builder.setPositiveButton("Okay", new OnClickListener() {
+        builder.setPositiveButton(buttonText, new OnClickListener() {
 
             public void onClick(DialogInterface dialog, int which) {
                 dialog.dismiss();
