@@ -15,29 +15,23 @@
 
 package com.github.droidfu.activities;
 
-import java.util.List;
-
-import android.app.Activity;
-import android.app.ActivityManager;
-import android.app.AlertDialog;
-import android.app.Dialog;
-import android.app.ProgressDialog;
+import android.app.*;
 import android.app.ActivityManager.RunningTaskInfo;
 import android.app.AlertDialog.Builder;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.DialogInterface.OnClickListener;
 import android.content.DialogInterface.OnKeyListener;
+import android.content.Intent;
 import android.view.KeyEvent;
 import android.view.Window;
-
 import com.github.droidfu.DroidFuApplication;
 import com.github.droidfu.dialogs.DialogClickListener;
 import com.github.droidfu.exception.ResourceMessageException;
 import com.github.droidfu.support.DiagnosticSupport;
 import com.github.droidfu.support.IntentSupport;
+import java.util.List;
 
 public class BetterActivityHelper {
 
@@ -77,7 +71,7 @@ public class BetterActivityHelper {
      * @return The new dialog
      */
     public static ProgressDialog createProgressDialog(final Activity activity,
-            int progressDialogTitleId, int progressDialogMsgId) {
+                                                      int progressDialogTitleId, int progressDialogMsgId) {
         ProgressDialog progressDialog = new ProgressDialog(activity);
         if (progressDialogTitleId <= 0) {
             progressDialogTitleId = activity.getResources().getIdentifier(
@@ -102,7 +96,7 @@ public class BetterActivityHelper {
 
     /**
      * Creates a new Yes/No AlertDialog
-     * 
+     *
      * @param context
      * @param dialogTitle
      * @param screenMessage
@@ -111,7 +105,7 @@ public class BetterActivityHelper {
      * @return
      */
     public static AlertDialog newYesNoDialog(final Context context, String dialogTitle,
-            String screenMessage, int iconResourceId, OnClickListener listener) {
+                                             String screenMessage, int iconResourceId, OnClickListener listener) {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setCancelable(false);
         builder.setPositiveButton(android.R.string.yes, listener);
@@ -126,7 +120,7 @@ public class BetterActivityHelper {
 
     /**
      * Creates a new AlertDialog to display a simple message
-     * 
+     *
      * @param context
      * @param dialogTitle
      * @param screenMessage
@@ -134,7 +128,7 @@ public class BetterActivityHelper {
      * @return
      */
     public static AlertDialog newMessageDialog(final Context context, String dialogTitle,
-            String screenMessage, int iconResourceId) {
+                                               String screenMessage, int iconResourceId) {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setCancelable(false);
         builder.setPositiveButton("Okay", new OnClickListener() {
@@ -164,7 +158,7 @@ public class BetterActivityHelper {
      * @return
      */
     public static AlertDialog newErrorHandlerDialog(final Activity activity, String dialogTitle,
-            Exception error) {
+                                                    Exception error) {
         String screenMessage = "";
         if (error instanceof ResourceMessageException) {
             screenMessage = activity.getString(((ResourceMessageException) error)
@@ -230,14 +224,14 @@ public class BetterActivityHelper {
      * @return The new dialog.
      */
     public static <T> Dialog newListDialog(final Activity context, String dialogTitle,
-            final List<T> elements, final DialogClickListener<T> listener,
-            final boolean closeOnSelect) {
+                                           final List<T> elements, final DialogClickListener<T> listener,
+                                           final boolean closeOnSelect) {
         return newListDialog(context, dialogTitle, elements, listener, closeOnSelect, 0);
     }
 
     public static <T> Dialog newListDialog(final Activity context, String dialogTitle,
-            final List<T> elements, final DialogClickListener<T> listener,
-            final boolean closeOnSelect, int selectedItem) {
+                                           final List<T> elements, final DialogClickListener<T> listener,
+                                           final boolean closeOnSelect, int selectedItem) {
         final int entriesSize = elements.size();
         String[] entries = new String[entriesSize];
         for (int i = 0; i < entriesSize; i++) {
@@ -251,8 +245,9 @@ public class BetterActivityHelper {
         builder.setSingleChoiceItems(entries, selectedItem, new DialogInterface.OnClickListener() {
 
             public void onClick(DialogInterface dialog, int which) {
-                if (closeOnSelect)
+                if (closeOnSelect) {
                     dialog.dismiss();
+                }
                 listener.onClick(which, elements.get(which));
             }
         });
@@ -262,7 +257,7 @@ public class BetterActivityHelper {
 
     /**
      * Checks if the application is in the background (i.e behind another application's Activity).
-     * 
+     *
      * @param context
      * @return true if another application is above this one.
      */
@@ -296,18 +291,19 @@ public class BetterActivityHelper {
             ActivityManager am = (ActivityManager) context
                     .getSystemService(Context.ACTIVITY_SERVICE);
             List<RunningTaskInfo> tasks = am.getRunningTasks(2);
+            if (tasks != null) {
+                RunningTaskInfo currentTask = tasks.get(0);
+                RunningTaskInfo nextTask = tasks.get(1);
 
-            RunningTaskInfo currentTask = tasks.get(0);
-            RunningTaskInfo nextTask = tasks.get(1);
-
-            // if we're looking at this application's base/launcher Activity,
-            // and the next task is the Android home screen, then we know we're
-            // about to close the app
-            if (currentTask.topActivity.equals(currentTask.baseActivity)
-                    && nextTask.baseActivity.getPackageName().startsWith("com.android.launcher")) {
-                DroidFuApplication application = (DroidFuApplication) context
-                        .getApplicationContext();
-                application.onClose();
+                // if we're looking at this application's base/launcher Activity,
+                // and the next task is the Android home screen, then we know we're
+                // about to close the app
+                if (currentTask.topActivity.equals(currentTask.baseActivity)
+                        && nextTask.baseActivity.getPackageName().startsWith("com.android.launcher")) {
+                    DroidFuApplication application = (DroidFuApplication) context
+                            .getApplicationContext();
+                    application.onClose();
+                }
             }
         }
     }

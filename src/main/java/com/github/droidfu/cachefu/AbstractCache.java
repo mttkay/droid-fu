@@ -15,6 +15,15 @@
 
 package com.github.droidfu.cachefu;
 
+import android.app.ActivityManager;
+import android.app.ActivityManager.MemoryInfo;
+import android.content.Context;
+import android.os.Environment;
+import android.os.StatFs;
+import android.util.Log;
+import com.github.droidfu.support.StringSupport;
+import com.google.common.collect.MapMaker;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -24,13 +33,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
-
-import android.content.Context;
-import android.os.Environment;
-import android.util.Log;
-
-import com.github.droidfu.support.StringSupport;
-import com.google.common.collect.MapMaker;
 
 /**
  * <p>
@@ -57,6 +59,7 @@ public abstract class AbstractCache<KeyT, ValT> implements Map<KeyT, ValT> {
 
     public static final int DISK_CACHE_INTERNAL = 0;
     public static final int DISK_CACHE_SDCARD = 1;
+    public static final int DISK_CACHE_NONE = -1;
 
     private static final String LOG_TAG = "Droid-Fu[CacheFu]";
 
@@ -69,6 +72,8 @@ public abstract class AbstractCache<KeyT, ValT> implements Map<KeyT, ValT> {
     private String name;
     
     private long expirationInMinutes;
+
+    private int mStorageDevice = 0;
 
     /**
      * Creates a new cache instance.
@@ -131,21 +136,48 @@ public abstract class AbstractCache<KeyT, ValT> implements Map<KeyT, ValT> {
      * @return
      */
     public boolean enableDiskCache(Context context, int storageDevice) {
+        mStorageDevice = storageDevice;
+
         Context appContext = context.getApplicationContext();
 
+        MemoryInfo mi = new MemoryInfo();
+        ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+        activityManager.getMemoryInfo(mi);
+
+        File path = Environment.getExternalStorageDirectory();
+        StatFs stat = new StatFs(path.getPath());
+        long blockSize = stat.getBlockSize();
+        long availableBlocks = stat.getAvailableBlocks();
+        Long mFreenSD = (availableBlocks * blockSize)/1048576L;
+        boolean hasSpace =  mFreenSD > 50;
+
         String rootDir = null;
-        if (storageDevice == DISK_CACHE_SDCARD
+        if (hasSpace && storageDevice == DISK_CACHE_SDCARD
                 && Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())) {
             // SD-card available
             rootDir = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Android/data/"
                     + appContext.getPackageName() + "/cache";
-        } else {
+        } else if(!mi.lowMemory) {
+             mStorageDevice = DISK_CACHE_INTERNAL;
+
             File internalCacheDir = appContext.getCacheDir();
             // apparently on some configurations this can come back as null
             if (internalCacheDir == null) {
                 return (isDiskCacheEnabled = false);
             }
             rootDir = internalCacheDir.getAbsolutePath();
+
+        } else if(Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState()) || hasSpace){
+            mStorageDevice = DISK_CACHE_SDCARD;
+
+            Log.d(LOG_TAG, "Low internal space - opening cache on SD card");
+                // SD-card available
+                rootDir = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Android/data/"
+                    + appContext.getPackageName() + "/cache";
+        }
+        else{
+            mStorageDevice = DISK_CACHE_NONE;
+            Log.d(LOG_TAG, "Low internal space, no SD card - no cache");
         }
 
         setRootDir(rootDir);
@@ -191,6 +223,30 @@ public abstract class AbstractCache<KeyT, ValT> implements Map<KeyT, ValT> {
     }
 
     /**
+     * Only meaningful if disk caching is enabled. See {@link #enableDiskCache}.
+     *
+     * @return The current cache location
+     *      -1 - DISK_CACHE_NONE There's no cache (internal and sd card are full\non-existent)
+     *
+     *      0 - DISK_CACHE_INTERNAL
+     *
+     *      1 - DISK_CACHE_SDCARD
+     */
+    public int getDiskCacheStatus() {
+        return mStorageDevice;
+    }
+    
+    /**
+     * Set disk cache directory <br/>
+     * <b>Use this method with extra caution</b>
+     * 
+     * @param diskCacehDirectory
+     */
+    public void setDiskCacheDirectory(String diskCacehDirectory) {
+        this.diskCacheDirectory = diskCacehDirectory;
+    }
+
+    /**
      * Only meaningful if disk caching is enabled. See {@link #enableDiskCache}. Turns a cache key
      * into the file name that will be used to persist the value to disk. Subclasses must implement
      * this.
@@ -216,7 +272,7 @@ public abstract class AbstractCache<KeyT, ValT> implements Map<KeyT, ValT> {
      * Only meaningful if disk caching is enabled. See {@link #enableDiskCache}. Persists a value to
      * the disk cache.
      * 
-     * @param ostream
+     * @param file
      *            the file output stream (buffered).
      * @param value
      *            the cache value to persist
@@ -226,9 +282,12 @@ public abstract class AbstractCache<KeyT, ValT> implements Map<KeyT, ValT> {
 
     private void cacheToDisk(KeyT key, ValT value) {
         File file = new File(diskCacheDirectory + "/" + getFileNameForKey(key));
+
         try {
             file.createNewFile();
             file.deleteOnExit();
+
+
 
             writeValueToDisk(file, value);
 

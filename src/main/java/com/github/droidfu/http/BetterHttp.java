@@ -194,6 +194,22 @@ public class BetterHttp {
         }
     }
 
+    public static BetterHttpRequest get(String url, HashMap<String, String> params) {
+        if (params != null) {
+            if (!url.contains("?")) url += "?";
+            StringBuffer buffer = new StringBuffer(url);
+            for (String key : params.keySet()) {
+                buffer.append(key);
+                buffer.append("=");
+                buffer.append(params.get(key));
+                buffer.append("&");
+            }
+            buffer.deleteCharAt(buffer.lastIndexOf("&"));
+            url = buffer.toString();
+        }
+        return get(url, false);
+    }
+
     public static BetterHttpRequest get(String url) {
         return get(url, false);
     }

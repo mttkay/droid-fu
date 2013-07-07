@@ -102,10 +102,10 @@ public class ModelCache extends AbstractCache<String, CachedModel> {
         Parcel parcelOut = Parcel.obtain();
         parcelOut.writeString(data.getClass().getCanonicalName());
         parcelOut.writeParcelable(data, 0);
-
+        
         // Write byte data to file
         FileOutputStream ostream = new FileOutputStream(file);
-        BufferedOutputStream bistream = new BufferedOutputStream(ostream);
+        BufferedOutputStream bistream = new BufferedOutputStream(ostream); 
         bistream.write(parcelOut.marshall());
         bistream.close();
     }

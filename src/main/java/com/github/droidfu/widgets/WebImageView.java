@@ -23,10 +23,9 @@ import android.os.Message;
 import android.util.AttributeSet;
 import android.view.Gravity;
 import android.widget.ImageView;
+import android.widget.ImageView.ScaleType;
 import android.widget.ProgressBar;
 import android.widget.ViewSwitcher;
-import android.widget.ImageView.ScaleType;
-
 import com.github.droidfu.DroidFu;
 import com.github.droidfu.imageloader.ImageLoader;
 import com.github.droidfu.imageloader.ImageLoaderHandler;
@@ -39,17 +38,17 @@ import com.github.droidfu.imageloader.ImageLoaderHandler;
  */
 public class WebImageView extends ViewSwitcher {
 
-    private String imageUrl;
+    protected String imageUrl;
 
-    private boolean isLoaded;
+    protected boolean isLoaded;
 
-    private ProgressBar loadingSpinner;
+    protected ProgressBar loadingSpinner;
 
-    private ImageView imageView;
+    protected ImageView imageView;
 
-    private ScaleType scaleType = ScaleType.CENTER_CROP;
+    protected ScaleType scaleType = ScaleType.CENTER_CROP;
 
-    private Drawable progressDrawable, errorDrawable;
+    protected Drawable progressDrawable, errorDrawable;
 
     /**
      * @param context
@@ -126,7 +125,7 @@ public class WebImageView extends ViewSwitcher {
         // styles.recycle();
     }
 
-    private void initialize(Context context, String imageUrl, Drawable progressDrawable,
+    protected void initialize(Context context, String imageUrl, Drawable progressDrawable,
             Drawable errorDrawable,
             boolean autoLoad) {
         this.imageUrl = imageUrl;
@@ -163,8 +162,7 @@ public class WebImageView extends ViewSwitcher {
             }
         }
 
-        LayoutParams lp = new LayoutParams(progressDrawable.getIntrinsicWidth(), progressDrawable
-                .getIntrinsicHeight());
+        LayoutParams lp = new LayoutParams(progressDrawable.getIntrinsicWidth(), progressDrawable.getIntrinsicHeight());
         lp.gravity = Gravity.CENTER;
 
         addView(loadingSpinner, 0, lp);
@@ -207,6 +205,7 @@ public class WebImageView extends ViewSwitcher {
     public void setNoImageDrawable(int imageResourceId) {
         imageView.setImageDrawable(getContext().getResources().getDrawable(imageResourceId));
         setDisplayedChild(1);
+
     }
 
     @Override
@@ -216,7 +215,7 @@ public class WebImageView extends ViewSwitcher {
         this.setDisplayedChild(0);
     }
 
-    private class DefaultImageLoaderHandler extends ImageLoaderHandler {
+    protected class DefaultImageLoaderHandler extends ImageLoaderHandler {
 
         public DefaultImageLoaderHandler() {
             super(imageView, imageUrl, errorDrawable);
@@ -240,4 +239,27 @@ public class WebImageView extends ViewSwitcher {
 	public String getImageUrl() {
 		return imageUrl;
 	}
+
+    /**
+     * Return the wrapped ImageView
+     *
+     * @return
+     */
+    public ImageView getImage() {
+        return imageView;
+    }
+
+    /**
+     * Get last assigned image url
+     *
+     * @return
+     */
+    public String getLastImageUrl() {
+        String lastImageUrl = null;
+        if (imageView != null) {
+            lastImageUrl = (String) imageView.getTag();
+        }
+
+        return lastImageUrl;
+    }
 }
