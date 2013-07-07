@@ -100,6 +100,16 @@ public class ImageLoader implements Runnable {
             imageCache.enableDiskCache(context, ImageCache.DISK_CACHE_SDCARD);
         }
     }
+    
+    public static synchronized void initialize(Context context, boolean enableSDCardCache) {
+        if (executor == null) {
+            executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(DEFAULT_POOL_SIZE);
+        }
+        if (imageCache == null) {
+            imageCache = new ImageCache(25, expirationInMinutes, DEFAULT_POOL_SIZE);
+            imageCache.enableDiskCache(context, (enableSDCardCache) ? ImageCache.DISK_CACHE_SDCARD:ImageCache.DISK_CACHE_INTERNAL);
+        }
+    }
 
     public static synchronized void initialize(Context context, long expirationInMinutes) {
     	ImageLoader.expirationInMinutes = expirationInMinutes;

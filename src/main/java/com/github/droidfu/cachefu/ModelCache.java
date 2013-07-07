@@ -68,7 +68,7 @@ public class ModelCache extends AbstractCache<String, CachedModel> {
 
         // Read file into byte array
         byte[] dataWritten = new byte[(int) file.length()];
-        BufferedInputStream bistream = new BufferedInputStream(istream);
+        BufferedInputStream bistream = new BufferedInputStream(istream,AbstractCache.DEFAULT_BUFFER_SIZE);
         bistream.read(dataWritten);
         bistream.close();
 
@@ -105,7 +105,7 @@ public class ModelCache extends AbstractCache<String, CachedModel> {
 
         // Write byte data to file
         FileOutputStream ostream = new FileOutputStream(file);
-        BufferedOutputStream bistream = new BufferedOutputStream(ostream);
+        BufferedOutputStream bistream = new BufferedOutputStream(ostream,AbstractCache.DEFAULT_BUFFER_SIZE);
         bistream.write(parcelOut.marshall());
         bistream.close();
     }
