@@ -16,8 +16,11 @@
 package com.github.droidfu.imageloader;
 
 import java.io.BufferedInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -290,20 +293,33 @@ public class ImageLoader implements Runnable {
         if (fileSize < 0) {
             return null;
         }
-        byte[] imageData = new byte[fileSize];
 
-        // download the file
+        // download the file using method specified on:
+        //   http://stackoverflow.com/questions/4339082/android-decoder-decode-returned-false-for-bitmap-download/5039288#5039288
         Log.d(LOG_TAG, "fetching image " + imageUrl + " (" + fileSize + ")");
-        BufferedInputStream istream = new BufferedInputStream(connection.getInputStream());
-        int bytesRead = 0;
-        int offset = 0;
-        while (bytesRead != -1 && offset < fileSize) {
-            bytesRead = istream.read(imageData, offset, fileSize - offset);
-            offset += bytesRead;
+        InputStream i = null;
+        BufferedInputStream bis = null;
+        ByteArrayOutputStream out = null;
+        byte[] imageData = null;
+        try {
+            i = (InputStream) connection.getContent();
+            bis = new BufferedInputStream(i, 1024 * 8);
+            out = new ByteArrayOutputStream();
+            int len = 0;
+            byte[] buffer = new byte[1024];
+            while ((len = bis.read(buffer)) != -1) {
+              out.write(buffer, 0, len);
+            }
+            out.close();
+            bis.close();
+            imageData = out.toByteArray();
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-
-        // clean up
-        istream.close();
+        
+        // clean up connection
         connection.disconnect();
 
         return imageData;
