@@ -72,4 +72,25 @@ public interface BetterHttpRequest {
      * Wi-Fi and 3G).
      */
     public BetterHttpResponse send() throws ConnectException;
+
+    /**
+     * Sets the value of option on this request
+     * 
+     * @param option
+     *            the http header to set
+     * @param value
+     *            the value to set the header to
+     * @return this request
+     */
+    public BetterHttpRequest addHeader(String option, String value);
+    
+
+    /**
+     * Unsets the value of option on this request
+     * 
+     * @param option
+     *            the http header to unset
+     * @return this request
+     */
+    public BetterHttpRequest removeHeader(String option);
 }

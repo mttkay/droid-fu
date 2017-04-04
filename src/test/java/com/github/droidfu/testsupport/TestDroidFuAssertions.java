@@ -162,11 +162,14 @@ public class TestDroidFuAssertions {
     @Test
     public void assertEqualTimes() {
         Calendar cal = Calendar.getInstance();
+        cal.clear();
         cal.set(2010, Calendar.JANUARY, 1, 12, 0, 0);
 
         Date expected = cal.getTime();
-        Date actual = new Date(cal.getTime().getTime() + 50); // 50ms deviation
+        Date actual = new Date(cal.getTime().getTime() + 999); // 999ms deviation
+        DroidFuAssertions.assertTimeEquals(expected, actual);
         
+        actual = new Date(cal.getTime().getTime() + 1); // 1ms deviation
         DroidFuAssertions.assertTimeEquals(expected, actual);
     }
 }

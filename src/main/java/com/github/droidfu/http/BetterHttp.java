@@ -195,14 +195,19 @@ public class BetterHttp {
     }
 
     public static BetterHttpRequest get(String url) {
-        return get(url, false);
+        return  new HttpGet(httpClient, url, defaultHeaders);
     }
 
     public static BetterHttpRequest get(String url, boolean cached) {
         if (cached && responseCache != null && responseCache.containsKey(url)) {
             return new CachedHttpRequest(url);
         }
-        return new HttpGet(httpClient, url, defaultHeaders);
+        
+        //Note: This is backwards of standard delegation to allow for testing cache
+        //hits without having to mock / expose the HttpGet class. With this
+        //configuration we can just mock get(String) and have it cover
+        //the non-cache cases
+        return get(url);
     }
 
     public static BetterHttpRequest post(String url) {
